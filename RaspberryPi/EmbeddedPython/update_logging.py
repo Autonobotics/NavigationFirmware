@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 __author__ = 'Dan'
 
-import common
+from common import ABLogConstant
 import socket
 import sys
 import struct
@@ -11,7 +11,7 @@ with open(sys.argv[1], 'rb') as f:
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print('connecting...')
-s.connect((common.LOGGING_CONFIG_HOST, common.LOGGING_CONFIG_PORT))
+s.connect((ABLogConstant.CONFIG_HOST, ABLogConstant.CONFIG_PORT))
 print('sending config...')
 s.send(struct.pack('>L', len(data_to_send)))
 s.send(data_to_send)

@@ -1,41 +1,44 @@
 __author__ = 'Dan'
 
-import const
-import common
-import logging
-import logging.config
+from common import ABStatus
+import ab_log as ABLog
 import time
 
 
-def main_loop():
-    print "Starting Main Loop"
+def main():
+    # Get Logger instance
+    logger = ABLog.get_logger('main')
+    logger.info("Starting application loop")
 
-    logger = logging.getLogger()
-    try:
-        # loop through logging calls to see the difference
-        # new configurations make, until Ctrl+C is pressed
-        while True:
-            logger.debug('debug message')
-            logger.info('info message')
-            logger.warn('warn message')
-            logger.error('error message')
-            logger.critical('critical message')
-            time.sleep(5)
-    except KeyboardInterrupt:
-        # cleanup
-        logging.config.stopListening()
-        t.join()
+    # Configure the Ultrasonic Sensor Pins
 
-    return const.STATUS_SUCCESS
+
+    # Configure the IR Distance Sensor Pins
+
+    # Configure the IR Tracking Sensor Pins
+
+    # Configure the Camera and OpenCV
+
+    # Configure the I2C Interface to the main board
+
+    # Wait for the Controller Board to Signal Ready
+
+    # Perform main Loop
+
+
+    return ABStatus.STATUS_SUCCESS
 
 
 # Application Start
 if __name__ == "__main__":
-    # Perform any initial Environment Setup
-    logging.config.fileConfig('log_config.conf')
-    t = logging.config.listen(common.LOGGING_CONFIG_PORT)
-    t.start()
+    print "Initializing Logging..."
+    ABLog.initialize_logging()
 
     # Start the main loop
-    status = main_loop()
+    print "Starting Application..."
+    status = main()
+    print "Application Exit Requested..."
+    print "Cleaning Logging..."
+    ABLog.cleanup_logging()
+
     print "Exiting with status: {0!s}".format(status)
