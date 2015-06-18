@@ -11,6 +11,7 @@ log_configuration_thread = None
 
 # Initialize the Logging Setup
 def initialize_logging():
+    global log_configuration_thread
     logging.config.fileConfig('log_config.conf')
     log_configuration_thread = logging.config.listen(ABLogConstant.CONFIG_PORT)
     log_configuration_thread.start()
@@ -23,5 +24,6 @@ def get_logger(category):
 
 # Clean the Threading Configuration Log
 def cleanup_logging():
+    global log_configuration_thread
     logging.config.stopListening()
     log_configuration_thread.join()
