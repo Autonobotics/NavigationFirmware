@@ -2,29 +2,25 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="dd8d1b4a-abe5-4637-9b86-7cc99a033457" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ab_log.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hc_sr04_driver.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/other.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/testrunner.xml" />
-      <change type="DELETED" beforePath="C:\Workspace\Drone\NavigationFirmware\RaspberryPi\EmbeddedPython\const.py" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/EmbeddedPython.iml" afterPath="$PROJECT_DIR$/.idea/EmbeddedPython.iml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test_hc_sr04_driver.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/common.py" afterPath="$PROJECT_DIR$/common.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hc_sr04_driver.py" afterPath="$PROJECT_DIR$/hc_sr04_driver.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_config.conf" afterPath="$PROJECT_DIR$/log_config.conf" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main.py" afterPath="$PROJECT_DIR$/main.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/update_logging.py" afterPath="$PROJECT_DIR$/update_logging.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="EmbeddedPython.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="dd8d1b4a-abe5-4637-9b86-7cc99a033457" time="1434402529800" ignored="false" />
-    <file path="/common.py" changelist="dd8d1b4a-abe5-4637-9b86-7cc99a033457" time="1434405301307" ignored="false" />
+    <file path="/Dummy.txt" changelist="dd8d1b4a-abe5-4637-9b86-7cc99a033457" time="1434576637726" ignored="false" />
+    <file path="/common.py" changelist="dd8d1b4a-abe5-4637-9b86-7cc99a033457" time="1434583352315" ignored="false" />
     <file path="/update_logging.py" changelist="dd8d1b4a-abe5-4637-9b86-7cc99a033457" time="1434405313210" ignored="false" />
-    <file path="/main.py" changelist="dd8d1b4a-abe5-4637-9b86-7cc99a033457" time="1434408840205" ignored="false" />
+    <file path="/main.py" changelist="dd8d1b4a-abe5-4637-9b86-7cc99a033457" time="1434578342359" ignored="false" />
     <file path="/ab_log.py" changelist="dd8d1b4a-abe5-4637-9b86-7cc99a033457" time="1434408075565" ignored="false" />
-    <file path="/a.py" changelist="dd8d1b4a-abe5-4637-9b86-7cc99a033457" time="1434407535375" ignored="false" />
-    <file path="/log_config.conf" changelist="dd8d1b4a-abe5-4637-9b86-7cc99a033457" time="1434408643241" ignored="false" />
+    <file path="/a.py" changelist="dd8d1b4a-abe5-4637-9b86-7cc99a033457" time="1434508793152" ignored="false" />
+    <file path="/log_config.conf" changelist="dd8d1b4a-abe5-4637-9b86-7cc99a033457" time="1434583542273" ignored="false" />
+    <file path="/test_hc_sr04_driver.py" changelist="dd8d1b4a-abe5-4637-9b86-7cc99a033457" time="1434584864084" ignored="false" />
+    <file path="/hc_sr04_driver.py" changelist="dd8d1b4a-abe5-4637-9b86-7cc99a033457" time="1434584962269" ignored="false" />
+    <file path="/rpi_board.py" changelist="dd8d1b4a-abe5-4637-9b86-7cc99a033457" time="1434577619399" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,7 +43,7 @@
       <file leaf-file-name="main.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="13" column="0" selection-start="250" selection-end="250" vertical-scroll-proportion="0.0">
+            <state line="19" column="44" selection-start="394" selection-end="394" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="e#20#47#0" expanded="true" />
               </folding>
@@ -55,10 +51,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="hc_sr04_driver.py" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/hc_sr04_driver.py">
+      <file leaf-file-name="update_logging.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/update_logging.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="2" column="23" selection-start="43" selection-end="43" vertical-scroll-proportion="0.09289618">
+            <state line="7" column="0" selection-start="114" selection-end="114" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -67,7 +63,47 @@
       <file leaf-file-name="log_config.conf" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/log_config.conf">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="16" column="0" selection-start="206" selection-end="206" vertical-scroll-proportion="0.0">
+            <state line="11" column="23" selection-start="144" selection-end="144" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="hc_sr04_driver.py" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/hc_sr04_driver.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="174" column="39" selection-start="6215" selection-end="6215" vertical-scroll-proportion="1.2732143">
+              <folding>
+                <element signature="e#20#47#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="test_hc_sr04_driver.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test_hc_sr04_driver.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="19" column="27" selection-start="622" selection-end="622" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="e#20#43#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="common.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/common.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="7" column="0" selection-start="117" selection-end="117" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ab_log.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ab_log.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="7" column="44" selection-start="136" selection-end="136" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -93,12 +129,14 @@
     <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/const.py" />
-        <option value="$PROJECT_DIR$/common.py" />
         <option value="$PROJECT_DIR$/ablog.py" />
         <option value="$PROJECT_DIR$/update_logging.py" />
         <option value="$PROJECT_DIR$/ab_log.py" />
-        <option value="$PROJECT_DIR$/log_config.conf" />
+        <option value="$PROJECT_DIR$/rpi_board.py" />
         <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/common.py" />
+        <option value="$PROJECT_DIR$/log_config.conf" />
+        <option value="$PROJECT_DIR$/test_hc_sr04_driver.py" />
         <option value="$PROJECT_DIR$/hc_sr04_driver.py" />
       </list>
     </option>
@@ -135,7 +173,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -156,13 +193,14 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="recentsLimit" value="5" />
-    <property name="options.lastSelected" value="preferences.sourceCode.Python" />
+    <property name="options.lastSelected" value="project.propDebugger" />
     <property name="restartRequiresConfirmation" value="true" />
     <property name="last_opened_file_path" value="C:/Program Files (x86)/Git/bin/git.exe" />
     <property name="FullScreen" value="false" />
@@ -402,15 +440,14 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="7" />
     <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32876712" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2590909" sideWeight="0.6712329" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.14621212" sideWeight="0.6712329" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
@@ -420,6 +457,7 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32876712" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -503,62 +541,18 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/common.py">
+    <entry file="file://$PROJECT_DIR$/hc_sr04_driver.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/update_logging.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+        <state line="2" column="23" selection-start="43" selection-end="43" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="e#20#47#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/common.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="20" selection-start="139" selection-end="139" vertical-scroll-proportion="0.4180328">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/update_logging.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="0" selection-start="114" selection-end="114" vertical-scroll-proportion="0.3251366">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ab_log.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="44" selection-start="136" selection-end="136" vertical-scroll-proportion="-0.09289618">
-          <folding>
-            <element signature="e#20#52#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/log_config.conf">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="0" selection-start="206" selection-end="206" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="0" selection-start="250" selection-end="250" vertical-scroll-proportion="0.0">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="e#20#47#0" expanded="true" />
           </folding>
@@ -567,8 +561,93 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/hc_sr04_driver.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="23" selection-start="43" selection-end="43" vertical-scroll-proportion="0.09289618">
+        <state line="2" column="23" selection-start="43" selection-end="43" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#20#47#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#20#47#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/update_logging.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#20#47#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="44" selection-start="394" selection-end="394" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#20#47#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ab_log.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="44" selection-start="136" selection-end="136" vertical-scroll-proportion="0.0">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_hc_sr04_driver.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="27" selection-start="622" selection-end="622" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#20#43#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="0" selection-start="117" selection-end="117" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/update_logging.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="0" selection-start="114" selection-end="114" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/log_config.conf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="11" column="23" selection-start="144" selection-end="144" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hc_sr04_driver.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="174" column="39" selection-start="6215" selection-end="6215" vertical-scroll-proportion="1.2732143">
+          <folding>
+            <element signature="e#20#47#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

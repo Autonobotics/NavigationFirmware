@@ -10,35 +10,40 @@ def main():
     logger = ABLog.get_logger('main')
     logger.info("Starting application loop")
 
-    # Configure the Ultrasonic Sensor Pins
+    # Configure the RPI to BCM Pin numbering
+    GPIO.setmode(GPIO.BCM)
 
+    # Configure the I2C Interface
 
-    # Configure the IR Distance Sensor Pins
+    # Configure the SPI Interface
 
-    # Configure the IR Tracking Sensor Pins
+    # Configure the Ultrasonic Sensor Driver
+
+    # Configure the IR Distance Sensor Driver
+
+    # Configure the IR Tracking Sensor Driver
 
     # Configure the Camera and OpenCV
-
-    # Configure the I2C Interface to the main board
 
     # Wait for the Controller Board to Signal Ready
 
     # Perform main Loop
 
-
+    # Cleanup and Return
+    GPIO.cleanup()
     return ABStatus.STATUS_SUCCESS
 
 
 # Application Start
 if __name__ == "__main__":
-    print "Initializing Logging..."
+    print("Initializing Logging...")
     ABLog.initialize_logging()
 
     # Start the main loop
-    print "Starting Application..."
+    print("Starting Application...")
     status = main()
-    print "Application Exit Requested..."
-    print "Cleaning Logging..."
+    print("Application Exit Requested...")
+    print("Cleaning Logging...")
     ABLog.cleanup_logging()
 
-    print "Exiting with status: {0!s}".format(status)
+    print("Exiting with status: {0!s}".format(status))
