@@ -113,8 +113,10 @@ def pulse_trigger(pulse_sequence):
     hc_sr04_log.debug("Pulsing Trigger for {0} time in cycle.".format(pulse_sequence))
 
     # Add the triggered axis to the waiting list by port number
+    global desired_axis_list
     for axis in desired_axis_list:
         still_waiting.append(axis[1])
+    hc_sr04_log.debug("Still Waiting List: {0}".format(still_waiting))
 
     # If the trigger is shared, pulse it, else pulse each trigger individually
     if trigger_is_shared:
@@ -159,7 +161,8 @@ def start_sense_cycle():
 
 
 def edge_callback_wrapper(channel):
-    print("Channel in Edge Callback: {0}".format(channel))
+    hc_sr04_log.debug("Channel in Edge Callback: {0}".format(channel))
+    hc_sr04_log.debug("Pin is {0}".format(GPIO.input(channel)))
     if GPIO.input(channel):
         # Pin is high, meaning Rising Edge
         rising_edge_callback(channel)
@@ -170,12 +173,14 @@ def edge_callback_wrapper(channel):
 
 def rising_edge_callback(channel):
     # Store the Initial Time of the Pulse
+    hc_sr04_log.debug("In Rising Edge Callback")
     global initial_pulse_time
     initial_pulse_time[channel] = -time.time()
 
 
 def falling_edge_callback(channel):
     # Compute the duration of the pulse
+    hc_sr04_log.debug("In Falling Edge Callback")
     global initial_pulse_time
     global pulse_duration
     pulse_duration[channel] = initial_pulse_time[channel] + time.time()
