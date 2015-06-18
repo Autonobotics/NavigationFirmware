@@ -2,7 +2,7 @@
 *.uvopt
 *.lst
 
-.idea/
+*.idea/
+*.pyc
 Output/
 Navigation Configuration/
-*workspace.xml

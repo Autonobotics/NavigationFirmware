@@ -115,7 +115,7 @@ def pulse_trigger(pulse_sequence):
     # Add the triggered axis to the waiting list by port number
     global desired_axis_list
     for axis in desired_axis_list:
-        still_waiting.append(axis)
+        still_waiting.append(HC_SR04_AXIS[axis][1])
     hc_sr04_log.debug("Still Waiting List: {0}".format(still_waiting))
 
     # If the trigger is shared, pulse it, else pulse each trigger individually

@@ -10,6 +10,7 @@ if __name__ == "__main__":
     print("Starting HCSR04 Test...")
     ABLog.initialize_logging()
     GPIO.setmode(GPIO.BCM)
+    GPIO.setwarnings(False)
     HCSR04.initialize([HCSR04.HC_SR04_AXIS_FRONT], True)
     HCSR04.start_sense_cycle()
     while not HCSR04.sense_cycle_complete:
