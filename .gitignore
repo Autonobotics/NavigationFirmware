@@ -2,6 +2,7 @@
 *.uvopt
 *.lst
 
+.idea/
 Output/
 Navigation Configuration/
 *workspace.xml
