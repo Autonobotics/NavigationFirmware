@@ -103,6 +103,8 @@ def initialize(axis_list, shared_trigger):
     is_initialized = True
     desired_axis_list = axis_list
     trigger_is_shared = shared_trigger
+    hc_sr04_log.debug("Allowing Sensor to Settle...")
+    time.sleep(2)
     hc_sr04_log.debug("Initialization Successful.")
     return ABStatus.STATUS_SUCCESS
 

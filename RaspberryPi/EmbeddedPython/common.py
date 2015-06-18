@@ -28,6 +28,6 @@ class ABPinConfig(): # TODO: Update Pin values
     HC_SR04_LEFT_AXIS_ECHO      = 1
     HC_SR04_RIGHT_AXIS_ECHO     = 1
     HC_SR04_REAR_AXIS_ECHO      = 1
-    HC_SR04_FRONT_AXIS_ECHO     = 12
+    HC_SR04_FRONT_AXIS_ECHO     = 20
     HC_SR04_TOP_AXIS_ECHO       = 1
     HC_SR04_BOTTOM_AXIS_ECHO    = 1
