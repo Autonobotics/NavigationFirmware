@@ -92,7 +92,7 @@ def initialize(axis_list, shared_trigger):
     for axis in axis_list:
         if axis in HC_SR04_AXIS:
             GPIO.setup(HC_SR04_AXIS[axis][1], GPIO.IN)  # Echo Pin is IN
-            GPIO.add_event_detect(HC_SR04_AXIS[axis][1], GPIO.BOTH, callback=edge_callback_wrapper, bouncetime=0)
+            GPIO.add_event_detect(HC_SR04_AXIS[axis][1], GPIO.BOTH, callback=edge_callback_wrapper, bouncetime=1)
         else:
             hc_sr04_log.error("Unknown Axis given at Initialization. Pins may not be correctly configured.")
             return ABStatus.STATUS_FAILURE
