@@ -16,7 +16,7 @@ class ABStatus():
 # Defines the Pin Configuration of Board
 class ABPinConfig(): # TODO: Update Pin values
     # HC_SR04 Sensor Trigger Pins
-    HC_SR04_SHARED_TRIGGER      = 1
+    HC_SR04_SHARED_TRIGGER      = 16
     HC_SR04_LEFT_AXIS_TRIGGER   = 1
     HC_SR04_RIGHT_AXIS_TRIGGER  = 1
     HC_SR04_REAR_AXIS_TRIGGER   = 1
@@ -28,6 +28,6 @@ class ABPinConfig(): # TODO: Update Pin values
     HC_SR04_LEFT_AXIS_ECHO      = 1
     HC_SR04_RIGHT_AXIS_ECHO     = 1
     HC_SR04_REAR_AXIS_ECHO      = 1
-    HC_SR04_FRONT_AXIS_ECHO     = 1
+    HC_SR04_FRONT_AXIS_ECHO     = 12
     HC_SR04_TOP_AXIS_ECHO       = 1
     HC_SR04_BOTTOM_AXIS_ECHO    = 1

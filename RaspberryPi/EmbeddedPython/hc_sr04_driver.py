@@ -65,7 +65,7 @@ pulse_duration = {ABPinConfig.HC_SR04_FRONT_AXIS_ECHO  : 0,
 
 
 # Initialize the Driver
-def initialize(axis_list, shared_trigger=True):
+def initialize(axis_list, shared_trigger):
     # Get an instance of the logger
     global hc_sr04_log
     hc_sr04_log = ABLog.get_logger(HCSR04_LOGGER)
@@ -99,8 +99,10 @@ def initialize(axis_list, shared_trigger=True):
 
     global is_initialized
     global desired_axis_list
+    global trigger_is_shared
     is_initialized = True
     desired_axis_list = axis_list
+    trigger_is_shared = shared_trigger
     hc_sr04_log.debug("Initialization Successful.")
     return ABStatus.STATUS_SUCCESS
 
@@ -157,6 +159,7 @@ def start_sense_cycle():
 
 
 def edge_callback_wrapper(channel):
+    print("Channel in Edge Callback: {0}".format(channel))
     if GPIO.input(channel):
         # Pin is high, meaning Rising Edge
         rising_edge_callback(channel)
