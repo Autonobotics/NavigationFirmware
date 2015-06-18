@@ -92,7 +92,6 @@ def initialize(axis_list, shared_trigger):
     for axis in axis_list:
         if axis in HC_SR04_AXIS:
             GPIO.setup(HC_SR04_AXIS[axis][1], GPIO.IN)  # Echo Pin is IN
-            GPIO.add_event_detect(HC_SR04_AXIS[axis][1], GPIO.BOTH, callback=edge_callback_wrapper, bouncetime=1)
         else:
             hc_sr04_log.error("Unknown Axis given at Initialization. Pins may not be correctly configured.")
             return ABStatus.STATUS_FAILURE
@@ -118,6 +117,7 @@ def pulse_trigger(pulse_sequence):
     global desired_axis_list
     for axis in desired_axis_list:
         still_waiting.append(HC_SR04_AXIS[axis][1])
+        GPIO.add_event_detect(HC_SR04_AXIS[axis][1], GPIO.BOTH, callback=edge_callback_wrapper, bouncetime=1)
     hc_sr04_log.debug("Still Waiting List: {0}".format(still_waiting))
 
     # If the trigger is shared, pulse it, else pulse each trigger individually
