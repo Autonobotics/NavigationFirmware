@@ -1,7 +1,7 @@
 __author__ = 'Dan'
 
 import RPi.GPIO as GPIO
-import hc_sr04_driver as HCSR04
+from hc_sr04_driver import HCSR04Driver
 import ab_log as ABLog
 
 
@@ -11,12 +11,13 @@ if __name__ == "__main__":
     ABLog.initialize_logging()
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
-    HCSR04.initialize([HCSR04.HC_SR04_AXIS_FRONT], True)
-    HCSR04.start_sense_cycle()
-    while not HCSR04.sense_cycle_complete:
-        None
-    print("Axis           Duration")
-    for key, value in HCSR04.pulse_duration.iteritems():
-        print("{0}          {1}".format(key, value))
+
+    sonic = HCSR04Driver()
+    sonic.initialize([HCSR04Driver.HC_SR04_AXIS_FRONT,
+                      HCSR04Driver.HC_SR04_AXIS_REAR])
+
+    sonic.start_sense_cycle()      # 1
+    sonic.finish_sense_cycle()     # Averaging
+
     ABLog.cleanup_logging()
     print("Test Complete.")
