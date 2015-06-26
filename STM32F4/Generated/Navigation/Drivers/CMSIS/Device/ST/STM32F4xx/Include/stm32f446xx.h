@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32f446xx.h
   * @author  MCD Application Team
-  * @version V2.3.0
-  * @date    02-March-2015
+  * @version V2.3.1
+  * @date    03-April-2015
   * @brief   CMSIS STM32F446xx Device Peripheral Access Layer Header File.
   *
   *          This file contains:
@@ -944,10 +944,11 @@ typedef struct
 #define QSPI_R_BASE            ((uint32_t)0xA0001000) /*!< QuadSPI registers base address                                            */
 
 #define SRAM1_BB_BASE         ((uint32_t)0x22000000) /*!< SRAM1(112 KB) base address in the bit-band region                          */
-#define SRAM2_BB_BASE         ((uint32_t)0x2201C000) /*!< SRAM2(16 KB) base address in the bit-band region                           */
+#define SRAM2_BB_BASE         ((uint32_t)0x22380000) /*!< SRAM2(16 KB) base address in the bit-band region                           */
 #define PERIPH_BB_BASE        ((uint32_t)0x42000000) /*!< Peripheral base address in the bit-band region                             */
-#define BKPSRAM_BB_BASE       ((uint32_t)0x42024000) /*!< Backup SRAM(4 KB) base address in the bit-band region                      */
+#define BKPSRAM_BB_BASE       ((uint32_t)0x42480000) /*!< Backup SRAM(4 KB) base address in the bit-band region                      */
 #define FLASH_END             ((uint32_t)0x0807FFFF) /*!< FLASH end address                                                          */
+
 
 /* Legacy defines */
 #define SRAM_BASE             SRAM1_BASE
@@ -5654,7 +5655,7 @@ typedef struct
 
 /********************  Bits definition for RTC_PRER register  *****************/
 #define RTC_PRER_PREDIV_A                    ((uint32_t)0x007F0000)
-#define RTC_PRER_PREDIV_S                    ((uint32_t)0x00001FFF)
+#define RTC_PRER_PREDIV_S                    ((uint32_t)0x00007FFF)
 
 /********************  Bits definition for RTC_WUTR register  *****************/
 #define RTC_WUTR_WUT                         ((uint32_t)0x0000FFFF)

@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    Templates/Src/stm32f4xx_hal_msp.c
+  * @file    Src/stm32f4xx_hal_msp.c
   * @author  MCD Application Team
   * @version V1.2.1
   * @date    13-March-2015
@@ -10,10 +10,8 @@
  ===============================================================================
                      ##### How to use this driver #####
  ===============================================================================
-    [..]
-    This file is generated automatically by MicroXplorer and eventually modified 
-    by the user
-
+  
+  
   @endverbatim
   ******************************************************************************
   * @attention
@@ -46,16 +44,10 @@
   */ 
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_hal.h"
-
-/** @addtogroup STM32F4xx_HAL_Driver
-  * @{
-  */
-
-/** @defgroup HAL_MSP
-  * @brief HAL MSP module.
-  * @{
-  */
+// User Implementation of HAL_MSP functions in #include "stm32f4xx_hal.h"
+#include "app_common.h"
+#include "app_i2c.h"
+#include "app_usart.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -64,44 +56,172 @@
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
-/** @defgroup HAL_MSP_Private_Functions
-  * @{
-  */
-
 /**
-  * @brief  Initializes the Global MSP.
-  * @param  None
+  * @breif Global MSP Initialization
+  *        This function initializes any non-component specific hardware resources.
+  * @param None
   * @retval None
   */
-void HAL_MspInit(void)
-{
-  /* NOTE : This function is generated automatically by MicroXplorer and eventually  
-            modified by the user
-   */ 
-}
+//void HAL_MspInit(void)
+//{
+//    /* No current Initialization performed */
+//}
+//
+//
+///**
+//  * @breif Global MSP Deinitialization
+//  *        This function deinitializes any non-component specific hardware 
+//  *        resources that were initialized.
+//  * @param None
+//  * @retval None
+//  */
+//void HAL_MspDeInit(void)
+//{
+//    /* No current Deinitialization performed */
+//}
+
 
 /**
-  * @brief  DeInitializes the Global MSP.
-  * @param  None  
+  * @brief UART MSP Initialization 
+  *        This function configures the hardware resources used in this example: 
+  *           - Peripheral's clock enable
+  *           - Peripheral's GPIO Configuration  
+  *           - NVIC configuration for UART interrupt request enable
+  * @param huart: UART handle pointer
   * @retval None
   */
-void HAL_MspDeInit(void)
-{
-  /* NOTE : This function is generated automatically by MicroXplorer and eventually  
-            modified by the user
-   */
+void HAL_UART_MspInit(UART_HandleTypeDef *huart)
+{  
+    GPIO_InitTypeDef  GPIO_InitStruct;
+    
+    /*##-1- Enable peripherals and GPIO Clocks #################################*/
+    /* Enable GPIO TX/RX clock */
+    USARTx_TX_GPIO_CLK_ENABLE();
+    USARTx_RX_GPIO_CLK_ENABLE();
+    /* Enable USART2 clock */
+    USARTx_CLK_ENABLE(); 
+    
+    /*##-2- Configure peripheral GPIO ##########################################*/  
+    /* UART TX GPIO pin configuration  */
+    GPIO_InitStruct.Pin       = USARTx_TX_PIN;
+    GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull      = GPIO_NOPULL;
+    GPIO_InitStruct.Speed     = GPIO_SPEED_FAST;
+    GPIO_InitStruct.Alternate = USARTx_TX_AF;
+    
+    HAL_GPIO_Init(USARTx_TX_GPIO_PORT, &GPIO_InitStruct);
+
+    /* UART RX GPIO pin configuration  */
+    GPIO_InitStruct.Pin = USARTx_RX_PIN;
+    GPIO_InitStruct.Alternate = USARTx_RX_AF;
+        
+    HAL_GPIO_Init(USARTx_RX_GPIO_PORT, &GPIO_InitStruct);
+        
+    /*##-3- Configure the NVIC for UART ########################################*/
+    /* NVIC for USART1 */
+    HAL_NVIC_SetPriority(USARTx_IRQn, 0, 1);
+    HAL_NVIC_EnableIRQ(USARTx_IRQn);
 }
 
-/**
-  * @}
-  */
 
 /**
-  * @}
+  * @brief UART MSP De-Initialization 
+  *        This function frees the hardware resources used in this example:
+  *          - Disable the Peripheral's clock
+  *          - Revert GPIO and NVIC configuration to their default state
+  * @param huart: UART handle pointer
+  * @retval None
   */
+void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
+{
+    /*##-1- Reset peripherals ##################################################*/
+    USARTx_FORCE_RESET();
+    USARTx_RELEASE_RESET();
+    
+    /*##-2- Disable peripherals and GPIO Clocks #################################*/
+    /* Configure UART Tx as alternate function  */
+    HAL_GPIO_DeInit(USARTx_TX_GPIO_PORT, USARTx_TX_PIN);
+    /* Configure UART Rx as alternate function  */
+    HAL_GPIO_DeInit(USARTx_RX_GPIO_PORT, USARTx_RX_PIN);
+    
+    /*##-3- Disable the NVIC for UART ##########################################*/
+    HAL_NVIC_DisableIRQ(USARTx_IRQn);
+}
+
 
 /**
-  * @}
+  * @brief I2C MSP Initialization 
+  *        This function configures the hardware resources used in this example: 
+  *           - Peripheral's clock enable
+  *           - Peripheral's GPIO Configuration  
+  *           - DMA configuration for transmission request by peripheral 
+  *           - NVIC configuration for DMA interrupt request enable
+  * @param hi2c: I2C handle pointer
+  * @retval None
   */
+void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
+{  
+    GPIO_InitTypeDef  GPIO_InitStruct;
+    
+    /*##-1- Enable GPIO Clocks #################################################*/
+    /* Enable GPIO TX/RX clock */
+    I2Cx_SCL_GPIO_CLK_ENABLE();
+    I2Cx_SDA_GPIO_CLK_ENABLE();
+    
+    /*##-2- Configure peripheral GPIO ##########################################*/  
+    /* I2C TX GPIO pin configuration  */
+    GPIO_InitStruct.Pin       = I2Cx_SCL_PIN;
+    GPIO_InitStruct.Mode      = GPIO_MODE_AF_OD;
+    GPIO_InitStruct.Pull      = GPIO_PULLUP;
+    GPIO_InitStruct.Speed     = GPIO_SPEED_FAST;
+    GPIO_InitStruct.Alternate = I2Cx_SCL_AF;
+    
+    HAL_GPIO_Init(I2Cx_SCL_GPIO_PORT, &GPIO_InitStruct);
+        
+    /* I2C RX GPIO pin configuration  */
+    GPIO_InitStruct.Pin = I2Cx_SDA_PIN;
+    GPIO_InitStruct.Alternate = I2Cx_SDA_AF;
+        
+    HAL_GPIO_Init(I2Cx_SDA_GPIO_PORT, &GPIO_InitStruct);
+    
+    /*##-3- Enable I2C peripheral Clock ########################################*/ 
+    /* Enable I2C1 clock */
+    I2Cx_CLK_ENABLE();
+        
+    /*##-4- Configure the NVIC for I2C #########################################*/   
+    /* NVIC for I2C1 */
+    HAL_NVIC_SetPriority(I2Cx_ER_IRQn, 1, 0);
+    HAL_NVIC_EnableIRQ(I2Cx_ER_IRQn);
+    HAL_NVIC_SetPriority(I2Cx_EV_IRQn, 2, 0);
+    HAL_NVIC_EnableIRQ(I2Cx_EV_IRQn);
+}
+
+
+/**
+  * @brief I2C MSP De-Initialization 
+  *        This function frees the hardware resources used in this example:
+  *          - Disable the Peripheral's clock
+  *          - Revert GPIO, DMA and NVIC configuration to their default state
+  * @param hi2c: I2C handle pointer
+  * @retval None
+  */
+void HAL_I2C_MspDeInit(I2C_HandleTypeDef *hi2c)
+{
+    /*##-1- Reset peripherals ##################################################*/
+    I2Cx_FORCE_RESET();
+    I2Cx_RELEASE_RESET();
+    
+    /*##-2- Disable peripherals and GPIO Clocks ################################*/
+    /* Configure I2C Tx as alternate function  */
+    HAL_GPIO_DeInit(I2Cx_SCL_GPIO_PORT, I2Cx_SCL_PIN);
+    /* Configure I2C Rx as alternate function  */
+    HAL_GPIO_DeInit(I2Cx_SDA_GPIO_PORT, I2Cx_SDA_PIN);
+    
+    /*##-3- Disable the NVIC for I2C ###########################################*/
+    HAL_NVIC_DisableIRQ(I2Cx_ER_IRQn);
+    HAL_NVIC_DisableIRQ(I2Cx_EV_IRQn);
+}
+
+
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

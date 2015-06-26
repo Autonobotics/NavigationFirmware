@@ -48,7 +48,7 @@
           <OutputName>STM32F4-Discovery</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
-          <CreateHexFile>0</CreateHexFile>
+          <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
           <ListingPath></ListingPath>
@@ -347,7 +347,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>1</Optim>
+            <Optim>4</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -1148,7 +1148,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Example/MDK-ARM</GroupName>
+          <GroupName>Application/MDK-ARM</GroupName>
           <Files>
             <File>
               <FileName>startup_stm32f407xx.s</FileName>
@@ -1158,7 +1158,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Example/User</GroupName>
+          <GroupName>Application/User</GroupName>
           <Files>
             <File>
               <FileName>main.c</FileName>
@@ -1175,15 +1175,35 @@
               <FileType>1</FileType>
               <FilePath>..\Src\stm32f4xx_it.c</FilePath>
             </File>
+            <File>
+              <FileName>app_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\app_i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\app_usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\app_common.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_log.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\app_log.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>Middlewares/STM32_Audio</GroupName>
           <Files>
             <File>
-              <FileName>libPDMFilter_CM4_IAR.a</FileName>
+              <FileName>libPDMFilter_CM4_Keil.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\Middlewares\ST\STM32_Audio\Addons\PDM\libPDMFilter_CM4_IAR.a</FilePath>
+              <FilePath>..\..\Middlewares\ST\STM32_Audio\Addons\PDM\libPDMFilter_CM4_Keil.lib</FilePath>
             </File>
           </Files>
         </Group>

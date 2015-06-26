@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * @file    Templates/Inc/main.h 
+  * @file    Src/app_log.c 
   * @author  MCD Application Team
   * @version V1.2.1
   * @date    13-March-2015
-  * @brief   Header for main.c module
+  * @brief   Application Logging Implementation
   ******************************************************************************
   * @attention
   *
@@ -34,19 +34,19 @@
   *
   ******************************************************************************
   */
-  
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H
-#define __MAIN_H
-
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_hal.h"
+#include "app_common.h"
 
-/* Exported types ------------------------------------------------------------*/
-/* Exported constants --------------------------------------------------------*/
-/* Exported macro ------------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------- */
 
-#endif /* __MAIN_H */
+void APP_Log_Init()
+{
+    // This is a Work around. The tracer seems to drop part of
+    // the first message sent. Thus, we will allow a space to
+    // be dropped in this dummy init function.
+    APP_Log(" ");
+}
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+int fputc(int c, FILE *stream)
+{
+    return ITM_SendChar(c);
+}
