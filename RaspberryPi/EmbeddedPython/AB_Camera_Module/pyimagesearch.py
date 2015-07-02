@@ -1,9 +1,8 @@
 __author__ = 'Pravjot'
 
 # import the necessary packages
-import numpy as np
 import cv2
-
+import numpy as np
 
 def order_points(pts):
     # initialzie a list of coordinates that will be ordered
@@ -76,7 +75,7 @@ def resize(image, factor):
 
     return resized
 
-def rotate(image, degress):
+def rotate(image, degrees):
     (h,w) = image.shape[:2]
     center = (w/2,h/2)
 

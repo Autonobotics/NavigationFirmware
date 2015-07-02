@@ -2,57 +2,71 @@ __author__ = 'Pravjot'
 
 import numpy as np
 import cv2
+from AB_Camera_Module import beaconClass
+
+
+AB_beaconList = beaconClass.AB_beacons()
+
+def AB_startup():
+    #send be intial beacon lcation to STM board
+    startup_beacon_info = AB_beaconList.beacon_info(AB_beaconList.currentID)
+    print("Initial Startup beacon information: {0}".format(startup_beacon_info))
+    return
+
+#send the next beacons location to the flight controller
+def send_next_beacon_info():
+    currentB = AB_beaconList.currentID
+    nextB = AB_beaconList.nextID
+    if currentB == nextB:
+    #No more beacon left to navigate to
+        print("no more beacons left to navigate to")
+    else:
+        AB_beaconList.next_beacon()
+        #UART command to send information to STMF board
+        next_beacon = AB_beaconList.beacon_info(AB_beaconList.currentID)
+        print("Next beacon information: {0}".format(next_beacon))
+    return
 
 # search the image for the beacon, assuming that we use some kind of RED source
 def locate_beacon(image):
-    #define the list of boundaries in RGB (BGR cause OpenCV represents images as NumPy arrays in reverse)
-    #Each entry represents a a list of tuples with two values: Lower limits and upper limits
-    #RED, BLUE, YELLOW, GRAY
-    boundaries = [
-        ([86, 31, 4], [220, 88, 50])
-    ]
+    img = cv2.medianBlur(image, 5)
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-    for (lower, upper) in boundaries:
-        #create numpy arrays from the bounadires
-        lower = np.array(lower, dtype="uint8")
-        upper = np.array(upper, dtype="uint8")
+    # HSV properties
+    lower = [160, 100, 100]
+    upper = [179, 255, 255]
 
-        #find the colors within the specified boundaries and apply the mask
-        mask = cv2.inRange(image, lower, upper)
-        output = cv2.bitwise_and(image, image, mask=mask)
+    # create numpy arrays from the bounadires
+    lower = np.array(lower, dtype="uint8")
+    upper = np.array(upper, dtype="uint8")
+    mask = cv2.inRange(hsv, lower, upper)
 
-        # convert the image to grayscale, blur it
-        gray = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
-        gray = cv2.GaussianBlur(gray, (5, 5), 0)
+    #smooth the image by applying gaussian blur
+    blurr = cv2.GaussianBlur(mask, (9, 9), 2)
 
-        # find the contours in the edged image and keep the largest one;
-        # we'll assume that this is our piece of paper in the image
-        (_,cnts, _) = cv2.findContours(gray.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-        contours = sorted(cnts, key=cv2.contourArea, reverse=True)[:5]
+    #img = cv2.medianBlur(img,5)
+    #[h, s, v] = cv2.split(blurr)
+    #cimg = cv2.cvtColor(mask,cv2.)
 
-        for c in contours:
-            #approximate the contour
-            peri = cv2.arcLength(c, True)
-            approx = cv2.approxPolyDP(c, 0.02*peri, True)
+    circles = cv2.HoughCircles(blurr, cv2.HOUGH_GRADIENT, 1, 20,
+                               param1=50, param2=30, minRadius=0, maxRadius=0)
 
-            #if our approximated contour has four points, then we assume we found our beacon
-            if len(approx) == 4:
-                beacon = approx
-                break
-            #if beacon is not continue? 360 spin to locate? shutdown?
-            ## go towards the biggest contour which might be the beacon?
-            else:
-                #The beacon is the largest contour?
-                #beacon = contours[0]
-                return False
-        #(x,y) coordinates and width and height of the box
-        rect = cv2.minAreaRect(beacon)
+    circles = np.uint16(np.around(circles[0, :]))
 
-    return rect
+    for (x, y, r) in circles:
+        # draw the outer circle
+        cv2.circle(img, (x, y), r, (0, 255, 0), 2)
+        marker = beaconClass.marker(x, y, r)
+        print('MARKER LOCATION X: {0}, Y: {1}, R: {2}'.format(marker.x, marker.y, marker.r))
+        # draw the center of the circle
+        cv2.circle(img, (x, y), 2, (0, 255, 0), 3)
 
-#locate the information stored in the beacon (barcode), return the subimage containing the barcode information
+    return marker
+
+
+# locate the information stored in the beacon (barcode), return the subimage containing the barcode information
 def locate_beacon_information(image):
-    #load the image and convert it to grayscale
+    # load the image and convert it to grayscale
     orig = image.copy()
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -92,36 +106,20 @@ def locate_beacon_information(image):
     cv2.waitKey(0)
     return
 
-#determine the location of the beacon with respect to the drones current location
-#calculate the distance vector and send appropriate information to the drones controller
-def distance_to_camera(image,knownWidth,focalLength, marker):
-    perWidth = marker[1][0]
 
-    #F = (pixel width * distance from object)/ width of object
-    #NOTE: this is a very simple calibration! better to use intrinsic parameters of the camera to calibrate
-    #and obtain a better estimation of the focal length of the camera
-    #NOTE: documentation of the Pi camera says the focal length = 3.60mm -> 13.606299213 pixels
-    #focalLength = (perWidth*knownDistance)/knownWidth
+# determine the location of the beacon with respect to the drones current location
+#calculate the distance vector and send appropriate information to the drones controller
+def distance_to_camera(image, knownWidth, focalLength, marker):
+    perWidth = 2 * marker.r;
 
     #calculate the distance using triangle similarity distance calculation
-    distance_in_inches = (knownWidth*focalLength)/perWidth
-
-    #draw a bounding box around the image and siplay it
-    box = np.int0(cv2.boxPoints(marker))
-    cv2.drawContours(image, [box], -1, (0,255,0),2)
-    cv2.putText(image, "%.2fin" %(distance_in_inches), (image.shape[1]-200, image.shape[0]-20), cv2.FONT_HERSHEY_SIMPLEX,
-                2.0,(0,255,0),3)
-    cv2.imshow("image", image)
-    cv2.waitKey(0)
+    distance_in_inches = (knownWidth * focalLength) / perWidth
 
     #calculate the angle between the camera and the object in both the diagonal and horizontal
     #http://stackoverflow.com/questions/17499409/opencv-calculate-angle-between-camera-and-pixel
     #pi camera stats: sensor resolution 2592x1944 with horizontal FOV 53.50 degree Vertical FOV 41.41 degrees
     rotationX = 0
     rotationY = 0
-
+    print('Distance in inches {0}'.format(distance_in_inches))
     return [distance_in_inches, rotationX, rotationY]
 
-#send the next beacons location to the flight controller
-def send_next_beacon_info(beaconId):
-    return

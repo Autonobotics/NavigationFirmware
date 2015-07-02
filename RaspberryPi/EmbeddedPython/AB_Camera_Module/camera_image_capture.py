@@ -1,28 +1,36 @@
 __author__ = 'Pravjot'
+
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 import time
 import cv2
+import pyimagesearch
 import glob
 import numpy as np
+
 
 def get_PiImage():
     #intialize the camera and grab a reference to the raw camera capture
     camera = PiCamera()
-    rawCapture = PiRGBArray(camera)
 
-    #camera warmup time
-    time.sleep(0.1)
+    try:
+        rawCapture = PiRGBArray(camera)
+        #camera warmup time
+        time.sleep(0.1)
 
-    #grab an image from the camera
-    camera.capture(rawCapture, format='bgr')
-    image = rawCapture.array
+        #grab an image from the camera
+        camera.capture(rawCapture, format='bgr')
+        image = rawCapture.array
+        cv2.imwrite("output.jpg", image)
 
-    #display the image on screen and wait for a keypress
-    cv2 .imshow("Raspberry Pi Image Capture", image)
-    cv2.waitKey(0)
-
-    return image
+        #display the image on screen and wait for a keypress
+        #cv2 .imshow("Raspberry Pi Image Capture", image)
+        #cv2.waitKey(0)
+    except ValueError:
+        #log error
+        print 'Could not capture image!'
+        return False
+    return True
 
 #calibrate the camera using intrinsic parameters of the camera
 #is it necessary for raspberry pi camera?
