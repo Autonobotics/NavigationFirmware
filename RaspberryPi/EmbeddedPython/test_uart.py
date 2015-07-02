@@ -8,17 +8,25 @@ import time
 
 
 serialPort = Serial("/dev/ttyAMA0", 115200)
-if (serialPort.isOpen() == False):
+if serialPort.isOpen() is False:
     serialPort.open()
 
-outStr = ' ****UART_TwoBoards_ComIT****  ****UART_TwoBoards_ComIT****  ****UART_TwoBoards_ComIT**** '
+syncPacket = [0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF,
+              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
 
 serialPort.flushInput()
 serialPort.flushOutput()
 
-serialPort.write(outStr)
+inStr = serialPort.read(16)
+print "Received Message: {0}".format(inStr)
+
+output = serialPort.write(str(syncPacket))
+
+print "Sending: {0!s}".format(syncPacket)
+if output != 16:
+    print "Sending did not send 16 bytes as expected"
 time.sleep(0.05)
-inStr = serialPort.read(serialPort.inWaiting())
-print "Received: {0}".format(inStr)
+inStr = serialPort.read(16)
+print "Received Message: {0}".format(inStr)
 
 serialPort.close()

@@ -37,6 +37,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "app_usart.h"
+#include <stdio.h>
 
 /* Private typedef -----------------------------------------------------------*/
 typedef enum _eAPP_UART_DIR
@@ -47,6 +48,8 @@ typedef enum _eAPP_UART_DIR
 } eAPP_UART_DIR;
 
 /* Private define ------------------------------------------------------------*/
+#define INPUT_UART_BUFFER_SIZE (sizeof(AppUsartCblk.inputBuffer))
+#define OUTPUT_UART_BUFFER_SIZE (sizeof(AppUsartCblk.outputBuffer))
 
 /* Private macro -------------------------------------------------------------*/
 /* Pulbic variables ----------------------------------------------------------*/
@@ -56,7 +59,10 @@ UART_HandleTypeDef UartHandle;
 static sAPP_USART_CBLK AppUsartCblk = {
     NULL,
     UART_INIT,
-    RESET
+    FALSE,
+    RESET,
+    {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0},
+    {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0}
     };
 
 
@@ -86,6 +92,13 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
     
     /* Turn LED6 on: Transfer in transmission process is correct */
     BSP_LED_On(LED6);
+    
+    // Enter the Receive state
+    if ( HAL_OK != HAL_UART_Receive_IT(AppUsartCblk.handle, AppUsartCblk.inputBuffer.buffer, INPUT_UART_BUFFER_SIZE))
+    {
+        APP_Log("Error entering Receive state from Transmission Complete Callback.\r\n");
+        Error_Handler();
+    }
 }
 
 /**
@@ -102,6 +115,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     
     /* Turn LED4 on: Transfer in reception process is correct */
     BSP_LED_On(LED4);
+    
+    // Determine what to transmit
+    uart_state_machine(UART_RECEIVE);
 }
 
 /**
@@ -123,11 +139,62 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 /******************************************************************************/
 static eAPP_STATUS uart_handle_handshake(eAPP_UART_DIR direction)
 {
+    uAPP_USART_MESSAGES message;
+    
     if ( UART_TRANSMIT == direction )
     {
+        // Format the Handshake SYNC Packet
+        AppUsartCblk.outputBuffer.sync.cmd = ARMPIT_CMD_SYNC;
+        AppUsartCblk.outputBuffer.sync.flag = ARMPIT_FLAG_END;
+        
+        // Send the Packet
+        APP_UART_SetStatus(RESET);
+        if ( HAL_OK != HAL_UART_Transmit_IT(AppUsartCblk.handle, AppUsartCblk.outputBuffer.buffer, OUTPUT_UART_BUFFER_SIZE))
+        {
+            // Log Error and return failed
+            APP_Log("Error in transmission of SYNC.\r\n");
+            return STATUS_FAILURE;
+        }
+        return STATUS_SUCCESS;
     }
     else
     {
+        // Process the Handshake SYNC Packet
+        message.sync = AppUsartCblk.inputBuffer.sync;
+        Flush_Buffer(AppUsartCblk.inputBuffer.buffer, sizeof(AppUsartCblk.inputBuffer.buffer));
+        
+        // Validate the CMD
+        if ( ARMPIT_CMD_SYNC != message.sync.cmd )
+        {
+            // Log Failure and return
+            APP_Log("CMD Bits wrong on SYNC Command.\r\n");
+            return STATUS_FAILURE;
+        }
+        
+        // Validate the Flag as end
+        if ( ARMPIT_FLAG_END != message.sync.flag )
+        {
+            // Log Failure and return
+            APP_Log("FLAG Bits wrong on SYNC Command.\r\n");
+            return STATUS_FAILURE;
+        }
+        
+        // Format an ACK Packet for response
+        Flush_Buffer(AppUsartCblk.outputBuffer.buffer, sizeof(AppUsartCblk.outputBuffer.buffer));
+        AppUsartCblk.outputBuffer.ack.cmd = ARMPIT_CMD_ACK;
+        AppUsartCblk.outputBuffer.ack.flag = ARMPIT_FLAG_END;
+        
+        // Send the ACK Packet
+        APP_UART_SetStatus(RESET);
+        if ( HAL_OK != HAL_UART_Transmit_IT(AppUsartCblk.handle, AppUsartCblk.outputBuffer.buffer, OUTPUT_UART_BUFFER_SIZE))
+        {
+            // Log Error and return failed
+            return STATUS_FAILURE;
+        }
+        
+        // Change states
+        AppUsartCblk.state = UART_DATA_RECEIVE;
+        return STATUS_SUCCESS;
     }
 }
 
@@ -231,6 +298,7 @@ void APP_USART_Init(void)
 void APP_UART_Initiate(void)
 {
     // Start the internal state machine
+    APP_Log("Starting UART Handshake.\r\n");
     uart_state_machine(UART_TRANSMIT);
 }
 

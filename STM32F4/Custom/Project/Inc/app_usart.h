@@ -84,11 +84,47 @@ typedef enum _eAPP_USART_STATE
     
 } eAPP_USART_STATE;
 
-typedef struct
+#define ARMPIT_CMD_SYNC 0x01
+#define ARMPIT_CMD_DYNC 0xFE
+#define ARMPIT_CMD_ACK  0x02
+
+#define ARMPIT_FLAG_END 0xFF
+
+typedef struct _sAPP_ARMPIT_SYNC
+{
+    uint8_t cmd;
+    uint8_t payload[6];
+    uint8_t flag;
+    
+    uint8_t padding[8];
+    
+} sAPP_ARMPIT_SYNC;
+
+typedef struct _sAPP_ARMPIT_ACK
+{
+    uint8_t cmd;
+    uint8_t flag;
+    
+    uint8_t padding[14];
+    
+} sAPP_ARMPIT_ACK;
+
+typedef union _uAPP_USART_MESSAGES
+{
+    sAPP_ARMPIT_SYNC sync;
+    sAPP_ARMPIT_ACK ack;
+    uint8_t buffer[16];
+    
+} uAPP_USART_MESSAGES;
+
+typedef struct _sAPP_USART_CBLK
 {
     UART_HandleTypeDef *handle;
     eAPP_USART_STATE state;
+    BOOL started;
     __IO ITStatus uartReady;
+    uAPP_USART_MESSAGES inputBuffer;
+    uAPP_USART_MESSAGES outputBuffer;
     
 } sAPP_USART_CBLK;
 
