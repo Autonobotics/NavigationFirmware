@@ -1,6 +1,8 @@
 *.Dan
 *.uvopt
 *.lst
+*.o
+*.d
 
 *.idea/
 *.pyc
