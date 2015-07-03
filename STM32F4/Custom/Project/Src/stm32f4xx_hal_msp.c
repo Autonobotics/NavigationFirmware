@@ -119,7 +119,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         
     /*##-3- Configure the NVIC for UART ########################################*/
     /* NVIC for USART1 */
-    HAL_NVIC_SetPriority(USARTx_IRQn, 0, 1);
+    HAL_NVIC_SetPriority(USARTx_IRQn, 3, 0);
     HAL_NVIC_EnableIRQ(USARTx_IRQn);
 }
 

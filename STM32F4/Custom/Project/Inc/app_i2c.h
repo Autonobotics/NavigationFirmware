@@ -46,9 +46,7 @@
 /* Exported constants --------------------------------------------------------*/
 
 /* Definition for I2C commands and Address */
-#define I2C_ADDRESS        0x3E
-#define MASTER_REQ_READ    0x12
-#define MASTER_REQ_WRITE   0x34
+#define I2C_ADDRESS        0x30
 
 /* Definition for I2Cx clock resources */
 #define I2Cx                             I2C1
@@ -73,31 +71,108 @@
 #define I2Cx_ER_IRQn                    I2C1_ER_IRQn
 #define I2Cx_ER_IRQHandler              I2C1_ER_IRQHandler
 
-/* Size of Transmission buffer */
-#define I2C1_TXBUFFERSIZE               (COUNTOF(i2cTxBuffer) - 1)
-/* Size of Reception buffer */
-#define I2C1_RXBUFFERSIZE               I2C1_TXBUFFERSIZE
+/* Define Connection Timeout and Attempts */
+#define I2C_POLL_TIMEOUT 1000  // In Milliseconds
+#define I2C_CONNECTION_ATTEMPTS 20
 
 
 /* Exported types ------------------------------------------------------------*/
 typedef enum _eAPP_I2C_STATE
 {
     I2C_INIT = 0,
+    I2C_HANDSHAKE,
     I2C_PROCESS,
-    I2C_SHUTDOWN
+    I2C_SHUTDOWN,
+    
+    I2C_ERROR
     
 } eAPP_I2C_STATE;
+
+#define PIXARM_CMD_SYNC 0x01
+#define PIXARM_CMD_DYNC 0xFE
+#define PIXARM_CMD_ACK  0x02
+
+#define PIXARM_CMD_READ_REQ 0x03
+#define PIXARM_CMD_READ_DATA 0x04
+
+#define PIXARM_FLAG_END 0xFF
+
+typedef struct _sAPP_PIXARM_COMMON
+{
+    uint8_t cmd;
+    
+    uint8_t padding[23];
+    
+} sAPP_PIXARM_COMMON;
+
+typedef struct _sAPP_PIXARM_SYNC
+{
+    uint8_t cmd;
+    uint8_t payload[6];
+    uint8_t flag;
+    
+    uint8_t padding[16];
+    
+} sAPP_PIXARM_SYNC;
+
+typedef struct _sAPP_PIXARM_ACK
+{
+    uint8_t cmd;
+    uint8_t flag;
+    
+    uint8_t padding[22];
+    
+} sAPP_PIXARM_ACK;
+
+typedef struct _sAPP_PIXARM_READ_REQ
+{
+    uint8_t cmd;
+    uint8_t flag;
+    
+    uint8_t padding[22];
+    
+} sAPP_PIXARM_READ_REQ;
+
+typedef struct _sAPP_PIXARM_READ_DATA
+{
+    uint8_t cmd;
+    uint8_t padding_a[3];
+    
+    int32_t x;
+    int32_t y;
+    int32_t z;
+    uint32_t distance;
+   
+    uint8_t flag;
+    uint8_t padding_b[3];
+    
+} sAPP_PIXARM_READ_DATA;
+
+typedef union _uAPP_PIXARM_MESSAGES
+{
+    sAPP_PIXARM_SYNC sync;
+    sAPP_PIXARM_ACK ack;
+    sAPP_PIXARM_READ_REQ readReq;
+    sAPP_PIXARM_READ_DATA readData;
+
+    sAPP_PIXARM_COMMON common;
+    uint8_t buffer[24];
+    
+} uAPP_PIXARM_MESSAGES;
 
 typedef struct
 {
     I2C_HandleTypeDef *handle;
     eAPP_I2C_STATE state;
+    uAPP_PIXARM_MESSAGES inputBuffer;
+    uAPP_PIXARM_MESSAGES outputBuffer;
     
 } sAPP_I2C_CBLK;
 
 
 /* Exported functions ------------------------------------------------------- */
 void APP_I2C_Init(void);
+eAPP_STATUS APP_I2C_Initiate(void);
 
 
 #endif /* #ifndef __APP_I2C_H */

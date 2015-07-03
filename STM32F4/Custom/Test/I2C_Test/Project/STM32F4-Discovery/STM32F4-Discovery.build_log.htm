@@ -1,0 +1,42 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: µVision V5.15
+Copyright (C) 2015 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: Daniel Apperloo, University of Victoria, LIC=----
+ 
+Tool Versions:
+Toolchain:       MDK-Lite  Version: 5.15.0
+Toolchain Path:  C:\Keil_v5\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.05 update 2 (build 169)
+Assembler:       Armasm.exe V5.05 update 2 (build 169)
+Linker/Locator:  ArmLink.exe V5.05 update 2 (build 169)
+Library Manager: ArmAr.exe V5.05 update 2 (build 169)
+Hex Converter:   FromElf.exe V5.05 update 2 (build 169)
+CPU DLL:         SARMCM3.DLL V5.15.0
+Dialog DLL:      DCM.DLL V1.13.2.0
+Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V2.0.15.0_KEIL
+Dialog DLL:      TCM.DLL V1.14.5.0
+ 
+<h2>Project:</h2>
+C:\Workspace\DroneWorkspace\NavigationFirmware\STM32F4\Custom\Test\I2C_Test\Project\Project.uvproj
+Project File Date:  07/02/2015
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.05 update 2 (build 169)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
+Build target 'STM32F4-Discovery'
+compiling main.c...
+..\Src\main.c(87): warning:  #177-D: variable "temp" was declared but never referenced
+      int32_t temp = 0;
+..\Src\main.c(88): warning:  #177-D: variable "dis" was declared but never referenced
+      uint32_t dis = 0;
+..\Src\main.c: 2 warnings, 0 errors
+linking...
+Program Size: Code=6544 RO-data=452 RW-data=104 ZI-data=1112  
+FromELF: creating hex file...
+"STM32F4-Discovery\STM32F4-Discovery.axf" - 0 Error(s), 2 Warning(s).
+</pre>
+</body>
+</html>
