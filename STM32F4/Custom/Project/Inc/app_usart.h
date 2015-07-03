@@ -65,10 +65,9 @@
 #define USARTx_IRQn                      USART2_IRQn
 #define USARTx_IRQHandler                USART2_IRQHandler
 
-/* Size of Transmission buffer */
-#define USART2_TXBUFFERSIZE              (COUNTOF(usartTxBuffer) - 1)
-/* Size of Reception buffer */
-#define USART2_RXBUFFERSIZE              USART2_TXBUFFERSIZE
+/* Define Connection Timeout and Attempts */
+#define UART_POLL_TIMEOUT 1000  // In Milliseconds
+#define UART_CONNECTION_ATTEMPTS 20
 
 
 /* Exported types ------------------------------------------------------------*/
@@ -89,6 +88,14 @@ typedef enum _eAPP_USART_STATE
 #define ARMPIT_CMD_ACK  0x02
 
 #define ARMPIT_FLAG_END 0xFF
+
+typedef struct _sAPP_ARMPIT_COMMON
+{
+    uint8_t cmd;
+    
+    uint8_t padding[15];
+    
+} sAPP_ARMPIT_COMMON;
 
 typedef struct _sAPP_ARMPIT_SYNC
 {
@@ -113,6 +120,7 @@ typedef union _uAPP_USART_MESSAGES
 {
     sAPP_ARMPIT_SYNC sync;
     sAPP_ARMPIT_ACK ack;
+    sAPP_ARMPIT_COMMON common;
     uint8_t buffer[16];
     
 } uAPP_USART_MESSAGES;
@@ -121,7 +129,6 @@ typedef struct _sAPP_USART_CBLK
 {
     UART_HandleTypeDef *handle;
     eAPP_USART_STATE state;
-    BOOL started;
     __IO ITStatus uartReady;
     uAPP_USART_MESSAGES inputBuffer;
     uAPP_USART_MESSAGES outputBuffer;
@@ -131,6 +138,7 @@ typedef struct _sAPP_USART_CBLK
 
 /* Exported functions ------------------------------------------------------- */
 void APP_USART_Init(void);
+eAPP_STATUS APP_UART_Initiate(void);
 void APP_UART_SetStatus(__IO ITStatus newStatus);
 ITStatus APP_UART_GetStatus(void);
 

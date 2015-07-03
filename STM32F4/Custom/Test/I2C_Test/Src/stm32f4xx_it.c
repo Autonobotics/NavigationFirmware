@@ -1,10 +1,12 @@
 /**
   ******************************************************************************
-  * @file    Src/app_usart.c 
+  * @file    I2C/I2C_TwoBoards_ComPolling/Src/stm32f4xx_it.c 
   * @author  MCD Application Team
   * @version V1.2.1
   * @date    13-March-2015
-  * @brief   Application USART Implementation
+  * @brief   Main Interrupt Service Routines.
+  *          This file provides template for all exceptions handler and 
+  *          peripherals interrupt service routine.
   ******************************************************************************
   * @attention
   *
@@ -36,94 +38,151 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "app_common.h"
+#include "main.h"
+#include "stm32f4xx_it.h"   
+
+/** @addtogroup STM32F4xx_HAL_Examples
+  * @{
+  */
+
+/** @addtogroup I2C_TwoBoards_ComPolling
+  * @{
+  */
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
+/* I2C handler declared in "main.c" file */
+extern I2C_HandleTypeDef hi2c;
+
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
 /******************************************************************************/
-/*                 Utility Functions and Helpers                              */
+/*            Cortex-M4 Processor Exceptions Handlers                         */
 /******************************************************************************/
 
 /**
-  * @brief  Flushes the buffer
-  * @param  pBuffer: buffers to be flushed.
-  * @param  BufferLength: buffer's length
-  * @retval None
-  */
-void Flush_Buffer(uint8_t* pBuffer, uint16_t BufferLength)
-{
-    uint8_t* pBufferTemp = pBuffer;
-    while (BufferLength--)
-    {
-        *pBufferTemp = 0;
-    
-        pBufferTemp++;
-    }
-}
-
-
-/**
-  * @brief  Compares two buffers.
-  * @param  pBuffer1, pBuffer2: buffers to be compared.
-  * @param  BufferLength: buffer's length
-  * @retval 0  : pBuffer1 identical to pBuffer2
-  *         >0 : pBuffer1 differs from pBuffer2
-  */
-uint16_t Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint16_t BufferLength)
-{
-    while (BufferLength--)
-    {
-        if ((*pBuffer1) != *pBuffer2)
-        {
-        return BufferLength;
-        }
-        pBuffer1++;
-        pBuffer2++;
-    }
-    
-    return 0;
-}
-
-
-/******************************************************************************/
-/*                 Error Code and Handlers                                    */
-/******************************************************************************/
-/**
-  * @brief  This function is executed in case of error occurrence.
+  * @brief  This function handles NMI exception.
   * @param  None
   * @retval None
   */
-void Error_Handler(void)
+void NMI_Handler(void)
 {
-    /* Turn LED5 on */
-    BSP_LED_On(LED5);
-        
-    while(1)
-    {
-    }
 }
 
-#ifdef  USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
+  * @brief  This function handles Hard Fault exception.
+  * @param  None
   * @retval None
   */
-void assert_failed(uint8_t* file, uint32_t line)
+void HardFault_Handler(void)
 {
-    // Alert the user of the file and line number
-    printf("Error occured in file %s on line %d\r\n", file, line);
-    
-    /* Infinite loop */
-    while (1)
-    {
-    }
+  /* Go to infinite loop when Hard Fault exception occurs */
+  while (1)
+  {
+  }
 }
-#endif
+
+/**
+  * @brief  This function handles Memory Manage exception.
+  * @param  None
+  * @retval None
+  */
+void MemManage_Handler(void)
+{
+  /* Go to infinite loop when Memory Manage exception occurs */
+  while (1)
+  {
+  }
+}
+
+/**
+  * @brief  This function handles Bus Fault exception.
+  * @param  None
+  * @retval None
+  */
+void BusFault_Handler(void)
+{
+  /* Go to infinite loop when Bus Fault exception occurs */
+  while (1)
+  {
+  }
+}
+
+/**
+  * @brief  This function handles Usage Fault exception.
+  * @param  None
+  * @retval None
+  */
+void UsageFault_Handler(void)
+{
+  /* Go to infinite loop when Usage Fault exception occurs */
+  while (1)
+  {
+  }
+}
+
+/**
+  * @brief  This function handles SVCall exception.
+  * @param  None
+  * @retval None
+  */
+void SVC_Handler(void)
+{
+}
+
+/**
+  * @brief  This function handles Debug Monitor exception.
+  * @param  None
+  * @retval None
+  */
+void DebugMon_Handler(void)
+{
+}
+
+/**
+  * @brief  This function handles PendSVC exception.
+  * @param  None
+  * @retval None
+  */
+void PendSV_Handler(void)
+{
+}
+
+/**
+  * @brief  This function handles SysTick Handler.
+  * @param  None
+  * @retval None
+  */
+void SysTick_Handler(void)
+{
+  HAL_IncTick();
+}
+
+/******************************************************************************/
+/*                 STM32F4xx Peripherals Interrupt Handlers                   */
+/*  Add here the Interrupt Handler for the used peripheral(s) (PPP), for the  */
+/*  available peripheral interrupt handler's name please refer to the startup */
+/*  file (startup_stm32f4xx.s).                                               */
+/******************************************************************************/
+
+/**
+  * @brief  This function handles PPP interrupt request.
+  * @param  None
+  * @retval None
+  */
+/*void PPP_IRQHandler(void)
+{
+}*/
+
+/**
+  * @}
+  */ 
+
+/**
+  * @}
+  */
+
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -42,27 +42,13 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-#define TEST_UART
+//#define TEST_UART  // TODO: Remove
 //#define TEST_I2C
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
-// REMOVE THESE
-extern UART_HandleTypeDef UartHandle;
 
-/* Buffer used for transmission */
-uint8_t usartTxBuffer[] = " ****UART_TwoBoards_ComIT****  ****UART_TwoBoards_ComIT****  ****UART_TwoBoards_ComIT**** ";
 
-/* Buffer used for reception */
-uint8_t usartRxBuffer[USART2_RXBUFFERSIZE];
-
-/* Buffer used for transmission */
-uint8_t i2cTxBuffer[] = " ****I2C_TwoBoards advanced communication based on IT****  ****I2C_TwoBoards advanced communication based on IT****  ****I2C_TwoBoards advanced communication based on IT**** ";
-
-/* Buffer used for reception */
-uint8_t i2cRxBuffer[I2C1_RXBUFFERSIZE];
-uint16_t hTxNumData = 0, hRxNumData = 0;
-uint8_t bTransferRequest = 0;
 
 /* Private function prototypes -----------------------------------------------*/
 static void SystemClock_Config(void);
@@ -100,43 +86,28 @@ int main(void)
     APP_Log_Init();
     
     /* Add your application code here */
-    APP_USART_Init();
     APP_I2C_Init();
+    APP_USART_Init();
     
-    /* Log Init finished */
-    APP_Log("Finished Initialization\r\n");
+    /* Log Configuration finished */
+    APP_Log("Finished Component Configuration.\r\n");
     
-#if  defined(TEST_UART)
-    /* The board receives the message and sends it back */
-    /*##-2- Put UART peripheral in reception process ###########################*/  
-    if(HAL_UART_Receive_IT(&UartHandle, (uint8_t *)usartRxBuffer, USART2_RXBUFFERSIZE) != HAL_OK)
-    {
-        Error_Handler();
-    }
+    // Start I2C Interrupt Process
+    APP_I2C_Initiate();
     
-    /*##-3- Wait for the end of the transfer ###################################*/   
-    while (APP_UART_GetStatus() != SET)
-    {
-    } 
+    // Start UART Interrupt Process
+    APP_UART_Initiate();
     
-    /* Reset transmission flag */
-    APP_UART_SetStatus(RESET);
-    
-    /*##-4- Start the transmission process #####################################*/  
-    /* While the UART in reception process, user can transmit data through 
-        "aTxBuffer" buffer */
-    if(HAL_UART_Transmit_IT(&UartHandle, (uint8_t*)usartTxBuffer, USART2_TXBUFFERSIZE)!= HAL_OK)
-    {
-        Error_Handler();
-    }
-#elif defined(TEST_I2C)
-
-#endif
+    /* Log Initation Finished */
+    APP_Log("Finished Component Initiation.\r\n");
     
     /* Infinite loop */
     while (1)
-  {
-  }
+    {
+        // Make ourselves available for I2C Requests
+        
+        
+    }
 }
 
 /******************************************************************************/

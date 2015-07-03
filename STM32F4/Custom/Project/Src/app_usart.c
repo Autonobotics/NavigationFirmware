@@ -59,19 +59,18 @@ UART_HandleTypeDef UartHandle;
 static sAPP_USART_CBLK AppUsartCblk = {
     NULL,
     UART_INIT,
-    FALSE,
     RESET,
-    {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0},
-    {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0}
+    {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,
+     0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0},
+    {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,
+     0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0}
     };
 
 
 /* Private function prototypes -----------------------------------------------*/
-static eAPP_STATUS uart_handle_handshake(eAPP_UART_DIR direction);
 static eAPP_STATUS uart_handle_data_receive(eAPP_UART_DIR direction);
 static eAPP_STATUS uart_handle_data_send(eAPP_UART_DIR direction);
-static eAPP_STATUS uart_handle_terminate(eAPP_UART_DIR direction);
-static void uart_state_machine(eAPP_UART_DIR direction);
+static void uart_async_state_machine(eAPP_UART_DIR direction);
  
 
 /* Private functions ---------------------------------------------------------*/
@@ -117,7 +116,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     BSP_LED_On(LED4);
     
     // Determine what to transmit
-    uart_state_machine(UART_RECEIVE);
+    uart_async_state_machine(UART_RECEIVE);
 }
 
 /**
@@ -137,67 +136,6 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 /******************************************************************************/
 /*                 State Machine Management Functions                         */
 /******************************************************************************/
-static eAPP_STATUS uart_handle_handshake(eAPP_UART_DIR direction)
-{
-    uAPP_USART_MESSAGES message;
-    
-    if ( UART_TRANSMIT == direction )
-    {
-        // Format the Handshake SYNC Packet
-        AppUsartCblk.outputBuffer.sync.cmd = ARMPIT_CMD_SYNC;
-        AppUsartCblk.outputBuffer.sync.flag = ARMPIT_FLAG_END;
-        
-        // Send the Packet
-        APP_UART_SetStatus(RESET);
-        if ( HAL_OK != HAL_UART_Transmit_IT(AppUsartCblk.handle, AppUsartCblk.outputBuffer.buffer, OUTPUT_UART_BUFFER_SIZE))
-        {
-            // Log Error and return failed
-            APP_Log("Error in transmission of SYNC.\r\n");
-            return STATUS_FAILURE;
-        }
-        return STATUS_SUCCESS;
-    }
-    else
-    {
-        // Process the Handshake SYNC Packet
-        message.sync = AppUsartCblk.inputBuffer.sync;
-        Flush_Buffer(AppUsartCblk.inputBuffer.buffer, sizeof(AppUsartCblk.inputBuffer.buffer));
-        
-        // Validate the CMD
-        if ( ARMPIT_CMD_SYNC != message.sync.cmd )
-        {
-            // Log Failure and return
-            APP_Log("CMD Bits wrong on SYNC Command.\r\n");
-            return STATUS_FAILURE;
-        }
-        
-        // Validate the Flag as end
-        if ( ARMPIT_FLAG_END != message.sync.flag )
-        {
-            // Log Failure and return
-            APP_Log("FLAG Bits wrong on SYNC Command.\r\n");
-            return STATUS_FAILURE;
-        }
-        
-        // Format an ACK Packet for response
-        Flush_Buffer(AppUsartCblk.outputBuffer.buffer, sizeof(AppUsartCblk.outputBuffer.buffer));
-        AppUsartCblk.outputBuffer.ack.cmd = ARMPIT_CMD_ACK;
-        AppUsartCblk.outputBuffer.ack.flag = ARMPIT_FLAG_END;
-        
-        // Send the ACK Packet
-        APP_UART_SetStatus(RESET);
-        if ( HAL_OK != HAL_UART_Transmit_IT(AppUsartCblk.handle, AppUsartCblk.outputBuffer.buffer, OUTPUT_UART_BUFFER_SIZE))
-        {
-            // Log Error and return failed
-            return STATUS_FAILURE;
-        }
-        
-        // Change states
-        AppUsartCblk.state = UART_DATA_RECEIVE;
-        return STATUS_SUCCESS;
-    }
-}
-
 static eAPP_STATUS uart_handle_data_receive(eAPP_UART_DIR direction)
 {
     if ( UART_TRANSMIT == direction )
@@ -218,26 +156,12 @@ static eAPP_STATUS uart_handle_data_send(eAPP_UART_DIR direction)
     }
 }
 
-static eAPP_STATUS uart_handle_terminate(eAPP_UART_DIR direction)
-{
-    if ( UART_TRANSMIT == direction )
-    {
-    }
-    else
-    {
-    }
-}
-
-static void uart_state_machine(eAPP_UART_DIR direction)
+static void uart_async_state_machine(eAPP_UART_DIR direction)
 {
     eAPP_STATUS status = STATUS_FAILURE;
     
     switch( AppUsartCblk.state )
     {
-        case UART_HANDSHAKE:
-            status = uart_handle_handshake(direction);
-            break;
-        
         case UART_DATA_RECEIVE:
             status = uart_handle_data_receive(direction);
             break;
@@ -247,13 +171,11 @@ static void uart_state_machine(eAPP_UART_DIR direction)
             break;
         
         case UART_TERMINATE:
-            status = uart_handle_terminate(direction);
-            break;
-        
+        case UART_HANDSHAKE:
         case UART_INIT:
         case UART_ERROR:
         default:
-            APP_Log("UART APP Driver in ERROR State.\r\n");
+            APP_Log("UART APP Driver in Bad State.\r\n");
             AppUsartCblk.state = UART_ERROR;
             break;
     }
@@ -295,11 +217,90 @@ void APP_USART_Init(void)
     AppUsartCblk.state = UART_HANDSHAKE;
 }
 
-void APP_UART_Initiate(void)
+eAPP_STATUS APP_UART_Initiate(void)
 {
-    // Start the internal state machine
+    uAPP_USART_MESSAGES message;
+    uint8_t errorCount = 0;
+    
+    // Validate we are in correct state
+    if ( UART_HANDSHAKE != AppUsartCblk.state )
+    {
+        APP_Log("UART in incorrect state for Handshake Procedure.\r\n");
+        return STATUS_FAILURE;
+    }
+    
+    // Start the Handshake Procedure (Syncronous Process)
     APP_Log("Starting UART Handshake.\r\n");
-    uart_state_machine(UART_TRANSMIT);
+    
+    // Format the Handshake SYNC Packet
+    AppUsartCblk.outputBuffer.sync.cmd = ARMPIT_CMD_SYNC;
+    AppUsartCblk.outputBuffer.sync.flag = ARMPIT_FLAG_END;
+    
+    // Send the Packet
+    do {
+        if ( HAL_OK != HAL_UART_Transmit(AppUsartCblk.handle, AppUsartCblk.outputBuffer.buffer, OUTPUT_UART_BUFFER_SIZE, UART_POLL_TIMEOUT))
+        {
+            // Log Error and return failed
+            APP_Log("Error in transmission of SYNC.\r\n");
+        }
+        
+        if (HAL_OK != HAL_UART_Receive(AppUsartCblk.handle, AppUsartCblk.inputBuffer.buffer, INPUT_UART_BUFFER_SIZE, UART_POLL_TIMEOUT))
+        {
+            APP_Log("Error in reception of SYNC.\r\n");
+            errorCount++;
+        }
+        else
+        {
+            break;
+        }
+        if ( UART_CONNECTION_ATTEMPTS == errorCount)
+        {
+            // Log Error and Return Failed
+            APP_Log("Error in reception of SYNC, abandoning Process.\r\n");
+            return STATUS_FAILURE;
+        }
+        
+    } while( errorCount < UART_CONNECTION_ATTEMPTS );
+    
+    // Process the Handshake SYNC Packet
+    message.sync = AppUsartCblk.inputBuffer.sync;
+    Flush_Buffer(AppUsartCblk.inputBuffer.buffer, sizeof(AppUsartCblk.inputBuffer.buffer));
+    
+    // Validate the CMD
+    if ( ARMPIT_CMD_SYNC != message.sync.cmd )
+    {
+        // Log Failure and return
+        APP_Log("CMD Bits wrong on SYNC Command.\r\n");
+        return STATUS_FAILURE;
+    }
+    
+    // Validate the Flag as end
+    if ( ARMPIT_FLAG_END != message.sync.flag )
+    {
+        // Log Failure and return
+        APP_Log("FLAG Bits wrong on SYNC Command.\r\n");
+        return STATUS_FAILURE;
+    }
+    
+    // Format an ACK Packet for response
+    Flush_Buffer(AppUsartCblk.outputBuffer.buffer, sizeof(AppUsartCblk.outputBuffer.buffer));
+    AppUsartCblk.outputBuffer.ack.cmd = ARMPIT_CMD_ACK;
+    AppUsartCblk.outputBuffer.ack.flag = ARMPIT_FLAG_END;
+    
+    // Change states
+    APP_Log("Finished UART Handshake, starting Interrupt Process.\r\n");
+    AppUsartCblk.state = UART_DATA_RECEIVE;
+    
+    // Send the ACK Packet
+    APP_UART_SetStatus(RESET);
+    if ( HAL_OK != HAL_UART_Transmit_IT(AppUsartCblk.handle, AppUsartCblk.outputBuffer.buffer, OUTPUT_UART_BUFFER_SIZE))
+    {
+        // Log Error and return failed
+        return STATUS_FAILURE;
+    }
+    
+    return STATUS_SUCCESS;
+    
 }
 
 ITStatus APP_UART_GetStatus(void)
