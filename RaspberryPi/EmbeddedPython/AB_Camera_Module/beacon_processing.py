@@ -2,7 +2,8 @@ __author__ = 'Pravjot'
 
 import numpy as np
 import cv2
-from AB_Camera_Module import beaconClass
+import cv2.cv as cv
+import beaconClass
 
 
 AB_beaconList = beaconClass.AB_beacons()
@@ -20,46 +21,52 @@ def send_next_beacon_info():
     if currentB == nextB:
     #No more beacon left to navigate to
         print("no more beacons left to navigate to")
+        return False
     else:
         AB_beaconList.next_beacon()
         #UART command to send information to STMF board
         next_beacon = AB_beaconList.beacon_info(AB_beaconList.currentID)
         print("Next beacon information: {0}".format(next_beacon))
-    return
+    return True
 
 # search the image for the beacon, assuming that we use some kind of RED source
 def locate_beacon(image):
     img = cv2.medianBlur(image, 5)
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-
+    cv2.imwrite("hsv.jpg", hsv)
     # HSV properties
-    lower = [160, 100, 100]
-    upper = [179, 255, 255]
+    lower = [150, 90, 90]
+    upper = [190, 255, 255]
 
     # create numpy arrays from the bounadires
     lower = np.array(lower, dtype="uint8")
     upper = np.array(upper, dtype="uint8")
+
+    #filter out all unnecessary colors
     mask = cv2.inRange(hsv, lower, upper)
-
+    #HoughCircles likes ring like circles to filled ones
+    edge = cv2.Canny(mask, 100, 200)
     #smooth the image by applying gaussian blur
-    blurr = cv2.GaussianBlur(mask, (9, 9), 2)
+    blurr = cv2.GaussianBlur(edge, (9, 9), 2)
 
-    #img = cv2.medianBlur(img,5)
-    #[h, s, v] = cv2.split(blurr)
-    #cimg = cv2.cvtColor(mask,cv2.)
+    cv2.imwrite("edge.jpg", edge)
+    cv2.imwrite("mask.jpg", mask)
+    cv2.imwrite("blurr.jpg", blurr)
 
-    circles = cv2.HoughCircles(blurr, cv2.HOUGH_GRADIENT, 1, 20,
-                               param1=50, param2=30, minRadius=0, maxRadius=0)
-
-    circles = np.uint16(np.around(circles[0, :]))
-
-    for (x, y, r) in circles:
-        # draw the outer circle
-        cv2.circle(img, (x, y), r, (0, 255, 0), 2)
-        marker = beaconClass.marker(x, y, r)
-        print('MARKER LOCATION X: {0}, Y: {1}, R: {2}'.format(marker.x, marker.y, marker.r))
-        # draw the center of the circle
-        cv2.circle(img, (x, y), 2, (0, 255, 0), 3)
+    circles = cv2.HoughCircles(blurr, cv.CV_HOUGH_GRADIENT, 1.2, 100,
+                               param1=20, param2=80, minRadius=0, maxRadius=0)
+    if circles is not None:
+        circles = np.uint16(np.around(circles[0, :]))
+        for (x, y, r) in circles:
+            # draw the outer circle
+            cv2.circle(img, (x, y), r, (0, 255, 0), 2)
+            marker = beaconClass.marker(x, y, r)
+            print('MARKER LOCATION X: {0}, Y: {1}, R: {2} in pixels'.format(marker.x, marker.y, marker.r))
+            # draw the center of the circle
+            cv2.circle(img, (x, y), 2, (0, 255, 0), 3)
+            cv2.imwrite("img_circled.jpg", img)
+    else:
+        marker = None
 
     return marker
 

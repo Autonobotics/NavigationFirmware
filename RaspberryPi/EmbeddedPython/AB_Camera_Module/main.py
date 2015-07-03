@@ -1,31 +1,29 @@
 __author__ = 'Pravjot'
 import beacon_processing
-#import camera_image_capture
+import camera_image_capture
 import cv2
+import time
 if __name__ == "__main__":
-
-    #focal length in pixels
-    FOCAL_LENGTH = 13.606299213
-
-    #in inches
-    MIN_DISTANCE_BEACON = 2.0
 
     #beacon marker
     marker = False
 
+    picam = camera_image_capture.PiCam()
     #calibrate camera
-    #[ret, mtx, dist, rvecs, tvecs, tvecs] = camera_image_capture.calibrate_camera()
+    #[ret, mtx, dist, rvecs, tvecs, tvecs] = picam.calibrate_camera()
 
     #wait for command from STM board to tell you that the drone is facing the write way
     #this will be a while statement waiting on a response from UART
 
     #infinite loop
     #get image from raspberry pi camera and store it
-    #imageFlag = camera_image_capture.get_PiImage()
-    for i in range(0,5):
-        imageFlag = True
-        if imageFlag:
-            image = cv2.imread('circles_rectangles_noise.jpg')
+    camera, rawCapture = picam.PiVideo()
+
+    #capture frames and process them
+    for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+        image = frame.array
+        if image is not None:
+            #image = cv2.imread('output.jpg')
 
             #undistort
             #camera_image_capture.undistort_img(image, mtx, dist)
@@ -37,13 +35,19 @@ if __name__ == "__main__":
             #send response to nav board we have not found it
             print('Cannot locate beacon!')
         else:
-            distance = beacon_processing.distance_to_camera(image, marker.KNOWN_WIDTH, FOCAL_LENGTH,marker)
+            distance = beacon_processing.distance_to_camera(image, marker.KNOWN_WIDTH, picam.FOCAL_LENGTH,marker)
            #send distance to controller
 
-        #When the drone reaches a minimum distance from the beacon, go to the next beacon
-        if distance[0] < MIN_DISTANCE_BEACON:
-            print('Go find next beacon!')
-            beacon_processing.send_next_beacon_info()
+            #When the drone reaches a minimum distance from the beacon, go to the next beacon
+            if distance[0] < marker.MIN_DISTANCE_BEACON:
+                print('Go find next beacon!')
+                if beacon_processing.send_next_beacon_info() is False:
+                    break
 
-        #Wait for response from STM board, for the drone to finish rotation
-        #while loop
+
+
+            #Wait for response from STM board, for the drone to finish rotation
+            #while loop
+
+          # clear the stream in preparation for the next frame
+        rawCapture.truncate(0)
