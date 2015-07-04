@@ -4,13 +4,18 @@ from picamera.array import PiRGBArray
 from picamera import PiCamera
 import time
 import cv2
-import pyimagesearch
+from modules import image_transformations
 import glob
 import numpy as np
 
 class PiCam:
     #Run the calibration
     FOCAL_LENGTH = 570.41995122
+    RESOLUTION = [640, 480]
+
+    #https://www.raspberrypi.org/documentation/hardware/camera.md
+    HORIZONTAL_FOV = 53.50
+    VERTICAL_FOX = 41.41
 
     def PiVideo(self):
     # initialize the camera and grab a reference to the raw camera capture

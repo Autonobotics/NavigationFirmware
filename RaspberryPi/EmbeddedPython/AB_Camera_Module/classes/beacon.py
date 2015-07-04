@@ -29,11 +29,11 @@ class AB_beacons:
         return self.BEACON_LIST[next_ID]
 
 class marker:
-    #width of the beacon in inches
-    KNOWN_WIDTH = 7.25;
+    #width of the beacon in cm
+    KNOWN_WIDTH = 17.85
 
     #Mininmum distance drone has to be to trigger next beacon (in inches)
-    MIN_DISTANCE_BEACON = 10.0
+    MIN_DISTANCE_BEACON = 20
 
     def __init__(self, x, y, r):
         self.x = x;
