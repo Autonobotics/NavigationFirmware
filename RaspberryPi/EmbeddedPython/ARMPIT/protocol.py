@@ -40,6 +40,7 @@ def uart_receive_packet():
 # Write a ARMPIT Message to the UART
 def uart_transmit(armpit_message):
     global uart_logger
+
     sent = serial_port.write(armpit_message.get_byte_stream())
     if sent != 16:
         uart_logger.error("Uart did not send the expected 16 Bytes. Sent {0} bytes instead.", sent)
@@ -55,7 +56,7 @@ def perform_handshake():
     sync_package = uart_receive_packet()
 
     # Validate the Sync packet
-    sync_message = message.ARMPiTMessage().load_from_string_with_command(cmd, sync_package)
+    sync_message = message.SyncMessage().load_from_string_with_command(cmd, sync_package)
     if sync_message.flag is not message.ARMPiTMessage.FLAG_END:
         uart_logger.error("Uart SYNC packet was malformed.")
 

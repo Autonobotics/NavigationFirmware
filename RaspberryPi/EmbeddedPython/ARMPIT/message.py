@@ -42,12 +42,14 @@ class ARMPiTMessage():
             self.buffer = temp
             self.buffer.insert(0, cmd_input)
             self.cmd = cmd_input
+        return self
 
     def load_from_string(self, string_input):
         temp = map(ord, string_input)
         if len(temp) is 16:
             self.buffer = temp
             self.cmd = self.buffer[0]
+        return self
 
     def _update(self):
         self.buffer[0] = self.cmd
@@ -65,10 +67,12 @@ class SyncMessage(ARMPiTMessage):
     def load_from_string_with_command(self, cmd_input, string_input):
         ARMPiTMessage.load_from_string_with_command(self, cmd_input, string_input)
         self.flag = self.buffer[7]
+        return self
 
     def set_defaults(self):
         self.cmd = ARMPiTMessage.CMD_SYNC
         self.flag = ARMPiTMessage.FLAG_END
+        return self
 
     def _update(self):
         ARMPiTMessage._update(self)
@@ -76,7 +80,7 @@ class SyncMessage(ARMPiTMessage):
 
     def get_byte_stream(self):
         self._update()
-        ARMPiTMessage.get_byte_stream(self)
+        return ARMPiTMessage.get_byte_stream(self)
 
 
 class AckMessage(ARMPiTMessage):
@@ -88,10 +92,12 @@ class AckMessage(ARMPiTMessage):
     def load_from_string_with_command(self, cmd_input, string_input):
         ARMPiTMessage.load_from_string_with_command(self, cmd_input, string_input)
         self.flag = self.buffer[1]
+        return self
 
     def set_defaults(self):
         self.cmd = ARMPiTMessage.CMD_ACK
         self.flag = ARMPiTMessage.FLAG_END
+        return self
 
     def _update(self):
         ARMPiTMessage._update(self)
@@ -99,7 +105,7 @@ class AckMessage(ARMPiTMessage):
 
     def get_byte_stream(self):
         self._update()
-        ARMPiTMessage.get_byte_stream(self)
+        return ARMPiTMessage.get_byte_stream(self)
 
 
 class RackMessage(ARMPiTMessage):
@@ -117,10 +123,12 @@ class RackMessage(ARMPiTMessage):
         self.axis = self.buffer[2]
         self.distance = collapse_bytes_to_int(self.buffer[3:7])
         self.flag = self.buffer[7]
+        return self
 
     def set_defaults(self):
         self.cmd = ARMPiTMessage.CMD_RACK
         self.flag = ARMPiTMessage.FLAG_END
+        return self
 
     def _update(self):
         ARMPiTMessage._update(self)
@@ -131,4 +139,4 @@ class RackMessage(ARMPiTMessage):
 
     def get_byte_stream(self):
         self._update()
-        ARMPiTMessage.get_byte_stream(self)
+        return ARMPiTMessage.get_byte_stream(self)
