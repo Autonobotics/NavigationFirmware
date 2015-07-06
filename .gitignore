@@ -3,6 +3,9 @@
 *.lst
 *.o
 *.d
+*.hex
+*.crf
+*.xml
 
 *.idea/
 *.pyc
