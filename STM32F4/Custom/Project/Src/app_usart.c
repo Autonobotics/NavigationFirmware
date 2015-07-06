@@ -40,16 +40,11 @@
 #include <stdio.h>
 
 /* Private typedef -----------------------------------------------------------*/
-typedef enum _eAPP_UART_DIR
-{
-    UART_TRANSMIT = 0,
-    UART_RECEIVE
-    
-} eAPP_UART_DIR;
 
 /* Private define ------------------------------------------------------------*/
 #define INPUT_UART_BUFFER_SIZE (sizeof(AppUsartCblk.inputBuffer))
 #define OUTPUT_UART_BUFFER_SIZE (sizeof(AppUsartCblk.outputBuffer))
+#define UART_TRANSACTION_RETRY_LIMIT 5
 
 /* Private macro -------------------------------------------------------------*/
 /* Pulbic variables ----------------------------------------------------------*/
@@ -59,19 +54,21 @@ UART_HandleTypeDef UartHandle;
 static sAPP_USART_CBLK AppUsartCblk = {
     NULL,
     UART_INIT,
-    RESET,
     {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,
      0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0},
     {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,
-     0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0}
+     0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0},
+    UART_INITIAL
     };
 
 
 /* Private function prototypes -----------------------------------------------*/
-static eAPP_STATUS uart_handle_data_receive(eAPP_UART_DIR direction);
-static eAPP_STATUS uart_handle_data_send(eAPP_UART_DIR direction);
-static void uart_async_state_machine(eAPP_UART_DIR direction);
- 
+static eAPP_STATUS uart_receive(void);
+static eAPP_STATUS uart_transmit(void);
+static eAPP_STATUS uart_handle_handshake(uAPP_USART_MESSAGES message);
+static eAPP_STATUS uart_handle_data_receive(uAPP_USART_MESSAGES message);
+static eAPP_STATUS uart_state_machine(void);
+
 
 /* Private functions ---------------------------------------------------------*/
 /******************************************************************************/
@@ -86,18 +83,8 @@ static void uart_async_state_machine(eAPP_UART_DIR direction);
   */
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-    /* Set transmission flag: transfer complete */
-    APP_UART_SetStatus(SET);
-    
-    /* Turn LED6 on: Transfer in transmission process is correct */
-    BSP_LED_On(LED6);
-    
-    // Enter the Receive state
-    if ( HAL_OK != HAL_UART_Receive_IT(AppUsartCblk.handle, AppUsartCblk.inputBuffer.buffer, INPUT_UART_BUFFER_SIZE))
-    {
-        APP_Log("Error entering Receive state from Transmission Complete Callback.\r\n");
-        Error_Handler();
-    }
+    // Transmission was successful, so ready to listen for a new request
+    AppUsartCblk.requestState = UART_NO_REQUEST;
 }
 
 /**
@@ -109,14 +96,8 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
   */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    /* Set transmission flag: transfer complete */
-    APP_UART_SetStatus(SET);
-    
-    /* Turn LED4 on: Transfer in reception process is correct */
-    BSP_LED_On(LED4);
-    
-    // Determine what to transmit
-    uart_async_state_machine(UART_RECEIVE);
+    // Reception was successful, so ready for processing
+    AppUsartCblk.requestState = UART_REQUEST_WAITING;
 }
 
 /**
@@ -128,56 +109,184 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
   */
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 {
-    /* Turn LED3 on: Transfer error in reception/transmission process */
-    BSP_LED_On(LED3); 
+    /* Turn BSP_UART_ERROR_LED */
+    BSP_LED_On(BSP_UART_ERROR_LED);
+    
+    // Log Error and Return Failure
+    APP_Log("Generic UART Error Occured.\r\n");
+    Error_Handler();
+}
+
+/******************************************************************************/
+/*                 Internal Support Functions                                 */
+/******************************************************************************/
+static eAPP_STATUS uart_transmit(void)
+{
+    HAL_StatusTypeDef status;
+    uint32_t retryCount = 0;
+    
+    /* Start the UART peripheral transmission process */
+    AppUsartCblk.requestState = UART_REQUEST_PROCESSING;
+    while ( HAL_OK != (status = HAL_UART_Transmit_IT(AppUsartCblk.handle, AppUsartCblk.outputBuffer.buffer, OUTPUT_UART_BUFFER_SIZE)))
+    {
+        retryCount++;
+        if ( retryCount > UART_TRANSACTION_RETRY_LIMIT )
+        {
+            // Log Error and return failed
+            APP_Log("Error during UART transmission. IT Status: %d.\r\n", status);
+            return STATUS_FAILURE;
+        }
+    }
+    return STATUS_SUCCESS;
+}
+
+static eAPP_STATUS uart_receive(void)
+{
+    HAL_StatusTypeDef status;
+    uint32_t retryCount = 0;
+    
+    /* Put I2C peripheral in reception mode */ 
+    Flush_Buffer(AppUsartCblk.inputBuffer.buffer, INPUT_UART_BUFFER_SIZE);
+    Flush_Buffer(AppUsartCblk.outputBuffer.buffer, OUTPUT_UART_BUFFER_SIZE);
+    AppUsartCblk.requestState = UART_WAITING;
+    while( HAL_OK != (status = HAL_UART_Receive_IT(AppUsartCblk.handle, AppUsartCblk.inputBuffer.buffer, INPUT_UART_BUFFER_SIZE)))
+    {
+        retryCount++;
+        if ( retryCount > UART_TRANSACTION_RETRY_LIMIT )
+        {
+            // Log Error and return failed
+            APP_Log("Error during UART reception. IT Status: %d.\r\n", status);
+            return STATUS_FAILURE;
+        }
+    }
+    return STATUS_SUCCESS;
 }
 
 
 /******************************************************************************/
 /*                 State Machine Management Functions                         */
 /******************************************************************************/
-static eAPP_STATUS uart_handle_data_receive(eAPP_UART_DIR direction)
+static eAPP_STATUS uart_handle_handshake(uAPP_USART_MESSAGES message)
 {
-    if ( UART_TRANSMIT == direction )
+    eAPP_STATUS status = STATUS_FAILURE;
+    HAL_StatusTypeDef halStatus;
+    
+    switch (message.common.cmd)
     {
-    }
-    else
-    {
+        // Invalid 0x00 is used to start Handshake Procedure
+        case ARMPIT_CMD_INVD:
+            // Even if Receive fails, it was a successful attempt
+            status = STATUS_SUCCESS;
+        
+            // Format the Handshake SYNC Packet
+            AppUsartCblk.outputBuffer.sync.cmd = ARMPIT_CMD_SYNC;
+            AppUsartCblk.outputBuffer.sync.flag = ARMPIT_FLAG_END;
+        
+            if ( HAL_OK == (halStatus = HAL_UART_Transmit(AppUsartCblk.handle, AppUsartCblk.outputBuffer.buffer, OUTPUT_UART_BUFFER_SIZE, UART_POLL_TIMEOUT)))
+            {
+                Flush_Buffer(AppUsartCblk.outputBuffer.buffer, OUTPUT_UART_BUFFER_SIZE);
+                
+                halStatus = HAL_UART_Receive(AppUsartCblk.handle, AppUsartCblk.inputBuffer.buffer, INPUT_UART_BUFFER_SIZE, UART_POLL_TIMEOUT);
+                if ( HAL_OK == halStatus)
+                {
+                    AppUsartCblk.requestState = UART_REQUEST_WAITING;
+                }
+            }
+            
+            // Ensure that there was no major error with the UART on our end
+            if ( HAL_OK != halStatus
+              && HAL_TIMEOUT != halStatus )
+            {
+                APP_Log("An error occured with the UART on handshake. Entering Error State.\r\n");
+                status = STATUS_FAILURE;
+            }
+            return status;
+        
+        case ARMPIT_CMD_SYNC:
+            // Validate the Flag as end
+            if ( ARMPIT_FLAG_END != message.sync.flag )
+            {
+                // Log Failure and return
+                APP_Log("FLAG Bits wrong on SYNC Command.\r\n");
+                return STATUS_FAILURE;
+            }
+        
+            // Format the Handshake ACK Packet
+            AppUsartCblk.outputBuffer.ack.cmd = ARMPIT_CMD_ACK;
+            AppUsartCblk.outputBuffer.ack.flag = ARMPIT_FLAG_END;
+        
+            // Transmit and setup for receive
+            status = uart_transmit();
+            if ( STATUS_SUCCESS == status)
+            {
+                // Change states
+                APP_Log("Finished UART Handshake, starting Interrupt Process.\r\n");
+                AppUsartCblk.state = UART_DATA_RECEIVE;
+            }
+            return status;
+        
+        case ARMPIT_CMD_DYNC:
+        case ARMPIT_CMD_ACK:
+        default:
+            return status;
+        
     }
 }
 
-static eAPP_STATUS uart_handle_data_send(eAPP_UART_DIR direction)
+static eAPP_STATUS uart_handle_data_receive(uAPP_USART_MESSAGES message)
 {
-    if ( UART_RECEIVE == direction )
+    eAPP_STATUS status = STATUS_FAILURE;
+    
+    switch ( message.common.cmd )
     {
-    }
-    else
-    {
+        case ARMPIT_CMD_SYNC:
+            // Validate the Flag as end
+            if ( ARMPIT_FLAG_END != message.sync.flag )
+            {
+                // Log Failure and return
+                APP_Log("FLAG Bits wrong on SYNC Command.\r\n");
+                return STATUS_FAILURE;
+            }
+        
+            // Format the Handshake ACK Packet
+            AppUsartCblk.outputBuffer.ack.cmd = ARMPIT_CMD_ACK;
+            AppUsartCblk.outputBuffer.ack.flag = ARMPIT_FLAG_END;
+        
+            // Transmit and setup for receive
+            status = uart_transmit();
+            return status;
+        
+        case ARMPIT_CMD_INVD:
+        case ARMPIT_CMD_DYNC:
+        case ARMPIT_CMD_ACK:
+        default:
+            APP_Log("UART APP Driver state received bad command. Command: %x\r\n", message.common.cmd);
+            AppUsartCblk.state = UART_ERROR;
+            return STATUS_FAILURE;
     }
 }
 
-static void uart_async_state_machine(eAPP_UART_DIR direction)
+static eAPP_STATUS uart_state_machine()
 {
     eAPP_STATUS status = STATUS_FAILURE;
     
     switch( AppUsartCblk.state )
     {
-        case UART_DATA_RECEIVE:
-            status = uart_handle_data_receive(direction);
-            break;
+        case UART_HANDSHAKE:
+            status = uart_handle_handshake(AppUsartCblk.inputBuffer);
+            return status;
         
-        case UART_DATA_SEND:
-            status = uart_handle_data_send(direction);
-            break;
+        case UART_DATA_RECEIVE:
+            status = uart_handle_data_receive(AppUsartCblk.inputBuffer);
+            return status;
         
         case UART_TERMINATE:
-        case UART_HANDSHAKE:
         case UART_INIT:
         case UART_ERROR:
         default:
             APP_Log("UART APP Driver in Bad State.\r\n");
             AppUsartCblk.state = UART_ERROR;
-            break;
+            return status;
     }
 }
 
@@ -215,13 +324,11 @@ void APP_USART_Init(void)
     
     AppUsartCblk.handle = & UartHandle;
     AppUsartCblk.state = UART_HANDSHAKE;
+    AppUsartCblk.requestState = UART_TRANSMITING;
 }
 
 eAPP_STATUS APP_UART_Initiate(void)
 {
-    uAPP_USART_MESSAGES message;
-    uint8_t errorCount = 0;
-    
     // Validate we are in correct state
     if ( UART_HANDSHAKE != AppUsartCblk.state )
     {
@@ -229,89 +336,39 @@ eAPP_STATUS APP_UART_Initiate(void)
         return STATUS_FAILURE;
     }
     
-    // Start the Handshake Procedure (Syncronous Process)
+    // Start the Handshake Procedure (Asychronous Process)
     APP_Log("Starting UART Handshake.\r\n");
-    
-    // Format the Handshake SYNC Packet
-    AppUsartCblk.outputBuffer.sync.cmd = ARMPIT_CMD_SYNC;
-    AppUsartCblk.outputBuffer.sync.flag = ARMPIT_FLAG_END;
-    
-    // Send the Packet
-    do {
-        if ( HAL_OK != HAL_UART_Transmit(AppUsartCblk.handle, AppUsartCblk.outputBuffer.buffer, OUTPUT_UART_BUFFER_SIZE, UART_POLL_TIMEOUT))
-        {
-            // Log Error and return failed
-            APP_Log("Error in transmission of SYNC.\r\n");
-        }
-        
-        if (HAL_OK != HAL_UART_Receive(AppUsartCblk.handle, AppUsartCblk.inputBuffer.buffer, INPUT_UART_BUFFER_SIZE, UART_POLL_TIMEOUT))
-        {
-            APP_Log("Error in reception of SYNC.\r\n");
-            errorCount++;
-        }
-        else
-        {
-            break;
-        }
-        if ( UART_CONNECTION_ATTEMPTS == errorCount)
-        {
-            // Log Error and Return Failed
-            APP_Log("Error in reception of SYNC, abandoning Process.\r\n");
-            return STATUS_FAILURE;
-        }
-        
-    } while( errorCount < UART_CONNECTION_ATTEMPTS );
-    
-    // Process the Handshake SYNC Packet
-    message.sync = AppUsartCblk.inputBuffer.sync;
-    Flush_Buffer(AppUsartCblk.inputBuffer.buffer, sizeof(AppUsartCblk.inputBuffer.buffer));
-    
-    // Validate the CMD
-    if ( ARMPIT_CMD_SYNC != message.sync.cmd )
-    {
-        // Log Failure and return
-        APP_Log("CMD Bits wrong on SYNC Command.\r\n");
-        return STATUS_FAILURE;
-    }
-    
-    // Validate the Flag as end
-    if ( ARMPIT_FLAG_END != message.sync.flag )
-    {
-        // Log Failure and return
-        APP_Log("FLAG Bits wrong on SYNC Command.\r\n");
-        return STATUS_FAILURE;
-    }
-    
-    // Format an ACK Packet for response
-    Flush_Buffer(AppUsartCblk.outputBuffer.buffer, sizeof(AppUsartCblk.outputBuffer.buffer));
-    AppUsartCblk.outputBuffer.ack.cmd = ARMPIT_CMD_ACK;
-    AppUsartCblk.outputBuffer.ack.flag = ARMPIT_FLAG_END;
-    
-    // Change states
-    APP_Log("Finished UART Handshake, starting Interrupt Process.\r\n");
-    AppUsartCblk.state = UART_DATA_RECEIVE;
-    
-    // Send the ACK Packet
-    APP_UART_SetStatus(RESET);
-    if ( HAL_OK != HAL_UART_Transmit_IT(AppUsartCblk.handle, AppUsartCblk.outputBuffer.buffer, OUTPUT_UART_BUFFER_SIZE))
-    {
-        // Log Error and return failed
-        return STATUS_FAILURE;
-    }
-    
     return STATUS_SUCCESS;
     
 }
 
-ITStatus APP_UART_GetStatus(void)
+eAPP_STATUS APP_UART_Process_Message(void)
 {
-    return AppUsartCblk.uartReady;
+    eAPP_STATUS status = STATUS_SUCCESS;
+    
+    // If we are not in an invalid state
+    if ( (UART_INIT != AppUsartCblk.state)
+      && (UART_ERROR != AppUsartCblk.state))
+    {
+        // If a message is waiting, process it
+        if ( UART_REQUEST_WAITING == AppUsartCblk.requestState 
+          || UART_TRANSMITING == AppUsartCblk.requestState )
+        {
+            // Process Message
+            status = uart_state_machine();
+        }
+        else if ( UART_NO_REQUEST == AppUsartCblk.requestState )
+        {
+            // Enter the Reception state
+            status = uart_receive();
+        }
+    }
+    // If any failures, signal via LED
+    if ( STATUS_FAILURE == status )
+    {
+        BSP_LED_On(BSP_UART_ERROR_LED);
+    }
+    return status;
 }
-
-void APP_UART_SetStatus(__IO ITStatus newStatus)
-{
-    AppUsartCblk.uartReady = newStatus;
-}
-
 
 /* -------------------------- End of File ------------------------------------*/

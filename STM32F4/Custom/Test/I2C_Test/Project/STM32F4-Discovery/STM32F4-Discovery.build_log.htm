@@ -22,21 +22,25 @@ Dialog DLL:      TCM.DLL V1.14.5.0
  
 <h2>Project:</h2>
 C:\Workspace\DroneWorkspace\NavigationFirmware\STM32F4\Custom\Test\I2C_Test\Project\Project.uvproj
-Project File Date:  07/02/2015
+Project File Date:  07/03/2015
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.05 update 2 (build 169)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'STM32F4-Discovery'
 compiling main.c...
-..\Src\main.c(87): warning:  #177-D: variable "temp" was declared but never referenced
+..\Src\main.c(88): warning:  #177-D: variable "temp" was declared but never referenced
       int32_t temp = 0;
-..\Src\main.c(88): warning:  #177-D: variable "dis" was declared but never referenced
+..\Src\main.c(89): warning:  #177-D: variable "dis" was declared but never referenced
       uint32_t dis = 0;
-..\Src\main.c: 2 warnings, 0 errors
+..\Src\main.c(378): warning:  #177-D: function "Buffercmp" was declared but never referenced
+  static uint16_t Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint16_t BufferLength)
+..\Src\main.c(360): warning:  #177-D: function "Flush_Buffer" was declared but never referenced
+  void Flush_Buffer(uint8_t* pBuffer, uint16_t BufferLength)
+..\Src\main.c: 4 warnings, 0 errors
 linking...
-Program Size: Code=6544 RO-data=452 RW-data=104 ZI-data=1112  
+Program Size: Code=6600 RO-data=452 RW-data=108 ZI-data=1108  
 FromELF: creating hex file...
-"STM32F4-Discovery\STM32F4-Discovery.axf" - 0 Error(s), 2 Warning(s).
+"STM32F4-Discovery\STM32F4-Discovery.axf" - 0 Error(s), 4 Warning(s).
 </pre>
 </body>
 </html>

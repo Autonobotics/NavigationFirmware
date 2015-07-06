@@ -81,7 +81,7 @@ typedef struct _sAPP_PIXARM_READ_DATA
 #define I2Cx_SDA_AF                     GPIO_AF4_I2C1
 
 /* Size of Transmission buffer */
-#define TXBUFFERSIZE                      (COUNTOF(aTxBuffer))
+#define TXBUFFERSIZE                      (COUNTOF(aTxBuffer)-1)
 /* Size of Reception buffer */
 #define RXBUFFERSIZE                      TXBUFFERSIZE
 

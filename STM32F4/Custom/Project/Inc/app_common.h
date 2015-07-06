@@ -58,6 +58,15 @@ typedef enum _eAPP_STATUS
 #define FALSE   0
 typedef uint8_t BOOL;
 
+// LED5 -> RED
+#define BSP_HARD_ERROR_LED          LED5
+// LED3 -> ORANGE
+#define BSP_I2C_ERROR_LED           LED3
+// LED4 -> GREEN
+#define BSP_UART_ERROR_LED          LED4
+// LED6 -> BLUE
+#define BSP_ULTRASONIC_ERROR_LED    LED6
+
 /* Exported macro ------------------------------------------------------------*/
 #define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
 

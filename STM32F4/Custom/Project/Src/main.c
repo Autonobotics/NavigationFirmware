@@ -42,8 +42,6 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-//#define TEST_UART  // TODO: Remove
-//#define TEST_I2C
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
@@ -61,7 +59,8 @@ static void SystemClock_Config(void);
   */
 int main(void)
 {
-
+    eAPP_STATUS status;
+    
     /* STM32F4xx HAL library initialization:
         - Configure the Flash prefetch, Flash preread and Buffer caches
         - Systick timer is configured by default as source of time base, but user 
@@ -92,11 +91,11 @@ int main(void)
     /* Log Configuration finished */
     APP_Log("Finished Component Configuration.\r\n");
     
-    // Start I2C Interrupt Process
-    APP_I2C_Initiate();
+    // Start I2C Interrupt Process: Synchronous Initiation Process
+    status = APP_I2C_Initiate();
     
-    // Start UART Interrupt Process
-    APP_UART_Initiate();
+    // Start UART Interrupt Process: Asynchronous Initiation Process
+    status = APP_UART_Initiate();
     
     /* Log Initation Finished */
     APP_Log("Finished Component Initiation.\r\n");
@@ -104,9 +103,18 @@ int main(void)
     /* Infinite loop */
     while (1)
     {
-        // Make ourselves available for I2C Requests
+        // Process UART Requests
+        status = APP_UART_Process_Message();
+        
+        // Save State of IR Sensor
         
         
+        // Run Ultrasonics Driver
+        
+        // Make any calculations
+        
+        // Process I2C Requests
+        status = APP_I2C_Process_Message();
     }
 }
 

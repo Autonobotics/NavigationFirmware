@@ -59,12 +59,13 @@
 I2C_HandleTypeDef I2cHandle;
 
 /* Buffer used for transmission */
-uint8_t aTxBuffer[24] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF,
-                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-uint8_t bTxBuffer[24] = {0x03, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+static uint8_t aTxBuffer[] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF,
+                                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+static uint8_t bTxBuffer[] = {0x03, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 /* Buffer used for reception */
 uint8_t aRxBuffer[RXBUFFERSIZE];
@@ -102,6 +103,7 @@ int main(void)
     BSP_LED_Init(LED4);
     BSP_LED_Init(LED5);
     BSP_LED_Init(LED6);
+    BSP_LED_Init(LED3);
     
     /* Configure the system clock to 168 MHz */
     SystemClock_Config();
@@ -139,6 +141,7 @@ int main(void)
     {
     }
     
+    BSP_LED_On(LED3);
     BSP_LED_Off(LED6);
     BSP_LED_Off(LED4);
     
@@ -158,9 +161,6 @@ int main(void)
         }
     }
     
-    /* Turn LED4 on: Transfer in Transmission process is correct */
-    BSP_LED_On(LED4);
-    
     /*##-3- Put I2C peripheral in reception process ############################*/ 
     /* Timeout is set to 10S */ 
     while((stat = HAL_I2C_Master_Receive(&I2cHandle, (uint16_t)I2C_ADDRESS, aRxBuffer, RXBUFFERSIZE, 10000)) != HAL_OK)
@@ -178,14 +178,14 @@ int main(void)
     BSP_LED_On(LED6);
     
     /*##-4- Compare the sent and received buffers ##############################*/
-    if(Buffercmp((uint8_t*)aTxBuffer,(uint8_t*)aRxBuffer,RXBUFFERSIZE))
-    {
-        /* Processing Error */
-        Error_Handler();
-    }
+    //if(Buffercmp((uint8_t*)aTxBuffer,(uint8_t*)aRxBuffer,RXBUFFERSIZE))
+    //{
+    //    /* Processing Error */
+    //    Error_Handler();
+    //}
     
     Test_Log("Finished I2C Handshaking.\r\n");
-    Flush_Buffer(aRxBuffer, RXBUFFERSIZE);
+    //Flush_Buffer(aRxBuffer, RXBUFFERSIZE);
     
     /* Infinite loop */  
     while (1)
@@ -193,16 +193,18 @@ int main(void)
         /*##-2- Start the transmission process #####################################*/  
         /* Timeout is set to 10S */
         Test_Log("Iteration %d\r\n", iter);
-        while(HAL_I2C_Master_Transmit(&I2cHandle, (uint16_t)I2C_ADDRESS, bTxBuffer, TXBUFFERSIZE, 10000) !=  HAL_OK)
+        while((stat = HAL_I2C_Master_Transmit(&I2cHandle, (uint16_t)I2C_ADDRESS, bTxBuffer, TXBUFFERSIZE, 10000)) !=  HAL_OK)
         {
             /* Error_Handler() function is called when Timeout error occurs.
             When Acknowledge failure occurs (Slave don't acknowledge it's address)
             Master restarts communication */
             if (HAL_I2C_GetError(&I2cHandle) != HAL_I2C_ERROR_AF)
             {
+                Test_Log("Error during Transmission. Transmission Error no. %d\r\n", stat);
                 Test_Log("Error During Transmission.\r\n");
                 Error_Handler();
             }
+            //Test_Log("Transmit Failed. Error no. %d. Trying again.\r\n", stat);
         }
         
         while (HAL_I2C_GetState(&I2cHandle) != HAL_I2C_STATE_READY)
@@ -222,6 +224,11 @@ int main(void)
                 Test_Log("Error during Reception. I2C Error no. %d\r\n", HAL_I2C_GetError(&I2cHandle));
                 Error_Handler();
             }
+            //Test_Log("Receive Failed. Error no. %d. Trying again.\r\n", stat);
+        }
+        
+        while (HAL_I2C_GetState(&I2cHandle) != HAL_I2C_STATE_READY)
+        {
         }
         
         // Validate the data
@@ -251,6 +258,7 @@ int main(void)
             Test_Log("Flag incorrect on packet. Received %x.\r\n", data->flag);
         }
         
+        HAL_Delay(10);
         iter++;
     }
 }

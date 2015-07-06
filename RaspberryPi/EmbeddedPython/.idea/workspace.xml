@@ -2,14 +2,47 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="dd8d1b4a-abe5-4637-9b86-7cc99a033457" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/AB_Camera_Module/beaconClass.py" afterPath="$PROJECT_DIR$/AB_Camera_Module/beaconClass.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/AB_Camera_Module/beacon_processing.py" afterPath="$PROJECT_DIR$/AB_Camera_Module/beacon_processing.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/AB_Camera_Module/camera_image_capture.py" afterPath="$PROJECT_DIR$/AB_Camera_Module/camera_image_capture.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/AB_Camera_Module/main.py" afterPath="$PROJECT_DIR$/AB_Camera_Module/main.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/STM32F4-Discovery.axf" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/STM32F4-Discovery.axf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/main.crf" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/main.crf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4_discovery.crf" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4_discovery.crf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal.crf" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal.crf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_cortex.crf" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_cortex.crf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_dma.crf" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_dma.crf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_flash.crf" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_flash.crf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_flash_ex.crf" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_flash_ex.crf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_gpio.crf" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_gpio.crf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_i2c.crf" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_i2c.crf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_i2c_ex.crf" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_i2c_ex.crf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_msp.crf" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_msp.crf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_pwr.crf" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_pwr.crf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_pwr_ex.crf" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_pwr_ex.crf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_rcc.crf" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_rcc.crf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_rcc_ex.crf" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_rcc_ex.crf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_spi.crf" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_hal_spi.crf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_it.crf" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/stm32f4xx_it.crf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/system_stm32f4xx.crf" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/system_stm32f4xx.crf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/test_log.crf" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/test_log.crf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Project/MDK-ARM/Project.uvproj" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Project/MDK-ARM/Project.uvproj" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/Project.uvproj" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/Project.uvproj" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/Project_STM32F4-Discovery.dep" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/Project_STM32F4-Discovery.dep" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/STM32F4-Discovery.build_log.htm" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/STM32F4-Discovery.build_log.htm" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/STM32F4-Discovery.hex" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/STM32F4-Discovery.hex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/STM32F4-Discovery.htm" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/STM32F4-Discovery.htm" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/STM32F4-Discovery.map" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Project/STM32F4-Discovery/STM32F4-Discovery.map" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Project/Src/app_common.c" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Project/Src/app_common.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Project/Inc/app_common.h" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Project/Inc/app_common.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Project/Src/app_i2c.c" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Project/Src/app_i2c.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Project/Inc/app_i2c.h" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Project/Inc/app_i2c.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Project/Src/app_usart.c" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Project/Src/app_usart.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Project/Inc/app_usart.h" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Project/Inc/app_usart.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Project/Src/main.c" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Project/Src/main.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Src/main.c" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Src/main.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Inc/main.h" afterPath="$PROJECT_DIR$/../../STM32F4/Custom/Test/I2C_Test/Inc/main.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test_uart.py" afterPath="$PROJECT_DIR$/test_uart.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="EmbeddedPython.iws" />
     <ignored path=".idea/workspace.xml" />
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,29 +62,17 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="scrap.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/scrap.py">
+      <file leaf-file-name="update_logging.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/update_logging.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="476" max-vertical-offset="697">
-              <caret line="29" column="0" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="136" max-vertical-offset="408">
+              <caret line="8" column="34" selection-start-line="8" selection-start-column="34" selection-end-line="8" selection-end-column="34" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="update_logging.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/update_logging.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="136" max-vertical-offset="408">
-              <caret line="8" column="34" selection-start-line="8" selection-start-column="34" selection-end-line="8" selection-end-column="34" />
-              <folding>
-                <element signature="e#42#74#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="test_i2c.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="test_i2c.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test_i2c.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0" vertical-offset="357" max-vertical-offset="459">
@@ -61,72 +82,80 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test_spi.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="test_spi.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test_spi.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="401" max-vertical-offset="1122">
+            <state vertical-scroll-proportion="0.0" vertical-offset="1020" max-vertical-offset="1139">
               <caret line="60" column="6" selection-start-line="60" selection-start-column="6" selection-end-line="60" selection-end-column="6" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test_uart.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="test_uart.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/test_uart.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-12.24" vertical-offset="0" max-vertical-offset="646">
-              <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
-              <folding>
-                <element signature="e#169#194#0" expanded="true" />
-              </folding>
+            <state vertical-scroll-proportion="0.7228739" vertical-offset="0" max-vertical-offset="816">
+              <caret line="30" column="0" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="beacon_processing.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/AB_Camera_Module/beacon_processing.py">
+      <file leaf-file-name="app_usart.c" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../STM32F4/Custom/Project/Src/app_usart.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.0" vertical-offset="0" max-vertical-offset="2295">
+            <state vertical-scroll-proportion="0.0" vertical-offset="1989" max-vertical-offset="6460">
               <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="beaconClass.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/AB_Camera_Module/beaconClass.py">
+      <file leaf-file-name="beacon_processing.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/AB_Camera_Module/beacon_processing.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.9512195" vertical-offset="34" max-vertical-offset="799">
-              <caret line="41" column="0" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2346">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="camera_image_capture.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="beaconClass.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/AB_Camera_Module/beaconClass.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="391" max-vertical-offset="799">
+              <caret line="23" column="21" selection-start-line="23" selection-start-column="21" selection-end-line="23" selection-end-column="21" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="camera_image_capture.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/AB_Camera_Module/camera_image_capture.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-26.52" vertical-offset="34" max-vertical-offset="799">
+            <state vertical-scroll-proportion="0.0" vertical-offset="799" max-vertical-offset="901">
               <caret line="47" column="19" selection-start-line="47" selection-start-column="19" selection-end-line="47" selection-end-column="19" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="main.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/AB_Camera_Module/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.0" vertical-offset="0" max-vertical-offset="935">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="986">
               <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test_hc_sr04_driver.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="test_hc_sr04_driver.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test_hc_sr04_driver.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="102" max-vertical-offset="459">
+            <state vertical-scroll-proportion="0.0" vertical-offset="136" max-vertical-offset="493">
               <caret line="8" column="26" selection-start-line="8" selection-start-column="26" selection-end-line="8" selection-end-column="26" />
               <folding />
             </state>
@@ -149,7 +178,7 @@
     </option>
   </component>
   <component name="IdeDocumentHistory">
-    <option name="CHANGED_PATHS">
+    <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/test_uart.py" />
       </list>
@@ -259,7 +288,6 @@
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
       <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
       <RunnerSettings RunnerId="PythonRunner" />
       <ConfigurationWrapper RunnerId="PythonRunner" />
       <method />
@@ -279,12 +307,11 @@
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/update_logging.py" />
       <option name="PARAMETERS" value="log_config.conf" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
       <RunnerSettings RunnerId="PythonRunner" />
       <ConfigurationWrapper RunnerId="PythonRunner" />
       <method />
     </configuration>
-    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+    <configuration default="true" type="DjangoTestsConfigurationType" factoryName="Django tests">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -297,32 +324,11 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="EmbeddedPython" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <method />
-    </configuration>
-    <configuration default="true" type="tests" factoryName="Unittests">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="EmbeddedPython" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="" />
-      <option name="CLASS_NAME" value="" />
-      <option name="METHOD_NAME" value="" />
-      <option name="FOLDER_NAME" value="" />
-      <option name="TEST_TYPE" value="TEST_SCRIPT" />
-      <option name="PATTERN" value="" />
-      <option name="USE_PATTERN" value="false" />
-      <option name="PUREUNITTEST" value="true" />
-      <option name="PARAMS" value="" />
-      <option name="USE_PARAM" value="false" />
+      <option name="TARGET" value="" />
+      <option name="SETTINGS_FILE" value="" />
+      <option name="CUSTOM_SETTINGS" value="false" />
+      <option name="USE_OPTIONS" value="false" />
+      <option name="OPTIONS" value="" />
       <method />
     </configuration>
     <configuration default="true" type="tests" factoryName="py.test">
@@ -350,69 +356,6 @@
       <option name="USE_KEYWORD" value="false" />
       <method />
     </configuration>
-    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
-      <method />
-    </configuration>
-    <configuration default="true" type="tests" factoryName="Attests">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="EmbeddedPython" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="" />
-      <option name="CLASS_NAME" value="" />
-      <option name="METHOD_NAME" value="" />
-      <option name="FOLDER_NAME" value="" />
-      <option name="TEST_TYPE" value="TEST_SCRIPT" />
-      <option name="PATTERN" value="" />
-      <option name="USE_PATTERN" value="false" />
-      <method />
-    </configuration>
-    <configuration default="true" type="tests" factoryName="Doctests">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="EmbeddedPython" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="" />
-      <option name="CLASS_NAME" value="" />
-      <option name="METHOD_NAME" value="" />
-      <option name="FOLDER_NAME" value="" />
-      <option name="TEST_TYPE" value="TEST_SCRIPT" />
-      <option name="PATTERN" value="" />
-      <option name="USE_PATTERN" value="false" />
-      <method />
-    </configuration>
-    <configuration default="true" type="DjangoTestsConfigurationType" factoryName="Django tests">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="EmbeddedPython" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="TARGET" value="" />
-      <option name="SETTINGS_FILE" value="" />
-      <option name="CUSTOM_SETTINGS" value="false" />
-      <option name="USE_OPTIONS" value="false" />
-      <option name="OPTIONS" value="" />
-      <method />
-    </configuration>
     <configuration default="true" type="tests" factoryName="Nosetests">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -435,6 +378,92 @@
       <option name="USE_PARAM" value="false" />
       <method />
     </configuration>
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="EmbeddedPython" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <method />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="Unittests">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="EmbeddedPython" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <option name="PUREUNITTEST" value="true" />
+      <option name="PARAMS" value="" />
+      <option name="USE_PARAM" value="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
+      <method />
+    </configuration>
+    <configuration default="true" type="NodeJSConfigurationType" factoryName="Node.js" working-dir="">
+      <method />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="Doctests">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="EmbeddedPython" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="Attests">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="EmbeddedPython" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <method />
+    </configuration>
     <list size="2">
       <item index="0" class="java.lang.String" itemvalue="Python.main" />
       <item index="1" class="java.lang.String" itemvalue="Python.update_logging" />
@@ -454,49 +483,34 @@
     <task active="true" id="Default" summary="Default task">
       <changelist id="dd8d1b4a-abe5-4637-9b86-7cc99a033457" name="Default" comment="" />
       <created>1434348973314</created>
-      <option name="number" value="Default" />
       <updated>1434348973314</updated>
     </task>
     <task id="LOCAL-00001" summary="a">
       <created>1434593115562</created>
-      <option name="number" value="00001" />
-      <option name="project" value="LOCAL" />
       <updated>1434593115562</updated>
     </task>
     <task id="LOCAL-00002" summary="a">
       <created>1434593905973</created>
-      <option name="number" value="00002" />
-      <option name="project" value="LOCAL" />
       <updated>1434593905973</updated>
     </task>
     <task id="LOCAL-00003" summary="Test Script">
       <created>1434595350606</created>
-      <option name="number" value="00003" />
-      <option name="project" value="LOCAL" />
       <updated>1434595350606</updated>
     </task>
     <task id="LOCAL-00004" summary="Please God...">
       <created>1434595629529</created>
-      <option name="number" value="00004" />
-      <option name="project" value="LOCAL" />
       <updated>1434595629529</updated>
     </task>
     <task id="LOCAL-00005" summary="Please God...">
       <created>1434595979453</created>
-      <option name="number" value="00005" />
-      <option name="project" value="LOCAL" />
       <updated>1434595979453</updated>
     </task>
     <task id="LOCAL-00006" summary="Please God...">
       <created>1434834758763</created>
-      <option name="number" value="00006" />
-      <option name="project" value="LOCAL" />
       <updated>1434834758763</updated>
     </task>
     <task id="LOCAL-00007" summary="Please God...">
       <created>1435034579069</created>
-      <option name="number" value="00007" />
-      <option name="project" value="LOCAL" />
       <updated>1435034579069</updated>
     </task>
     <option name="localTasksCounter" value="8" />
@@ -506,27 +520,27 @@
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="false" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20802534" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.26145834" sideWeight="0.6712329" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32900432" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20756757" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.51623374" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32876712" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32876712" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.26705757" sideWeight="0.6712329" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32876712" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32900432" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32876712" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="UnknownFeatures">
@@ -556,16 +570,8 @@
     <breakpoint-manager>
       <option name="time" value="2" />
     </breakpoint-manager>
-    <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/update_logging.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="119" max-vertical-offset="408">
-          <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/log_config.conf">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="156" max-vertical-offset="748">
@@ -577,7 +583,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1737" max-vertical-offset="3043">
           <caret line="136" column="71" selection-start-line="136" selection-start-column="71" selection-end-line="136" selection-end-column="71" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -593,7 +598,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="71" max-vertical-offset="663">
           <caret line="27" column="35" selection-start-line="27" selection-start-column="35" selection-end-line="27" selection-end-column="35" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -608,7 +612,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="102" max-vertical-offset="714">
           <caret line="26" column="25" selection-start-line="26" selection-start-column="25" selection-end-line="26" selection-end-column="25" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -637,7 +640,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1632" max-vertical-offset="3451">
           <caret line="96" column="19" selection-start-line="96" selection-start-column="19" selection-end-line="96" selection-end-column="19" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -653,7 +655,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="71" max-vertical-offset="663">
           <caret line="28" column="35" selection-start-line="28" selection-start-column="35" selection-end-line="28" selection-end-column="35" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -689,7 +690,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="578" max-vertical-offset="3451">
           <caret line="34" column="25" selection-start-line="34" selection-start-column="25" selection-end-line="34" selection-end-column="25" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -705,7 +705,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="510" max-vertical-offset="663">
           <caret line="30" column="36" selection-start-line="30" selection-start-column="36" selection-end-line="30" selection-end-column="36" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -741,7 +740,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="306" max-vertical-offset="408">
           <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -757,7 +755,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="119" max-vertical-offset="306">
           <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -779,7 +776,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
           <caret line="2" column="23" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -794,7 +790,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
           <caret line="2" column="23" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -837,7 +832,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="646">
           <caret line="15" column="39" selection-start-line="15" selection-start-column="39" selection-end-line="15" selection-end-column="39" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -845,7 +839,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="561">
           <caret line="20" column="14" selection-start-line="20" selection-start-column="4" selection-end-line="20" selection-end-column="14" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -853,7 +846,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="44" max-vertical-offset="748">
           <caret line="15" column="23" selection-start-line="15" selection-start-column="23" selection-end-line="15" selection-end-column="23" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -861,7 +853,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1428" max-vertical-offset="2754">
           <caret line="26" column="56" selection-start-line="26" selection-start-column="56" selection-end-line="26" selection-end-column="56" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -869,7 +860,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="697">
           <caret line="29" column="0" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -901,19 +891,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="408">
           <caret line="8" column="34" selection-start-line="8" selection-start-column="34" selection-end-line="8" selection-end-column="34" />
-          <folding>
-            <element signature="e#42#74#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test_uart.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-12.24" vertical-offset="0" max-vertical-offset="646">
-          <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
-          <folding>
-            <element signature="e#169#194#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -935,7 +913,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/AB_Camera_Module/camera_image_capture.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-26.52" vertical-offset="34" max-vertical-offset="799">
+        <state vertical-scroll-proportion="0.0" vertical-offset="799" max-vertical-offset="901">
           <caret line="47" column="19" selection-start-line="47" selection-start-column="19" selection-end-line="47" selection-end-column="19" />
           <folding />
         </state>
@@ -943,11 +921,28 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/AB_Camera_Module/beaconClass.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.9512195" vertical-offset="34" max-vertical-offset="799">
-          <caret line="41" column="0" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="799">
+          <caret line="23" column="21" selection-start-line="23" selection-start-column="21" selection-end-line="23" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../STM32F4/Custom/Project/Src/app_usart.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="6511">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_uart.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.7228739" vertical-offset="0" max-vertical-offset="816">
+          <caret line="30" column="0" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
   </component>
 </project>
+

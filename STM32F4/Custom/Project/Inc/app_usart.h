@@ -66,8 +66,7 @@
 #define USARTx_IRQHandler                USART2_IRQHandler
 
 /* Define Connection Timeout and Attempts */
-#define UART_POLL_TIMEOUT 1000  // In Milliseconds
-#define UART_CONNECTION_ATTEMPTS 20
+#define UART_POLL_TIMEOUT 1  // Ie. Non-blocking Poll (In Milliseconds)
 
 
 /* Exported types ------------------------------------------------------------*/
@@ -76,13 +75,24 @@ typedef enum _eAPP_USART_STATE
     UART_INIT = 0,
     UART_HANDSHAKE,
     UART_DATA_RECEIVE,
-    UART_DATA_SEND,
     UART_TERMINATE,
     
     UART_ERROR
     
 } eAPP_USART_STATE;
 
+typedef enum _eAPP_UART_REQUEST_STATE
+{
+    UART_INITIAL = 0,
+    UART_NO_REQUEST,
+    UART_TRANSMITING,
+    UART_REQUEST_WAITING,
+    UART_REQUEST_PROCESSING,
+    UART_WAITING
+    
+} eAPP_UART_REQUEST_STATE;
+
+#define ARMPIT_CMD_INVD 0x00
 #define ARMPIT_CMD_SYNC 0x01
 #define ARMPIT_CMD_DYNC 0xFE
 #define ARMPIT_CMD_ACK  0x02
@@ -129,9 +139,10 @@ typedef struct _sAPP_USART_CBLK
 {
     UART_HandleTypeDef *handle;
     eAPP_USART_STATE state;
-    __IO ITStatus uartReady;
     uAPP_USART_MESSAGES inputBuffer;
     uAPP_USART_MESSAGES outputBuffer;
+    
+    volatile eAPP_UART_REQUEST_STATE requestState;
     
 } sAPP_USART_CBLK;
 
@@ -139,8 +150,7 @@ typedef struct _sAPP_USART_CBLK
 /* Exported functions ------------------------------------------------------- */
 void APP_USART_Init(void);
 eAPP_STATUS APP_UART_Initiate(void);
-void APP_UART_SetStatus(__IO ITStatus newStatus);
-ITStatus APP_UART_GetStatus(void);
+eAPP_STATUS APP_UART_Process_Message(void);
 
 
 #endif /* #ifndef __APP_USART_H */

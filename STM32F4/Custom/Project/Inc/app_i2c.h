@@ -73,7 +73,7 @@
 
 /* Define Connection Timeout and Attempts */
 #define I2C_POLL_TIMEOUT 1000  // In Milliseconds
-#define I2C_CONNECTION_ATTEMPTS 20
+#define I2C_CONNECTION_ATTEMPTS 60
 
 
 /* Exported types ------------------------------------------------------------*/
@@ -87,6 +87,16 @@ typedef enum _eAPP_I2C_STATE
     I2C_ERROR
     
 } eAPP_I2C_STATE;
+
+typedef enum _eAPP_I2C_REQUEST_STATE
+{
+    I2C_INITIAL = 0,
+    I2C_NO_REQUEST,
+    I2C_REQUEST_WAITING,
+    I2C_REQUEST_PROCESSING,
+    I2C_WAITING
+    
+} eAPP_I2C_REQUEST_STATE;
 
 #define PIXARM_CMD_SYNC 0x01
 #define PIXARM_CMD_DYNC 0xFE
@@ -167,12 +177,15 @@ typedef struct
     uAPP_PIXARM_MESSAGES inputBuffer;
     uAPP_PIXARM_MESSAGES outputBuffer;
     
+    volatile eAPP_I2C_REQUEST_STATE requestState;
+    
 } sAPP_I2C_CBLK;
 
 
 /* Exported functions ------------------------------------------------------- */
 void APP_I2C_Init(void);
 eAPP_STATUS APP_I2C_Initiate(void);
+eAPP_STATUS APP_I2C_Process_Message(void);
 
 
 #endif /* #ifndef __APP_I2C_H */

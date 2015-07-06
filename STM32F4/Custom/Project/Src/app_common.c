@@ -57,12 +57,11 @@
   */
 void Flush_Buffer(uint8_t* pBuffer, uint16_t BufferLength)
 {
-    uint8_t* pBufferTemp = pBuffer;
     while (BufferLength--)
     {
-        *pBufferTemp = 0;
+        *pBuffer = 0;
     
-        pBufferTemp++;
+        pBuffer++;
     }
 }
 
@@ -100,8 +99,8 @@ uint16_t Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint16_t BufferLength)
   */
 void Error_Handler(void)
 {
-    /* Turn LED5 on */
-    BSP_LED_On(LED5);
+    /* Turn BSP_HARD_ERROR_LED on */
+    BSP_LED_On(BSP_HARD_ERROR_LED);
         
     while(1)
     {
