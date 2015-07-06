@@ -96,6 +96,7 @@ typedef enum _eAPP_UART_REQUEST_STATE
 #define ARMPIT_CMD_SYNC 0x01
 #define ARMPIT_CMD_DYNC 0xFE
 #define ARMPIT_CMD_ACK  0x02
+#define ARMPIT_CMD_RACK 0x03
 
 #define ARMPIT_FLAG_END 0xFF
 
@@ -125,6 +126,18 @@ typedef struct _sAPP_ARMPIT_ACK
     uint8_t padding[14];
     
 } sAPP_ARMPIT_ACK;
+
+typedef struct _sAPP_ARMPIT_RACK
+{
+    uint8_t cmd;
+    uint16_t payload_a;
+    uint16_t payload_b;
+    uint16_t payload_c;
+    uint8_t flag;
+    
+    uint8_t padding[8];
+    
+} sAPP_ARMPIT_RACK;
 
 typedef union _uAPP_USART_MESSAGES
 {

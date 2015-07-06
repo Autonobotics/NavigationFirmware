@@ -1,8 +1,7 @@
 __author__ = 'Dan'
-
 from common import ABStatus
-import ab_log as ABLog
-import time
+from AB_Logging import ab_log as ABLog
+from ARMPIT import protocol, message
 
 
 def main():
@@ -10,27 +9,21 @@ def main():
     logger = ABLog.get_logger('main')
     logger.info("Starting application loop")
 
-    # Configure the RPI to BCM Pin numbering
-    GPIO.setmode(GPIO.BCM)
+    # Perform any Camera and OpenCV config and Init
 
-    # Configure the I2C Interface
+    # Initialize the UART
+    protocol.initialize_serial_port()
 
-    # Configure the SPI Interface
-
-    # Configure the Ultrasonic Sensor Driver
-
-    # Configure the IR Distance Sensor Driver
-
-    # Configure the IR Tracking Sensor Driver
-
-    # Configure the Camera and OpenCV
-
-    # Wait for the Controller Board to Signal Ready
+    # Perform Handshake
+    protocol.perform_handshake()
 
     # Perform main Loop
+    status = ABStatus.STATUS_SUCCESS
+    while status is ABStatus.STATUS_SUCCESS:
+        break
 
     # Cleanup and Return
-    GPIO.cleanup()
+    protocol.cleanup_serial_port()
     return ABStatus.STATUS_SUCCESS
 
 

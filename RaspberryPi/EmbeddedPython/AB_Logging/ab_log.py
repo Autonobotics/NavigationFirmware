@@ -1,6 +1,6 @@
 __author__ = 'Dan'
 
-from common import ABLogConstant
+from log_common import ABLogConstant
 import logging
 import logging.config
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 __author__ = 'Dan'
 
-from common import ABLogConstant
+from log_common import ABLogConstant
 import socket
 import sys
 import struct
