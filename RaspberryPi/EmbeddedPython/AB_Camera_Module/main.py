@@ -1,16 +1,18 @@
 __author__ = 'Pravjot'
-import beacon_processing
-import camera_image_capture
+
+from modules import beacon_processing, image_transformations
+from classes import camera
+import modules.image_transformations
 import cv2
 import time
+
 if __name__ == "__main__":
-
     #beacon marker
-    marker = False
+    marker = None
 
-    picam = camera_image_capture.PiCam()
-    #calibrate camera
-    #[ret, mtx, dist, rvecs, tvecs, tvecs] = picam.calibrate_camera()
+    picam = camera.PiCam()
+
+    vector_dist = []
 
     #wait for command from STM board to tell you that the drone is facing the write way
     #this will be a while statement waiting on a response from UART
@@ -27,7 +29,6 @@ if __name__ == "__main__":
 
             #undistort
             #camera_image_capture.undistort_img(image, mtx, dist)
-
             #beacon_processing.locate_beacon_information('barcode_01.jpg')
             marker = beacon_processing.locate_beacon(image)
 
@@ -35,11 +36,20 @@ if __name__ == "__main__":
             #send response to nav board we have not found it
             print('Cannot locate beacon!')
         else:
-            distance = beacon_processing.distance_to_camera(image, marker.KNOWN_WIDTH, picam.FOCAL_LENGTH,marker)
+            distance, x, y = beacon_processing.distance_to_camera(image, picam, marker)
+            vector_dist.append(distance)
+
+            if len(vector_dist) == 5:
+                #avg = beacon_processing.movingAverage(vector_dist, 10)
+                avg = beacon_processing.regAverage(vector_dist)
+                vector_dist = []
+                print('AVERAGE: {0}'.format(avg))
+
            #send distance to controller
 
+
             #When the drone reaches a minimum distance from the beacon, go to the next beacon
-            if distance[0] < marker.MIN_DISTANCE_BEACON:
+            if distance < marker.MIN_DISTANCE_BEACON:
                 print('Go find next beacon!')
                 if beacon_processing.send_next_beacon_info() is False:
                     break
@@ -48,6 +58,5 @@ if __name__ == "__main__":
 
             #Wait for response from STM board, for the drone to finish rotation
             #while loop
-
           # clear the stream in preparation for the next frame
         rawCapture.truncate(0)

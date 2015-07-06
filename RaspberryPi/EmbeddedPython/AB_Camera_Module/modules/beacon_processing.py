@@ -3,10 +3,11 @@ __author__ = 'Pravjot'
 import numpy as np
 import cv2
 import cv2.cv as cv
-import beaconClass
+from classes import beacon
+import math
 
 
-AB_beaconList = beaconClass.AB_beacons()
+AB_beaconList = beacon.AB_beacons()
 
 def AB_startup():
     #send be intial beacon lcation to STM board
@@ -33,7 +34,7 @@ def send_next_beacon_info():
 def locate_beacon(image):
     img = cv2.medianBlur(image, 5)
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    cv2.imwrite("hsv.jpg", hsv)
+    #cv2.imwrite("hsv.jpg", hsv)
     # HSV properties
     lower = [150, 90, 90]
     upper = [190, 255, 255]
@@ -49,22 +50,22 @@ def locate_beacon(image):
     #smooth the image by applying gaussian blur
     blurr = cv2.GaussianBlur(edge, (9, 9), 2)
 
-    cv2.imwrite("edge.jpg", edge)
-    cv2.imwrite("mask.jpg", mask)
-    cv2.imwrite("blurr.jpg", blurr)
+    #cv2.imwrite("edge.jpg", edge)
+    #cv2.imwrite("mask.jpg", mask)
+    #cv2.imwrite("blurr.jpg", blurr)
 
-    circles = cv2.HoughCircles(blurr, cv.CV_HOUGH_GRADIENT, 1.2, 100,
+    circles = cv2.HoughCircles(blurr, cv.CV_HOUGH_GRADIENT, 1.2, 150,
                                param1=20, param2=80, minRadius=0, maxRadius=0)
     if circles is not None:
         circles = np.uint16(np.around(circles[0, :]))
         for (x, y, r) in circles:
             # draw the outer circle
             cv2.circle(img, (x, y), r, (0, 255, 0), 2)
-            marker = beaconClass.marker(x, y, r)
+            marker = beacon.marker(x, y, r)
             print('MARKER LOCATION X: {0}, Y: {1}, R: {2} in pixels'.format(marker.x, marker.y, marker.r))
             # draw the center of the circle
             cv2.circle(img, (x, y), 2, (0, 255, 0), 3)
-            cv2.imwrite("img_circled.jpg", img)
+            #cv2.imwrite("img_circled.jpg", img)
     else:
         marker = None
 
@@ -109,24 +110,39 @@ def locate_beacon_information(image):
 
     #draw a bounding box around the detected barcode and display the image
     cv2.drawContours(image, [box], -1, (0, 255, 0), 3)
-    cv2.imshow("Barcode detection", image)
-    cv2.waitKey(0)
     return
 
 
 # determine the location of the beacon with respect to the drones current location
 #calculate the distance vector and send appropriate information to the drones controller
-def distance_to_camera(image, knownWidth, focalLength, marker):
-    perWidth = 2 * marker.r;
+def distance_to_camera(image, cam, marker):
+    perWidth = 2*marker.r;
 
     #calculate the distance using triangle similarity distance calculation
-    distance_in_inches = (knownWidth * focalLength) / perWidth
+    distance = (marker.KNOWN_WIDTH * cam.FOCAL_LENGTH) / perWidth
 
     #calculate the angle between the camera and the object in both the diagonal and horizontal
     #http://stackoverflow.com/questions/17499409/opencv-calculate-angle-between-camera-and-pixel
     #pi camera stats: sensor resolution 2592x1944 with horizontal FOV 53.50 degree Vertical FOV 41.41 degrees
-    rotationX = 0
-    rotationY = 0
-    print('Distance in inches {0}'.format(distance_in_inches))
-    return [distance_in_inches, rotationX, rotationY]
 
+    #compute the number of pixels along the diagonal
+    pixels_diag = math.sqrt(pow(cam.RESOLUTION[0], 2)+pow(cam.RESOLUTION[1], 2))
+    degrees_per_pixel_diag = cam.HORIZONTAL_FOV / pixels_diag
+    x_angle = (marker.x * degrees_per_pixel_diag)
+    X = distance*math.cos(x_angle)
+    Y = distance*math.sin(x_angle)
+
+    print('Distance in cm: {0}, Angle: {1} ({2},{3})'.format(distance, x_angle, X, Y))
+
+    norm_vec = math.sqrt(math.pow(X,2)+math.pow(Y,2))
+    print norm_vec
+    X_norm = X / norm_vec
+    Y_norm = Y / norm_vec
+    print('NORMALIZED: ({0},{1})'.format(X_norm, Y_norm))
+    return [distance, X, Y]
+
+def movingAverage(x, N):
+    return np.convolve(x,np.ones((N, ))/N, mode='valid')[(N-1): ]
+
+def regAverage(x):
+    return reduce(lambda i, j: i+j, x)/len(x)

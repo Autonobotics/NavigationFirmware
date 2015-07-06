@@ -76,11 +76,9 @@ def resize(image, factor):
     return resized
 
 def rotate(image, degrees):
-    (h,w) = image.shape[:2]
-    center = (w/2,h/2)
+    row,col = image.shape[0:2]
+    image_center = tuple(np.array([row,col])/2)
 
-    #rotate the image by degress
-    M = cv2.getRotationMatrix2D(center, 180, 1.0)
-    rotated = cv2.warpAffline(image, M, (w,h))
-
+    rotation_mtx = cv2.getRotationMatrix2D(image_center, degrees, 1.0)
+    rotated = cv2.warpAffline(image, rotation_mtx, rotation_mtx, (col,row))
     return rotated
