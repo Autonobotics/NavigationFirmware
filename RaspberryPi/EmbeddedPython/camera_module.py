@@ -1,21 +1,24 @@
 __author__ = 'Pravjot'
 
-from modules import beacon_processing, image_transformations
-from classes import camera
-import modules.image_transformations
+from AB_camera_modules import beacon_processing, image_transformations
+from ARMPIT import protocol as ARMPit
+from AB_Camera_classes import camera
+from AB_Logging import ab_log ab as AB_Log
 import cv2
 import time
 
 if __name__ == "__main__":
     #beacon marker
     marker = None
-
     picam = camera.PiCam()
-
     vector_dist = []
+
+    #intialize handshake
+    ARMPit.perform_handshake();
 
     #wait for command from STM board to tell you that the drone is facing the write way
     #this will be a while statement waiting on a response from UART
+    cmd = ARMPit.uart_receive_cmd()
 
     #infinite loop
     #get image from raspberry pi camera and store it
@@ -25,8 +28,6 @@ if __name__ == "__main__":
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
         image = frame.array
         if image is not None:
-            #image = cv2.imread('output.jpg')
-
             #undistort
             #camera_image_capture.undistort_img(image, mtx, dist)
             #beacon_processing.locate_beacon_information('barcode_01.jpg')
