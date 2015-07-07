@@ -3,7 +3,7 @@ __author__ = 'Pravjot'
 import numpy as np
 import cv2
 import cv2.cv as cv
-from classes import beacon
+from AB_Camera_classes import beacon
 import math
 
 
