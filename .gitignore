@@ -6,7 +6,7 @@
 *.hex
 *.crf
 *.xml
-
+*.iml
 *.idea/
 *.pyc
 Output/

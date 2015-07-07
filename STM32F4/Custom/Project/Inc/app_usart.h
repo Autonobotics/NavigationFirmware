@@ -7,7 +7,7 @@
   * @brief   Header for app_usart.c module
   ******************************************************************************
   * @attention
-  *
+  * 
   * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
@@ -97,6 +97,11 @@ typedef enum _eAPP_UART_REQUEST_STATE
 #define ARMPIT_CMD_DYNC 0xFE
 #define ARMPIT_CMD_ACK  0x02
 #define ARMPIT_CMD_RACK 0x03
+#define ARMPIT_CMD_NO_BEACON 0x30
+#define ARMPIT_CMD_BEACON_DETECTED 0x31
+#define ARMPIT_CMD_EDGE_DETECTED 0x32
+#define ARMPIT_CMD_BEACON_ROTATION 0x33
+#define ARMPIT_CMD_QUERY_ROTATION 0x34
 
 #define ARMPIT_FLAG_END 0xFF
 
@@ -130,19 +135,89 @@ typedef struct _sAPP_ARMPIT_ACK
 typedef struct _sAPP_ARMPIT_RACK
 {
     uint8_t cmd;
+    uint8_t sub_cmd;
+    uint8_t axis;
+    uint8_t padding_a;
+    
     uint16_t payload_a;
     uint16_t payload_b;
-    uint16_t payload_c;
     uint8_t flag;
     
-    uint8_t padding[8];
+    uint8_t padding[7];
     
 } sAPP_ARMPIT_RACK;
+
+typedef struct _sAPP_ARMPIT_NO_BEACON
+{
+    uint8_t cmd;
+    uint8_t flag;
+    
+    uint8_t padding[14];
+    
+} sAPP_ARMPIT_BEACON;
+
+typedef struct _sAPP_ARMPIT_BEACON_DETECTED
+{
+    uint8_t cmd;
+    uint8_t padding_a;
+    
+    int16_t x_distance;
+    int16_t y_distance;
+    int16_t z_distance;
+    
+    uint8_t flag;
+    
+    uint8_t padding[7];
+    
+} sAPP_ARMPIT_BEACON_DETECTED;
+
+typedef struct _sAPP_ARMPIT_EDGE_DETECTED
+{
+    uint8_t cmd;
+    uint8_t padding_a;
+    
+    int16_t x_distance;
+    
+    uint8_t flag;
+    
+    uint8_t padding[11];
+    
+} sAPP_ARMPIT_EDGE_DETECTED;
+
+typedef struct _sAPP_ARMPIT_BEACON_ROTATION
+{
+    uint8_t cmd;
+    uint8_t padding_a;
+    
+    int16_t x_rotation;
+    
+    uint8_t flag;
+    
+    uint8_t padding[11];
+    
+} sAPP_ARMPIT_BEACON_ROTATION;
+
+typedef struct _sAPP_ARMPIT_QUERY_ROTATION
+{
+    uint8_t cmd;
+    uint8_t flag;
+    
+    uint8_t padding[14];
+    
+} sAPP_ARMPIT_QUERY_ROTATION;
 
 typedef union _uAPP_USART_MESSAGES
 {
     sAPP_ARMPIT_SYNC sync;
     sAPP_ARMPIT_ACK ack;
+    sAPP_ARMPIT_RACK rack;
+    
+    sAPP_ARMPIT_BEACON beacon;
+    sAPP_ARMPIT_BEACON_DETECTED beacon_detected;
+    sAPP_ARMPIT_BEACON_ROTATION beacon_rotation;
+    sAPP_ARMPIT_QUERY_ROTATION query_rotation;
+    sAPP_ARMPIT_EDGE_DETECTED edge_detected;
+    
     sAPP_ARMPIT_COMMON common;
     uint8_t buffer[16];
     
