@@ -255,10 +255,31 @@ static eAPP_STATUS uart_handle_data_receive(uAPP_USART_MESSAGES message)
             // Transmit and setup for receive
             status = uart_transmit();
             return status;
+            
+        case ARMPIT_CMD_NO_BEACON:
+            
+            return status;
+        
+        case ARMPIT_CMD_BEACON_DETECTED:
+            
+            return status;
+        
+        case ARMPIT_CMD_EDGE_DETECTED:
+            
+            return status;
+        
+        case ARMPIT_CMD_BEACON_ROTATION:
+            
+            return status;
+        
+        case ARMPIT_CMD_QUERY_ROTATION:
+            
+            return status;
         
         case ARMPIT_CMD_INVD:
         case ARMPIT_CMD_DYNC:
         case ARMPIT_CMD_ACK:
+        case ARMPIT_CMD_RACK:
         default:
             APP_Log("UART APP Driver state received bad command. Command: %x\r\n", message.common.cmd);
             AppUsartCblk.state = UART_ERROR;
