@@ -48,15 +48,14 @@
 typedef struct _sAPP_PIXARM_READ_DATA
 {
     uint8_t cmd;
-    uint8_t padding_a[3];
     
-    int32_t x;
-    int32_t y;
-    int32_t z;
-    uint32_t distance;
-   
+    uint8_t x_intensity;
+    uint8_t y_intensity;
+    uint8_t z_intensity;
+    int16_t rotation_absolute;
+
+    uint8_t padding_b;
     uint8_t flag;
-    uint8_t padding_b[3];
     
 } sAPP_PIXARM_READ_DATA;
 
@@ -81,7 +80,7 @@ typedef struct _sAPP_PIXARM_READ_DATA
 #define I2Cx_SDA_AF                     GPIO_AF4_I2C1
 
 /* Size of Transmission buffer */
-#define TXBUFFERSIZE                      (COUNTOF(aTxBuffer)-1)
+#define TXBUFFERSIZE                      (COUNTOF(aTxBuffer))
 /* Size of Reception buffer */
 #define RXBUFFERSIZE                      TXBUFFERSIZE
 

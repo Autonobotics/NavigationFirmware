@@ -1,8 +1,9 @@
 /**
   ******************************************************************************
   * @file    Src/app_ir.c 
+  * @author  Autonobotic Team
   * @version V1.0
-  * @date    3-July-2015
+  * @date    6-July-2015
   * @brief   Application Infrared Implementation
   ******************************************************************************
 */
@@ -16,13 +17,15 @@
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
+/* Public functions ----------------------------------------------------------*/
 void APP_IR_Init(void)
 {
+    // Setup the IR Component Hardware
+    APP_Log("Configuring IR Component.\r\n");
     HAL_IR_MspInit();
 }
 
 
-/* Public functions ----------------------------------------------------------*/
 GPIO_PinState APP_Scan_IR(void)
 {
     GPIO_PinState ir_pin;

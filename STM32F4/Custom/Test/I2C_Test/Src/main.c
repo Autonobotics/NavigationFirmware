@@ -59,13 +59,9 @@
 I2C_HandleTypeDef I2cHandle;
 
 /* Buffer used for transmission */
-static uint8_t aTxBuffer[] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF,
-                                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+static uint8_t aTxBuffer[] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF};
 
-static uint8_t bTxBuffer[] = {0x03, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+static uint8_t bTxBuffer[] = {0x03, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 /* Buffer used for reception */
 uint8_t aRxBuffer[RXBUFFERSIZE];
@@ -237,21 +233,21 @@ int main(void)
         {
             Test_Log("CMD incorrect on packet. Received %x.\r\n", data->cmd);
         }
-        if (data->x != 32)
+        if (data->x_intensity != 0)
         {
-            Test_Log("X incorrect on packet. Received %d.\r\n", data->x);
+            Test_Log("X incorrect on packet. Received %d.\r\n", data->x_intensity);
         }
-        if (data->y != -2)
+        if (data->y_intensity != 0)
         {
-            Test_Log("Y incorrect on packet. Received %d.\r\n", data->y);
+            Test_Log("Y incorrect on packet. Received %d.\r\n", data->y_intensity);
         }
-        if (data->z != 40)
+        if (data->z_intensity != 0)
         {
-            Test_Log("Z incorrect on packet. Received %d.\r\n", data->z);
+            Test_Log("Z incorrect on packet. Received %d.\r\n", data->z_intensity);
         }
-        if (data->distance != 300)
+        if (data->rotation_absolute != 0)
         {
-            Test_Log("Distance incorrect on packet. Received %d.\r\n", data->distance);
+            Test_Log("Distance incorrect on packet. Received %d.\r\n", data->rotation_absolute);
         }
         if (data->flag != 0xFF)
         {

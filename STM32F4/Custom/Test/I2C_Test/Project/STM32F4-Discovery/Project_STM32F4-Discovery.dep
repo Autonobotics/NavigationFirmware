@@ -437,8 +437,8 @@ I (..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_pwr.h)(0x5577A2C9)
 I (..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_pwr_ex.h)(0x5597028E)
 I (..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_spi.h)(0x5577A2CA)
 F (startup_stm32f407xx.s)(0x5597041C)(--cpu Cortex-M4.fp --pd "__EVAL SETA 1" -g --apcs=interwork --pd "__MICROLIB SETA 1"-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include--pd "__UVISION_VERSION SETA 515"--list startup_stm32f407xx.lst --xref -o stm32f4-discovery\startup_stm32f407xx.o --depend stm32f4-discovery\startup_stm32f407xx.d)
-F (..\Src\main.c)(0x559A06E5)(-c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I..\Inc -I..\..\..\Drivers\CMSIS\Device\ST\STM32F4xx\Include -I..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc -I..\..\..\Drivers\BSP\STM32F4-Discovery --C99-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-D__UVISION_VERSION="515" -DUSE_HAL_DRIVER -DSTM32F407xx -DUSE_STM32F4_DISCO-o stm32f4-discovery\main.o --omf_browse stm32f4-discovery\main.crf --depend stm32f4-discovery\main.d)
-I (..\Inc\main.h)(0x55971283)
+F (..\Src\main.c)(0x559B8A58)(-c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I..\Inc -I..\..\..\Drivers\CMSIS\Device\ST\STM32F4xx\Include -I..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc -I..\..\..\Drivers\BSP\STM32F4-Discovery --C99-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-D__UVISION_VERSION="515" -DUSE_HAL_DRIVER -DSTM32F407xx -DUSE_STM32F4_DISCO-o stm32f4-discovery\main.o --omf_browse stm32f4-discovery\main.crf --depend stm32f4-discovery\main.d)
+I (..\Inc\main.h)(0x559B8A11)
 I (..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h)(0x5597028E)
 I (..\Inc\stm32f4xx_hal_conf.h)(0x55970298)
 I (..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_rcc.h)(0x5577A2C9)
@@ -469,7 +469,7 @@ I (..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_pwr_ex.h)(0x5597028E)
 I (..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_spi.h)(0x5577A2CA)
 I (..\..\..\Drivers\BSP\STM32F4-Discovery\stm32f4_discovery.h)(0x5597027C)
 F (..\Src\stm32f4xx_hal_msp.c)(0x5597041C)(-c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I..\Inc -I..\..\..\Drivers\CMSIS\Device\ST\STM32F4xx\Include -I..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc -I..\..\..\Drivers\BSP\STM32F4-Discovery --C99-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-D__UVISION_VERSION="515" -DUSE_HAL_DRIVER -DSTM32F407xx -DUSE_STM32F4_DISCO-o stm32f4-discovery\stm32f4xx_hal_msp.o --omf_browse stm32f4-discovery\stm32f4xx_hal_msp.crf --depend stm32f4-discovery\stm32f4xx_hal_msp.d)
-I (..\Inc\main.h)(0x55971283)
+I (..\Inc\main.h)(0x559B8A11)
 I (..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h)(0x5597028E)
 I (..\Inc\stm32f4xx_hal_conf.h)(0x55970298)
 I (..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_rcc.h)(0x5577A2C9)
@@ -500,7 +500,7 @@ I (..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_pwr_ex.h)(0x5597028E)
 I (..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_spi.h)(0x5577A2CA)
 I (..\..\..\Drivers\BSP\STM32F4-Discovery\stm32f4_discovery.h)(0x5597027C)
 F (..\Src\stm32f4xx_it.c)(0x5597041C)(-c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I..\Inc -I..\..\..\Drivers\CMSIS\Device\ST\STM32F4xx\Include -I..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc -I..\..\..\Drivers\BSP\STM32F4-Discovery --C99-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-D__UVISION_VERSION="515" -DUSE_HAL_DRIVER -DSTM32F407xx -DUSE_STM32F4_DISCO-o stm32f4-discovery\stm32f4xx_it.o --omf_browse stm32f4-discovery\stm32f4xx_it.crf --depend stm32f4-discovery\stm32f4xx_it.d)
-I (..\Inc\main.h)(0x55971283)
+I (..\Inc\main.h)(0x559B8A11)
 I (..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h)(0x5597028E)
 I (..\Inc\stm32f4xx_hal_conf.h)(0x55970298)
 I (..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_rcc.h)(0x5577A2C9)
@@ -531,8 +531,8 @@ I (..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_pwr_ex.h)(0x5597028E)
 I (..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_spi.h)(0x5577A2CA)
 I (..\..\..\Drivers\BSP\STM32F4-Discovery\stm32f4_discovery.h)(0x5597027C)
 I (..\Inc\stm32f4xx_it.h)(0x5597041C)
-F (..\Src\test_log.c)(0x5597041C)(-c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I..\Inc -I..\..\..\Drivers\CMSIS\Device\ST\STM32F4xx\Include -I..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc -I..\..\..\Drivers\BSP\STM32F4-Discovery --C99-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-D__UVISION_VERSION="515" -DUSE_HAL_DRIVER -DSTM32F407xx -DUSE_STM32F4_DISCO-o stm32f4-discovery\test_log.o --omf_browse stm32f4-discovery\test_log.crf --depend stm32f4-discovery\test_log.d)
-I (..\Inc\main.h)(0x55971283)
+F (..\Src\test_log.c)(0x559B89CF)(-c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I..\Inc -I..\..\..\Drivers\CMSIS\Device\ST\STM32F4xx\Include -I..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc -I..\..\..\Drivers\BSP\STM32F4-Discovery --C99-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\CMSIS\Include-D__UVISION_VERSION="515" -DUSE_HAL_DRIVER -DSTM32F407xx -DUSE_STM32F4_DISCO-o stm32f4-discovery\test_log.o --omf_browse stm32f4-discovery\test_log.crf --depend stm32f4-discovery\test_log.d)
+I (..\Inc\main.h)(0x559B8A11)
 I (..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h)(0x5597028E)
 I (..\Inc\stm32f4xx_hal_conf.h)(0x55970298)
 I (..\..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_rcc.h)(0x5577A2C9)

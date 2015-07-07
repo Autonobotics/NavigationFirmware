@@ -1,40 +1,12 @@
 /**
   ******************************************************************************
   * @file    Src/app_usart.c 
-  * @author  MCD Application Team
-  * @version V1.2.1
-  * @date    13-March-2015
+  * @author  Autonobotic Team
+  * @version V1.0
+  * @date    6-July-2015
   * @brief   Application USART Implementation
   ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
-  ******************************************************************************
   */
-
 /* Includes ------------------------------------------------------------------*/
 #include "app_usart.h"
 #include <stdio.h>
@@ -42,13 +14,13 @@
 /* Private typedef -----------------------------------------------------------*/
 
 /* Private define ------------------------------------------------------------*/
-// #define UART_ACCEPT_SYNC
+#define UART_ACCEPT_SYNC
 #define INPUT_UART_BUFFER_SIZE (sizeof(AppUsartCblk.inputBuffer))
 #define OUTPUT_UART_BUFFER_SIZE (sizeof(AppUsartCblk.outputBuffer))
 #define UART_TRANSACTION_RETRY_LIMIT 5
 
 /* Private macro -------------------------------------------------------------*/
-/* Pulbic variables ----------------------------------------------------------*/
+/* Public variables ----------------------------------------------------------*/
 UART_HandleTypeDef UartHandle;
 
 /* Private variables ---------------------------------------------------------*/
@@ -60,16 +32,17 @@ static sAPP_USART_CBLK AppUsartCblk = {
     {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,
      0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0},
     UART_INITIAL
-    };
+};
 
 
 /* Private function prototypes -----------------------------------------------*/
 static eAPP_STATUS uart_receive(void);
 static eAPP_STATUS uart_transmit(void);
-static eAPP_STATUS uart_send_response(void);
+static eAPP_STATUS uart_send_response(sAPP_NAVIGATION_CBLK* navigation_cblk);
 static eAPP_STATUS uart_handle_handshake(uAPP_USART_MESSAGES message);
-static eAPP_STATUS uart_handle_data_receive(uAPP_USART_MESSAGES message);
-static eAPP_STATUS uart_state_machine(void);
+static eAPP_STATUS uart_handle_data_receive(sAPP_NAVIGATION_CBLK* navigation_cblk,
+                                            uAPP_USART_MESSAGES message);
+static eAPP_STATUS uart_state_machine(sAPP_NAVIGATION_CBLK* navigation_cblk);
 
 
 /* Private functions ---------------------------------------------------------*/
@@ -168,28 +141,30 @@ static eAPP_STATUS uart_receive(void)
 /******************************************************************************/
 /*                 State Machine Management Functions                         */
 /******************************************************************************/
-static eAPP_STATUS uart_send_response(void)
+static eAPP_STATUS uart_send_response(sAPP_NAVIGATION_CBLK* navigation_cblk)
 {
     eAPP_STATUS status;
+    uint16_t distance;
+    
+    // Format the RACK Packet by default
+    AppUsartCblk.outputBuffer.rack.cmd = ARMPIT_CMD_RACK;
+    AppUsartCblk.outputBuffer.rack.flag = ARMPIT_FLAG_END;
+    
+    // Read distance on frontal Ultrasonic
+    distance = navigation_cblk->hc_sr04_data.distance[AXIS_FRONT];
     
     // If we have something to tell the Image Board, send RACK, else just ACK
-    if ( FALSE )
+    if ( ROTATION_COMPLETE ==  navigation_cblk->navigation_flags.rotation_status )
     {
-         // Format the RACK Packet
-         AppUsartCblk.outputBuffer.rack.cmd = ARMPIT_CMD_RACK;
-         AppUsartCblk.outputBuffer.rack.flag = ARMPIT_FLAG_END;
-        
-        // Based on the Type of data we send, format the data differently
-        if ( TRUE )
-        {
-            AppUsartCblk.outputBuffer.rack.sub_cmd = ARMPIT_SUBCMD_COLLISION_DETECTED;
-            AppUsartCblk.outputBuffer.rack.axis = AXIS_FRONT; // No other possible value currently
-            AppUsartCblk.outputBuffer.rack.payload_a = 10; // TODO: Fill in with Frontal Ultrasonic value
-        }
-        else if ( FALSE )
-        {
-            AppUsartCblk.outputBuffer.rack.sub_cmd = ARMPIT_SUBCMD_ROTATION_COMPLETE;
-        }
+        AppUsartCblk.outputBuffer.rack.sub_cmd = ARMPIT_SUBCMD_ROTATION_COMPLETE;
+        // Reset the Rotation Flag
+        navigation_cblk->navigation_flags.rotation_status = ROTATION_INCOMPLETE;
+    }
+    else if ( HC_SR04_OUT_OF_RANGE != distance )
+    {
+        AppUsartCblk.outputBuffer.rack.sub_cmd = ARMPIT_SUBCMD_COLLISION_DETECTED;
+        AppUsartCblk.outputBuffer.rack.axis = AXIS_FRONT; // No other possible value currently
+        AppUsartCblk.outputBuffer.rack.payload_a = distance;
     }
     else
     {
@@ -270,7 +245,8 @@ static eAPP_STATUS uart_handle_handshake(uAPP_USART_MESSAGES message)
     }
 }
 
-static eAPP_STATUS uart_handle_data_receive(uAPP_USART_MESSAGES message)
+static eAPP_STATUS uart_handle_data_receive(sAPP_NAVIGATION_CBLK* navigation_cblk, 
+                                            uAPP_USART_MESSAGES message)
 {
     eAPP_STATUS status = STATUS_FAILURE;
     
@@ -290,7 +266,7 @@ static eAPP_STATUS uart_handle_data_receive(uAPP_USART_MESSAGES message)
             
 
             // Transmit Response
-            status = uart_send_response();
+            status = uart_send_response(navigation_cblk);
             return status;
         
         case ARMPIT_CMD_BEACON_DETECTED:
@@ -307,7 +283,7 @@ static eAPP_STATUS uart_handle_data_receive(uAPP_USART_MESSAGES message)
             
 
             // Transmit Response
-            status = uart_send_response();
+            status = uart_send_response(navigation_cblk);
             return status;
         
         case ARMPIT_CMD_EDGE_DETECTED:
@@ -324,7 +300,7 @@ static eAPP_STATUS uart_handle_data_receive(uAPP_USART_MESSAGES message)
             
             
             // Transmit Response
-            status = uart_send_response();
+            status = uart_send_response(navigation_cblk);
             return status;
         
         case ARMPIT_CMD_BEACON_ROTATION:
@@ -341,7 +317,7 @@ static eAPP_STATUS uart_handle_data_receive(uAPP_USART_MESSAGES message)
             
             
             // Transmit Response
-            status = uart_send_response();
+            status = uart_send_response(navigation_cblk);
             return status;
         
         case ARMPIT_CMD_QUERY_ROTATION:
@@ -358,7 +334,7 @@ static eAPP_STATUS uart_handle_data_receive(uAPP_USART_MESSAGES message)
             
             
             // Transmit Response
-            status = uart_send_response();
+            status = uart_send_response(navigation_cblk);
             return status;
         
         case ARMPIT_CMD_SYNC:
@@ -372,7 +348,7 @@ static eAPP_STATUS uart_handle_data_receive(uAPP_USART_MESSAGES message)
             }
         
             // Transmit Response
-            status = uart_send_response();
+            status = uart_send_response(navigation_cblk);
             return status;
 #endif // #ifdef UART_ACCEPT_SYNC
         case ARMPIT_CMD_INVD:
@@ -386,7 +362,7 @@ static eAPP_STATUS uart_handle_data_receive(uAPP_USART_MESSAGES message)
     }
 }
 
-static eAPP_STATUS uart_state_machine()
+static eAPP_STATUS uart_state_machine(sAPP_NAVIGATION_CBLK* navigation_cblk)
 {
     eAPP_STATUS status = STATUS_FAILURE;
     
@@ -397,7 +373,7 @@ static eAPP_STATUS uart_state_machine()
             return status;
         
         case UART_DATA_RECEIVE:
-            status = uart_handle_data_receive(AppUsartCblk.inputBuffer);
+            status = uart_handle_data_receive(navigation_cblk, AppUsartCblk.inputBuffer);
             return status;
         
         case UART_TERMINATE:
@@ -462,7 +438,7 @@ eAPP_STATUS APP_UART_Initiate(void)
     
 }
 
-eAPP_STATUS APP_UART_Process_Message(void)
+eAPP_STATUS APP_UART_Process_Message(sAPP_NAVIGATION_CBLK* navigation_cblk)
 {
     eAPP_STATUS status = STATUS_SUCCESS;
     
@@ -475,7 +451,7 @@ eAPP_STATUS APP_UART_Process_Message(void)
           || UART_TRANSMITING == AppUsartCblk.requestState )
         {
             // Process Message
-            status = uart_state_machine();
+            status = uart_state_machine(navigation_cblk);
         }
         else if ( UART_NO_REQUEST == AppUsartCblk.requestState )
         {

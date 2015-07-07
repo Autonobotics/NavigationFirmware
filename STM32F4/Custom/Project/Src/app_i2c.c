@@ -1,40 +1,12 @@
 /**
   ******************************************************************************
   * @file    Src/app_i2c.c 
-  * @author  MCD Application Team
-  * @version V1.2.1
-  * @date    13-March-2015
+  * @author  Autonobotic Team
+  * @version V1.0
+  * @date    6-July-2015
   * @brief   Application I2C Implementation
   ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
-  ******************************************************************************
   */
-
 /* Includes ------------------------------------------------------------------*/
 #include "app_i2c.h"
 
@@ -46,28 +18,24 @@
     
 /* Private macro -------------------------------------------------------------*/
 
-/* Pulbic variables ----------------------------------------------------------*/
+/* Public variables ----------------------------------------------------------*/
 I2C_HandleTypeDef I2CxHandle;
 
 /* Private variables ---------------------------------------------------------*/
 static sAPP_I2C_CBLK AppI2CCblk = {
     NULL,
     I2C_INIT,
-    {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,
-     0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,
-     0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0},
-    {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,
-     0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,
-     0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0},
+    {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0},
+    {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0},
     I2C_INITIAL
-    };
+};
 
 
 /* Private function prototypes -----------------------------------------------*/
 static eAPP_STATUS i2c_transmit(void);
 static eAPP_STATUS i2c_receive(void);
-static eAPP_STATUS i2c_handle_request(void);
-static eAPP_STATUS i2c_state_machine(void);
+static eAPP_STATUS i2c_handle_request(sAPP_NAVIGATION_CBLK* navigation_cblk);
+static eAPP_STATUS i2c_state_machine(sAPP_NAVIGATION_CBLK* navigation_cblk);
 
 /* Private functions ---------------------------------------------------------*/
 /******************************************************************************/
@@ -181,24 +149,32 @@ static eAPP_STATUS i2c_receive(void)
 /******************************************************************************/
 /*                 State Machine Management Functions                         */
 /******************************************************************************/
-static eAPP_STATUS i2c_handle_request()
+static eAPP_STATUS i2c_handle_request(sAPP_NAVIGATION_CBLK* navigation_cblk)
 {
+    eAPP_STATUS status;
     uAPP_PIXARM_MESSAGES request = AppI2CCblk.inputBuffer;
     
     switch (request.common.cmd)
     {
         case PIXARM_CMD_READ_REQ:
-            // Process the Read Req and send back a Read Data
+            // Process the Read Req, pulling out Rotation Completion Data
+            if ( APP_Navigation_Check_Rotation(request.readReq.rotation_absolute, 
+                                               navigation_cblk->navigation_data.rotation_absolute) )
+            {
+                navigation_cblk->navigation_flags.rotation_status = TRUE;
+            }
+        
+            // Send back a Read Data
             AppI2CCblk.outputBuffer.readData.cmd = PIXARM_CMD_READ_DATA;
-            AppI2CCblk.outputBuffer.readData.x = 32;
-            AppI2CCblk.outputBuffer.readData.y = -2;
-            AppI2CCblk.outputBuffer.readData.z = 40;
-            AppI2CCblk.outputBuffer.readData.distance = 300;
+            AppI2CCblk.outputBuffer.readData.x_intensity = navigation_cblk->navigation_data.x_axis;
+            AppI2CCblk.outputBuffer.readData.y_intensity = navigation_cblk->navigation_data.y_axis;
+            AppI2CCblk.outputBuffer.readData.z_intensity = navigation_cblk->navigation_data.z_axis;
+            AppI2CCblk.outputBuffer.readData.rotation_absolute = navigation_cblk->navigation_data.rotation_absolute;
             AppI2CCblk.outputBuffer.readData.flag = PIXARM_FLAG_END;
         
-            i2c_transmit(); // TODO: Check for errors
-            
-            return STATUS_SUCCESS;
+            // Transmit Response
+            status = i2c_transmit();
+            return status;
         
         case PIXARM_CMD_SYNC:
         case PIXARM_CMD_DYNC:
@@ -213,14 +189,14 @@ static eAPP_STATUS i2c_handle_request()
 }
 
 
-static eAPP_STATUS i2c_state_machine()
+static eAPP_STATUS i2c_state_machine(sAPP_NAVIGATION_CBLK* navigation_cblk)
 {
     eAPP_STATUS status = STATUS_FAILURE;
     
     switch( AppI2CCblk.state )
     {   
         case I2C_PROCESS:
-            status = i2c_handle_request();
+            status = i2c_handle_request(navigation_cblk);
             return status;
 
         case I2C_HANDSHAKE:
@@ -349,7 +325,7 @@ eAPP_STATUS APP_I2C_Initiate(void)
 }
 
 
-eAPP_STATUS APP_I2C_Process_Message(void)
+eAPP_STATUS APP_I2C_Process_Message(sAPP_NAVIGATION_CBLK* navigation_cblk)
 {
     eAPP_STATUS status = STATUS_SUCCESS;
     
@@ -361,7 +337,7 @@ eAPP_STATUS APP_I2C_Process_Message(void)
         if ( I2C_REQUEST_WAITING == AppI2CCblk.requestState )
         {
             // Process Message
-            status = i2c_state_machine();
+            status = i2c_state_machine(navigation_cblk);
         }
         else if ( I2C_NO_REQUEST == AppI2CCblk.requestState )
         {
