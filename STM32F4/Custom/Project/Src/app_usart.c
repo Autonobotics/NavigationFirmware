@@ -42,6 +42,7 @@
 /* Private typedef -----------------------------------------------------------*/
 
 /* Private define ------------------------------------------------------------*/
+// #define UART_ACCEPT_SYNC
 #define INPUT_UART_BUFFER_SIZE (sizeof(AppUsartCblk.inputBuffer))
 #define OUTPUT_UART_BUFFER_SIZE (sizeof(AppUsartCblk.outputBuffer))
 #define UART_TRANSACTION_RETRY_LIMIT 5
@@ -65,6 +66,7 @@ static sAPP_USART_CBLK AppUsartCblk = {
 /* Private function prototypes -----------------------------------------------*/
 static eAPP_STATUS uart_receive(void);
 static eAPP_STATUS uart_transmit(void);
+static eAPP_STATUS uart_send_response(void);
 static eAPP_STATUS uart_handle_handshake(uAPP_USART_MESSAGES message);
 static eAPP_STATUS uart_handle_data_receive(uAPP_USART_MESSAGES message);
 static eAPP_STATUS uart_state_machine(void);
@@ -166,6 +168,41 @@ static eAPP_STATUS uart_receive(void)
 /******************************************************************************/
 /*                 State Machine Management Functions                         */
 /******************************************************************************/
+static eAPP_STATUS uart_send_response(void)
+{
+    eAPP_STATUS status;
+    
+    // If we have something to tell the Image Board, send RACK, else just ACK
+    if ( FALSE )
+    {
+         // Format the RACK Packet
+         AppUsartCblk.outputBuffer.rack.cmd = ARMPIT_CMD_RACK;
+         AppUsartCblk.outputBuffer.rack.flag = ARMPIT_FLAG_END;
+        
+        // Based on the Type of data we send, format the data differently
+        if ( TRUE )
+        {
+            AppUsartCblk.outputBuffer.rack.sub_cmd = ARMPIT_SUBCMD_COLLISION_DETECTED;
+            AppUsartCblk.outputBuffer.rack.axis = AXIS_FRONT; // No other possible value currently
+            AppUsartCblk.outputBuffer.rack.payload_a = 10; // TODO: Fill in with Frontal Ultrasonic value
+        }
+        else if ( FALSE )
+        {
+            AppUsartCblk.outputBuffer.rack.sub_cmd = ARMPIT_SUBCMD_ROTATION_COMPLETE;
+        }
+    }
+    else
+    {
+         // Format the ACK Packet
+         AppUsartCblk.outputBuffer.ack.cmd = ARMPIT_CMD_ACK;
+         AppUsartCblk.outputBuffer.ack.flag = ARMPIT_FLAG_END;
+    }
+    
+    // Transmit and setup for receive
+    status = uart_transmit();
+    return status;
+}
+
 static eAPP_STATUS uart_handle_handshake(uAPP_USART_MESSAGES message)
 {
     eAPP_STATUS status = STATUS_FAILURE;
@@ -239,7 +276,93 @@ static eAPP_STATUS uart_handle_data_receive(uAPP_USART_MESSAGES message)
     
     switch ( message.common.cmd )
     {
+        case ARMPIT_CMD_NO_BEACON:
+            // Validate the Flag as end
+            if ( ARMPIT_FLAG_END != message.no_beacon.flag )
+            {
+                // Log Failure and return
+                APP_Log("FLAG Bits wrong on NO_BEACON Command.\r\n");
+                return STATUS_FAILURE;
+            }
+            
+            // Set Data Variables here
+            // TODO:
+            
+
+            // Transmit Response
+            status = uart_send_response();
+            return status;
+        
+        case ARMPIT_CMD_BEACON_DETECTED:
+            // Validate the Flag as end
+            if ( ARMPIT_FLAG_END != message.no_beacon.flag )
+            {
+                // Log Failure and return
+                APP_Log("FLAG Bits wrong on BEACON_DETECTED Command.\r\n");
+                return STATUS_FAILURE;
+            }
+            
+            // Set Data Variables here
+            // TODO:
+            
+
+            // Transmit Response
+            status = uart_send_response();
+            return status;
+        
+        case ARMPIT_CMD_EDGE_DETECTED:
+            // Validate the Flag as end
+            if ( ARMPIT_FLAG_END != message.no_beacon.flag )
+            {
+                // Log Failure and return
+                APP_Log("FLAG Bits wrong on EDGE_DETECTED Command.\r\n");
+                return STATUS_FAILURE;
+            }
+            
+            // Set Data Variables here
+            // TODO:
+            
+            
+            // Transmit Response
+            status = uart_send_response();
+            return status;
+        
+        case ARMPIT_CMD_BEACON_ROTATION:
+            // Validate the Flag as end
+            if ( ARMPIT_FLAG_END != message.beacon_rotation.flag )
+            {
+                // Log Failure and return
+                APP_Log("FLAG Bits wrong on BEACON_ROTATION Command.\r\n");
+                return STATUS_FAILURE;
+            }
+            
+            // Set Data Variables here
+            // TODO:
+            
+            
+            // Transmit Response
+            status = uart_send_response();
+            return status;
+        
+        case ARMPIT_CMD_QUERY_ROTATION:
+            // Validate the Flag as end
+            if ( ARMPIT_FLAG_END != message.query_rotation.flag )
+            {
+                // Log Failure and return
+                APP_Log("FLAG Bits wrong on QUERY_ROTATION Command.\r\n");
+                return STATUS_FAILURE;
+            }
+            
+            // Set Data Variables here
+            // TODO:
+            
+            
+            // Transmit Response
+            status = uart_send_response();
+            return status;
+        
         case ARMPIT_CMD_SYNC:
+#ifdef UART_ACCEPT_SYNC
             // Validate the Flag as end
             if ( ARMPIT_FLAG_END != message.sync.flag )
             {
@@ -248,34 +371,10 @@ static eAPP_STATUS uart_handle_data_receive(uAPP_USART_MESSAGES message)
                 return STATUS_FAILURE;
             }
         
-            // Format the Handshake ACK Packet
-            AppUsartCblk.outputBuffer.ack.cmd = ARMPIT_CMD_ACK;
-            AppUsartCblk.outputBuffer.ack.flag = ARMPIT_FLAG_END;
-        
-            // Transmit and setup for receive
-            status = uart_transmit();
+            // Transmit Response
+            status = uart_send_response();
             return status;
-            
-        case ARMPIT_CMD_NO_BEACON:
-            
-            return status;
-        
-        case ARMPIT_CMD_BEACON_DETECTED:
-            
-            return status;
-        
-        case ARMPIT_CMD_EDGE_DETECTED:
-            
-            return status;
-        
-        case ARMPIT_CMD_BEACON_ROTATION:
-            
-            return status;
-        
-        case ARMPIT_CMD_QUERY_ROTATION:
-            
-            return status;
-        
+#endif // #ifdef UART_ACCEPT_SYNC
         case ARMPIT_CMD_INVD:
         case ARMPIT_CMD_DYNC:
         case ARMPIT_CMD_ACK:

@@ -53,6 +53,19 @@ typedef enum _eAPP_STATUS
     
 } eAPP_STATUS;
 
+
+/* Quadcopter Axis Definitions */
+typedef enum _eAPP_AXIS
+{
+    AXIS_FRONT,     // +z
+    AXIS_REAR,      // -z
+    AXIS_LEFT,      // -x
+    AXIS_RIGH,      // +x
+    AXIS_TOP,       // +y
+    AXIS_BOTTOM     // -y
+    
+} eAPP_AXIS;
+
 /* Exported constants --------------------------------------------------------*/
 #define TRUE    1
 #define FALSE   0
@@ -66,6 +79,7 @@ typedef uint8_t BOOL;
 #define BSP_UART_ERROR_LED          LED4
 // LED6 -> BLUE
 #define BSP_ULTRASONIC_ERROR_LED    LED6
+
 
 /* Exported macro ------------------------------------------------------------*/
 #define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))

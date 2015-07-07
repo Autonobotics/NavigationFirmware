@@ -1195,6 +1195,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\app_log.c</FilePath>
             </File>
+            <File>
+              <FileName>app_ir.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\app_ir.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

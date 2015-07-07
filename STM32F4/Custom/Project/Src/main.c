@@ -39,6 +39,7 @@
 #include "app_common.h"
 #include "app_i2c.h"
 #include "app_usart.h"
+#include "app_ir.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -84,9 +85,12 @@ int main(void)
     /* Init the Logger */
     APP_Log_Init();
     
-    /* Add your application code here */
+    /* Initialize the Communication Components */
     APP_I2C_Init();
     APP_USART_Init();
+    
+    /* Initialize the Sensory Components */
+    APP_IR_Init();
     
     /* Log Configuration finished */
     APP_Log("Finished Component Configuration.\r\n");

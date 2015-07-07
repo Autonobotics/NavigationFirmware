@@ -48,6 +48,7 @@
 #include "app_common.h"
 #include "app_i2c.h"
 #include "app_usart.h"
+#include "app_ir.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -56,29 +57,20 @@
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
-/**
-  * @breif Global MSP Initialization
-  *        This function initializes any non-component specific hardware resources.
-  * @param None
-  * @retval None
-  */
-//void HAL_MspInit(void)
-//{
-//    /* No current Initialization performed */
-//}
-//
-//
-///**
-//  * @breif Global MSP Deinitialization
-//  *        This function deinitializes any non-component specific hardware 
-//  *        resources that were initialized.
-//  * @param None
-//  * @retval None
-//  */
-//void HAL_MspDeInit(void)
-//{
-//    /* No current Deinitialization performed */
-//}
+
+void HAL_IR_MspInit()
+{
+    GPIO_InitTypeDef   GPIO_InitStructure;
+    
+    __HAL_RCC_GPIOD_CLK_ENABLE();
+    /* Configure PD0 pin as input floating */
+    GPIO_InitStructure.Mode = GPIO_MODE_INPUT;
+
+    //nopull the Vout of the TSOP34840 will drive it 3.3-0V (no IR - sees IR)
+    GPIO_InitStructure.Pull = GPIO_NOPULL; 
+    GPIO_InitStructure.Pin = GPIO_PIN_0;
+    HAL_GPIO_Init(GPIOD, &GPIO_InitStructure);
+}
 
 
 /**

@@ -103,6 +103,9 @@ typedef enum _eAPP_UART_REQUEST_STATE
 #define ARMPIT_CMD_BEACON_ROTATION 0x33
 #define ARMPIT_CMD_QUERY_ROTATION 0x34
 
+#define ARMPIT_SUBCMD_COLLISION_DETECTED 0x01
+#define ARMPIT_SUBCMD_ROTATION_COMPLETE 0x02
+
 #define ARMPIT_FLAG_END 0xFF
 
 typedef struct _sAPP_ARMPIT_COMMON
@@ -154,7 +157,7 @@ typedef struct _sAPP_ARMPIT_NO_BEACON
     
     uint8_t padding[14];
     
-} sAPP_ARMPIT_BEACON;
+} sAPP_ARMPIT_NO_BEACON;
 
 typedef struct _sAPP_ARMPIT_BEACON_DETECTED
 {
@@ -212,7 +215,7 @@ typedef union _uAPP_USART_MESSAGES
     sAPP_ARMPIT_ACK ack;
     sAPP_ARMPIT_RACK rack;
     
-    sAPP_ARMPIT_BEACON beacon;
+    sAPP_ARMPIT_NO_BEACON no_beacon;
     sAPP_ARMPIT_BEACON_DETECTED beacon_detected;
     sAPP_ARMPIT_BEACON_ROTATION beacon_rotation;
     sAPP_ARMPIT_QUERY_ROTATION query_rotation;
