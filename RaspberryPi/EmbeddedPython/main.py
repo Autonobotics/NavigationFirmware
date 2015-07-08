@@ -2,6 +2,7 @@ __author__ = 'Dan'
 from common import ABStatus
 from AB_Logging import ab_log as ABLog
 from ARMPIT import protocol, message
+import camera_module
 
 
 def main():
@@ -20,9 +21,7 @@ def main():
     logger.info("Finished UART Handshake.")
 
     # Perform main Loop
-    status = ABStatus.STATUS_SUCCESS
-    while status is ABStatus.STATUS_SUCCESS:
-        break
+    camera_module.camera_loop()
 
     # Cleanup and Return
     logger.info("Cleaning up UART Resources.")

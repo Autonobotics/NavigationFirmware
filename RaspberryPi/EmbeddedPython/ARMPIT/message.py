@@ -36,6 +36,9 @@ class ARMPiTMessage():
     CMD_BEACON_ROTATION = 0x33
     CMD_QUERY_ROTATION = 0x34
 
+    SUBCMD_COLLISION_DETECTED = 0x01
+    SUBCMD_ROTATION_COMPLETE = 0x02
+
     FLAG_END = 0xFF
 
     def __init__(self):

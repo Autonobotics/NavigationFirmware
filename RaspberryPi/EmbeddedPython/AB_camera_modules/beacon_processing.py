@@ -1,10 +1,13 @@
 __author__ = 'Pravjot'
 
+import math
+
 import numpy as np
 import cv2
+
 import cv2.cv as cv
-from AB_Camera_classes import beacon
-import math
+from AB_Camera_Classes import beacon
+from AB_Camera_Modules import nav_board_comm as NAVcomm
 
 
 AB_beaconList = beacon.AB_beacons()
@@ -25,8 +28,14 @@ def send_next_beacon_info():
         return False
     else:
         AB_beaconList.next_beacon()
-        #UART command to send information to STMF board
+
         next_beacon = AB_beaconList.beacon_info(AB_beaconList.currentID)
+
+        #UART command to send information to STMF board
+        while NAVcomm.send_beacon_rotation(next_beacon) is not True:
+            #keep sending the rotation until the nav board accepts it
+            pass
+
         print("Next beacon information: {0}".format(next_beacon))
     return True
 
@@ -34,84 +43,40 @@ def send_next_beacon_info():
 def locate_beacon(image):
     img = cv2.medianBlur(image, 5)
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    #cv2.imwrite("hsv.jpg", hsv)
-    # HSV properties
-    lower = [150, 90, 90]
-    upper = [190, 255, 255]
+    # define the list of boundaries
+    boundaries = [
+        ([150, 90, 90], [190, 255, 255])
+    ]
 
-    # create numpy arrays from the bounadires
-    lower = np.array(lower, dtype="uint8")
-    upper = np.array(upper, dtype="uint8")
+    for (lower, upper) in boundaries:
+        # create numpy arrays from the bounadires
+        lower = np.array(lower, dtype="uint8")
+        upper = np.array(upper, dtype="uint8")
 
-    #filter out all unnecessary colors
-    mask = cv2.inRange(hsv, lower, upper)
-    #HoughCircles likes ring like circles to filled ones
-    edge = cv2.Canny(mask, 100, 200)
-    #smooth the image by applying gaussian blur
-    blurr = cv2.GaussianBlur(edge, (9, 9), 2)
+        #filter out all unnecessary colors
+        mask = cv2.inRange(hsv, lower, upper)
+        #HoughCircles likes ring like circles to filled ones
+        edge = cv2.Canny(mask, 100, 200)
+        #smooth the image by applying gaussian blur
+        blurr = cv2.GaussianBlur(mask, (9, 9), 2)
 
-    #cv2.imwrite("edge.jpg", edge)
-    #cv2.imwrite("mask.jpg", mask)
-    #cv2.imwrite("blurr.jpg", blurr)
 
-    circles = cv2.HoughCircles(blurr, cv.CV_HOUGH_GRADIENT, 1.2, 150,
-                               param1=20, param2=80, minRadius=0, maxRadius=0)
-    if circles is not None:
-        circles = np.uint16(np.around(circles[0, :]))
-        for (x, y, r) in circles:
-            # draw the outer circle
-            cv2.circle(img, (x, y), r, (0, 255, 0), 2)
-            marker = beacon.marker(x, y, r)
-            print('MARKER LOCATION X: {0}, Y: {1}, R: {2} in pixels'.format(marker.x, marker.y, marker.r))
-            # draw the center of the circle
-            cv2.circle(img, (x, y), 2, (0, 255, 0), 3)
-            #cv2.imwrite("img_circled.jpg", img)
-    else:
-        marker = None
+        circles = cv2.HoughCircles(blurr, cv.CV_HOUGH_GRADIENT, 1.2, 150,
+                                   param1=20, param2=50, minRadius=0, maxRadius=0)
+        if circles is not None:
+            circles = np.uint16(np.around(circles[0, :]))
+            for (x, y, r) in circles:
+                # draw the outer circle
+                cv2.circle(img, (x, y), r, (0, 255, 0), 2)
+                marker = beacon.marker(x, y, r)
+                print('MARKER LOCATION X: {0}, Y: {1}, R: {2} in pixels'.format(marker.x, marker.y, marker.r))
+                # draw the center of the circle
+                cv2.circle(img, (x, y), 2, (0, 255, 0), 3)
+                cv2.imwrite("img_circled.jpg", img)
+        else:
+            marker = None
 
     return marker
-
-
-# locate the information stored in the beacon (barcode), return the subimage containing the barcode information
-def locate_beacon_information(image):
-    # load the image and convert it to grayscale
-    orig = image.copy()
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-    #compute the Scharr gradient magnitude represntation of the images in both x and y direction
-    gradX = cv2.Sobel(gray, ddepth=cv2.CV_32F, dx=1, dy=0, ksize=-1)
-    gradY = cv2.Sobel(gray, ddepth=cv2.CV_32F, dx=0, dy=1, ksize=-1)
-
-    #subtract the y-gradient from the x-gradient
-    gradient = cv2.subtract(gradX, gradY)
-    gradient = cv2.convertScaleAbs(gradient)
-
-    #filter out the noise in the image and focus solely on the barcode region
-    # blur and threshold the image
-    blurred = cv2.blur(gradient, (9, 9))
-    ret, thresh = cv2.threshold(blurred, 225, 255, cv2.THRESH_BINARY)
-
-
-    #construct a closing kernel and apply it to the thresholded image
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (21, 7))
-    closed = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
-
-    #perform a series of erosions and dilations
-    closed = cv2.erode(closed, None, iterations=4)
-    closed = cv2.dilate(closed, None, iterations=4)
-
-    #find the contours in the thresholded image. then sort the contours by their area, keeping only the largest one
-    img, cnts, hierarchy = cv2.findContours(closed.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    c = sorted(cnts, key=cv2.contourArea, reverse=True)[0]
-
-    #compute the rotated bounding box of the largest contour
-    rect = cv2.minAreaRect(c)
-    box = np.int0(cv2.boxPoints(rect))
-
-    #draw a bounding box around the detected barcode and display the image
-    cv2.drawContours(image, [box], -1, (0, 255, 0), 3)
-    return
-
 
 # determine the location of the beacon with respect to the drones current location
 #calculate the distance vector and send appropriate information to the drones controller
@@ -138,11 +103,29 @@ def distance_to_camera(image, cam, marker):
     print norm_vec
     X_norm = X / norm_vec
     Y_norm = Y / norm_vec
+    Z_norm = distance
     print('NORMALIZED: ({0},{1})'.format(X_norm, Y_norm))
-    return [distance, X, Y]
+
+    return beacon.beaconLocation(X_norm,Y_norm,distance)
+
+def frontal_collision(distance_to_object):
+    #do some processing
+
+    NAVcomm.send_edge_distance(distance_to_object)
+
+    return
+
 
 def movingAverage(x, N):
     return np.convolve(x,np.ones((N, ))/N, mode='valid')[(N-1): ]
 
 def regAverage(x):
-    return reduce(lambda i, j: i+j, x)/len(x)
+    tmpx = 0.0
+    tmpy = 0.0
+    tmpz = 0.0
+    for i in x:
+        tmpx = tmpx + i.x
+        tmpy = tmpy + i.y
+        tmpz = tmpz + i.z
+
+    return beacon.beaconLocation(tmpx/len(x), tmpy/len(x), tmpz/len(x))
