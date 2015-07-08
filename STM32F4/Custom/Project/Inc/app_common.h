@@ -39,6 +39,9 @@ typedef enum _eAPP_AXIS
 } eAPP_AXIS;
 
 /* Exported constants --------------------------------------------------------*/
+#define DEBUG_UART
+//#define DEBUG_I2C
+
 #define TRUE    1
 #define FALSE   0
 typedef uint16_t BOOL;
@@ -59,6 +62,7 @@ typedef uint16_t BOOL;
 // This could be fixed by making a proper logging function that
 // uses vprintf with a given variadic and any extra data.
 #define APP_Log printf
+#define ENDLINE "\r\n"
 
     
 /* Exported functions ------------------------------------------------------- */

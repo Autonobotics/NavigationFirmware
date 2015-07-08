@@ -38,6 +38,11 @@ static sAPP_USART_CBLK AppUsartCblk = {
 /* Private function prototypes -----------------------------------------------*/
 static eAPP_STATUS uart_receive(void);
 static eAPP_STATUS uart_transmit(void);
+static void uart_set_navigation_data(sAPP_NAVIGATION_CBLK* navigation_cblk,
+                                     uint16_t x_distance,
+                                     uint16_t y_distance,
+                                     uint16_t z_distance,
+                                     int16_t rotation);
 static eAPP_STATUS uart_send_response(sAPP_NAVIGATION_CBLK* navigation_cblk);
 static eAPP_STATUS uart_handle_handshake(uAPP_USART_MESSAGES message);
 static eAPP_STATUS uart_handle_data_receive(sAPP_NAVIGATION_CBLK* navigation_cblk,
@@ -88,7 +93,7 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
     BSP_LED_On(BSP_UART_ERROR_LED);
     
     // Log Error and Return Failure
-    APP_Log("Generic UART Error Occured.\r\n");
+    APP_Log("UART: Generic UART Error Occured.\r\n");
     Error_Handler();
 }
 
@@ -108,7 +113,7 @@ static eAPP_STATUS uart_transmit(void)
         if ( retryCount > UART_TRANSACTION_RETRY_LIMIT )
         {
             // Log Error and return failed
-            APP_Log("Error during UART transmission. IT Status: %d.\r\n", status);
+            APP_Log("UART: Error during UART transmission. IT Status: %d.\r\n", status);
             return STATUS_FAILURE;
         }
     }
@@ -130,11 +135,26 @@ static eAPP_STATUS uart_receive(void)
         if ( retryCount > UART_TRANSACTION_RETRY_LIMIT )
         {
             // Log Error and return failed
-            APP_Log("Error during UART reception. IT Status: %d.\r\n", status);
+            APP_Log("UART: Error during UART reception. IT Status: %d.\r\n", status);
             return STATUS_FAILURE;
         }
     }
     return STATUS_SUCCESS;
+}
+
+
+static void uart_set_navigation_data(sAPP_NAVIGATION_CBLK* navigation_cblk,
+                                     uint16_t x_distance,
+                                     uint16_t y_distance,
+                                     uint16_t z_distance,
+                                     int16_t rotation)
+{
+    // Set the modified Flag
+    navigation_cblk->image_board_data.modified = TRUE;
+    navigation_cblk->image_board_data.x_distance = x_distance;
+    navigation_cblk->image_board_data.y_distance = y_distance;
+    navigation_cblk->image_board_data.z_distance = z_distance;
+    navigation_cblk->image_board_data.rotation = rotation;
 }
 
 
@@ -144,14 +164,10 @@ static eAPP_STATUS uart_receive(void)
 static eAPP_STATUS uart_send_response(sAPP_NAVIGATION_CBLK* navigation_cblk)
 {
     eAPP_STATUS status;
-    uint16_t distance;
     
     // Format the RACK Packet by default
     AppUsartCblk.outputBuffer.rack.cmd = ARMPIT_CMD_RACK;
     AppUsartCblk.outputBuffer.rack.flag = ARMPIT_FLAG_END;
-    
-    // Read distance on frontal Ultrasonic
-    distance = navigation_cblk->hc_sr04_data.distance[AXIS_FRONT];
     
     // If we have something to tell the Image Board, send RACK, else just ACK
     if ( ROTATION_COMPLETE ==  navigation_cblk->navigation_flags.rotation_status )
@@ -159,18 +175,31 @@ static eAPP_STATUS uart_send_response(sAPP_NAVIGATION_CBLK* navigation_cblk)
         AppUsartCblk.outputBuffer.rack.sub_cmd = ARMPIT_SUBCMD_ROTATION_COMPLETE;
         // Reset the Rotation Flag
         navigation_cblk->navigation_flags.rotation_status = ROTATION_INCOMPLETE;
+        
+#ifdef DEBUG_UART
+        APP_Log("UART: Replying with RACK. Subcmd: ROTATION_COMPLETE"ENDLINE);
+#endif
     }
-    else if ( HC_SR04_OUT_OF_RANGE != distance )
+    else if ( FRONTAL_AVOIDANCE_MODE_ON == navigation_cblk->navigation_flags.trigger_edge_on_image )
     {
+        // Read distance on frontal Ultrasonic
         AppUsartCblk.outputBuffer.rack.sub_cmd = ARMPIT_SUBCMD_COLLISION_DETECTED;
         AppUsartCblk.outputBuffer.rack.axis = AXIS_FRONT; // No other possible value currently
-        AppUsartCblk.outputBuffer.rack.payload_a = distance;
+        AppUsartCblk.outputBuffer.rack.payload_a = navigation_cblk->hc_sr04_data.distance[AXIS_FRONT];
+        
+#ifdef DEBUG_UART
+        APP_Log("UART: Replying with RACK. Subcmd: COLLISION_DETECTED"ENDLINE);
+#endif
     }
     else
     {
-         // Format the ACK Packet
-         AppUsartCblk.outputBuffer.ack.cmd = ARMPIT_CMD_ACK;
-         AppUsartCblk.outputBuffer.ack.flag = ARMPIT_FLAG_END;
+        // Format the ACK Packet
+        AppUsartCblk.outputBuffer.ack.cmd = ARMPIT_CMD_ACK;
+        AppUsartCblk.outputBuffer.ack.flag = ARMPIT_FLAG_END;
+        
+#ifdef DEBUG_UART
+        APP_Log("UART: Replying with ACK."ENDLINE);
+#endif
     }
     
     // Transmit and setup for receive
@@ -219,7 +248,7 @@ static eAPP_STATUS uart_handle_handshake(uAPP_USART_MESSAGES message)
             if ( ARMPIT_FLAG_END != message.sync.flag )
             {
                 // Log Failure and return
-                APP_Log("FLAG Bits wrong on SYNC Command.\r\n");
+                APP_Log("UART: FLAG Bits wrong on SYNC Command.\r\n");
                 return STATUS_FAILURE;
             }
         
@@ -257,13 +286,20 @@ static eAPP_STATUS uart_handle_data_receive(sAPP_NAVIGATION_CBLK* navigation_cbl
             if ( ARMPIT_FLAG_END != message.no_beacon.flag )
             {
                 // Log Failure and return
-                APP_Log("FLAG Bits wrong on NO_BEACON Command.\r\n");
+                APP_Log("UART: FLAG Bits wrong on NO_BEACON Command.\r\n");
                 return STATUS_FAILURE;
             }
             
-            // Set Data Variables here
-            // TODO:
+#ifdef DEBUG_UART
+            APP_Log("UART: Received CMD_NO_BEACON."ENDLINE);
+#endif
             
+            // Set Data Variables here
+            uart_set_navigation_data(navigation_cblk,
+                                     DISTANCE_UNKNOWN,
+                                     DISTANCE_UNKNOWN,
+                                     DISTANCE_UNKNOWN,
+                                     ROTATION_UNKNOWN);
 
             // Transmit Response
             status = uart_send_response(navigation_cblk);
@@ -274,13 +310,20 @@ static eAPP_STATUS uart_handle_data_receive(sAPP_NAVIGATION_CBLK* navigation_cbl
             if ( ARMPIT_FLAG_END != message.no_beacon.flag )
             {
                 // Log Failure and return
-                APP_Log("FLAG Bits wrong on BEACON_DETECTED Command.\r\n");
+                APP_Log("UART: FLAG Bits wrong on BEACON_DETECTED Command.\r\n");
                 return STATUS_FAILURE;
             }
             
-            // Set Data Variables here
-            // TODO:
+#ifdef DEBUG_UART
+            APP_Log("UART: Received CMD_BEACON_DETECTED."ENDLINE);
+#endif
             
+            // Set Data Variables here
+            uart_set_navigation_data(navigation_cblk,
+                                     message.beacon_detected.x_distance,
+                                     message.beacon_detected.y_distance,
+                                     message.beacon_detected.z_distance,
+                                     ROTATION_UNKNOWN);
 
             // Transmit Response
             status = uart_send_response(navigation_cblk);
@@ -291,13 +334,20 @@ static eAPP_STATUS uart_handle_data_receive(sAPP_NAVIGATION_CBLK* navigation_cbl
             if ( ARMPIT_FLAG_END != message.no_beacon.flag )
             {
                 // Log Failure and return
-                APP_Log("FLAG Bits wrong on EDGE_DETECTED Command.\r\n");
+                APP_Log("UART: FLAG Bits wrong on EDGE_DETECTED Command.\r\n");
                 return STATUS_FAILURE;
             }
             
-            // Set Data Variables here
-            // TODO:
+#ifdef DEBUG_UART
+            APP_Log("UART: Received CMD_EDGE_DETECTED."ENDLINE);
+#endif
             
+            // Set Data Variables here
+            uart_set_navigation_data(navigation_cblk,
+                                     message.edge_detected.x_distance,
+                                     DISTANCE_UNKNOWN,
+                                     DISTANCE_UNKNOWN,
+                                     ROTATION_UNKNOWN);
             
             // Transmit Response
             status = uart_send_response(navigation_cblk);
@@ -308,13 +358,20 @@ static eAPP_STATUS uart_handle_data_receive(sAPP_NAVIGATION_CBLK* navigation_cbl
             if ( ARMPIT_FLAG_END != message.beacon_rotation.flag )
             {
                 // Log Failure and return
-                APP_Log("FLAG Bits wrong on BEACON_ROTATION Command.\r\n");
+                APP_Log("UART: FLAG Bits wrong on BEACON_ROTATION Command.\r\n");
                 return STATUS_FAILURE;
             }
             
-            // Set Data Variables here
-            // TODO:
+#ifdef DEBUG_UART
+            APP_Log("UART: Received CMD_BEACON_ROTATION."ENDLINE);
+#endif
             
+            // Set Data Variables here
+            uart_set_navigation_data(navigation_cblk,
+                                     DISTANCE_UNKNOWN,
+                                     DISTANCE_UNKNOWN,
+                                     DISTANCE_UNKNOWN,
+                                     message.beacon_rotation.x_rotation);
             
             // Transmit Response
             status = uart_send_response(navigation_cblk);
@@ -325,13 +382,16 @@ static eAPP_STATUS uart_handle_data_receive(sAPP_NAVIGATION_CBLK* navigation_cbl
             if ( ARMPIT_FLAG_END != message.query_rotation.flag )
             {
                 // Log Failure and return
-                APP_Log("FLAG Bits wrong on QUERY_ROTATION Command.\r\n");
+                APP_Log("UART: FLAG Bits wrong on QUERY_ROTATION Command.\r\n");
                 return STATUS_FAILURE;
             }
             
-            // Set Data Variables here
-            // TODO:
+#ifdef DEBUG_UART
+            APP_Log("UART: Received CMD_QUERY_ROTATION."ENDLINE);
+#endif
             
+            // NOTE: No data set in a Query Rotation as we want our old
+            //       rotation value to continue to be transmitted.
             
             // Transmit Response
             status = uart_send_response(navigation_cblk);
@@ -343,9 +403,13 @@ static eAPP_STATUS uart_handle_data_receive(sAPP_NAVIGATION_CBLK* navigation_cbl
             if ( ARMPIT_FLAG_END != message.sync.flag )
             {
                 // Log Failure and return
-                APP_Log("FLAG Bits wrong on SYNC Command.\r\n");
+                APP_Log("UART: FLAG Bits wrong on SYNC Command.\r\n");
                 return STATUS_FAILURE;
             }
+            
+#ifdef DEBUG_UART
+            APP_Log("UART: Received CMD_SYNC."ENDLINE);
+#endif
         
             // Transmit Response
             status = uart_send_response(navigation_cblk);
@@ -356,7 +420,7 @@ static eAPP_STATUS uart_handle_data_receive(sAPP_NAVIGATION_CBLK* navigation_cbl
         case ARMPIT_CMD_ACK:
         case ARMPIT_CMD_RACK:
         default:
-            APP_Log("UART APP Driver state received bad command. Command: %x\r\n", message.common.cmd);
+            APP_Log("UART: UART APP Driver state received bad command. Command: %x\r\n", message.common.cmd);
             AppUsartCblk.state = UART_ERROR;
             return STATUS_FAILURE;
     }
@@ -380,7 +444,7 @@ static eAPP_STATUS uart_state_machine(sAPP_NAVIGATION_CBLK* navigation_cblk)
         case UART_INIT:
         case UART_ERROR:
         default:
-            APP_Log("UART APP Driver in Bad State.\r\n");
+            APP_Log("UART: UART APP Driver in Bad State.\r\n");
             AppUsartCblk.state = UART_ERROR;
             return status;
     }

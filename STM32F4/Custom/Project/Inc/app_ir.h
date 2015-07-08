@@ -18,6 +18,14 @@ Note: If sensor Vout pin = 0 (sees the IR) -> function returns 1
 /* Includes ------------------------------------------------------------------*/
 #include "app_common.h"
 
+/* Exported constants --------------------------------------------------------*/
+#define IR_CLOCK_ENABLE()       __HAL_RCC_GPIOD_CLK_ENABLE()
+
+#define IR_PIN                  GPIO_PIN_0
+#define IR_GPIO_PORT            GPIOD
+#define IR_GPIO_PULLUPDOWN      GPIO_NOPULL
+
+
 /* Function Declaration*/
 void APP_IR_Init(void);
 void HAL_IR_MspInit(void);

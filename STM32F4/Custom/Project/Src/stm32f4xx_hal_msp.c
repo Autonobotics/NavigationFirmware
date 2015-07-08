@@ -39,14 +39,14 @@ void HAL_IR_MspInit(void)
 {
     GPIO_InitTypeDef   GPIO_InitStructure;
     
-    __HAL_RCC_GPIOD_CLK_ENABLE();
+    IR_CLOCK_ENABLE();
     /* Configure PD0 pin as input floating */
     GPIO_InitStructure.Mode = GPIO_MODE_INPUT;
 
     //nopull the Vout of the TSOP34840 will drive it 3.3-0V (no IR - sees IR)
-    GPIO_InitStructure.Pull = GPIO_NOPULL; 
-    GPIO_InitStructure.Pin = GPIO_PIN_0;
-    HAL_GPIO_Init(GPIOD, &GPIO_InitStructure);
+    GPIO_InitStructure.Pull = IR_GPIO_PULLUPDOWN; 
+    GPIO_InitStructure.Pin = IR_PIN;
+    HAL_GPIO_Init(IR_GPIO_PORT, &GPIO_InitStructure);
 }
 
 

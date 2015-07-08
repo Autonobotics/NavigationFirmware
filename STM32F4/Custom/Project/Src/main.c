@@ -21,7 +21,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 static sAPP_NAVIGATION_CBLK AppNavigationCblk = {
-    {FALSE, 0x0000, 0x0000, 0x0000, 0x0000},
+    {FALSE, 0x0000, 0x0000, 0x0000, ROTATION_UNKNOWN},
     {{FALSE}, {0x0000}},
     {0x00},
     {IDLE_INTENSITY, IDLE_INTENSITY, IDLE_INTENSITY, 0x0000},
@@ -70,8 +70,8 @@ int main(void)
     APP_USART_Init();
     
     /* Initialize the Sensory Components */
-    APP_IR_Init();
-    APP_HC_SR04_Init();
+    //APP_IR_Init();
+    //APP_HC_SR04_Init();
     
     /* Log Configuration finished */
     APP_Log("Finished Component Configuration.\r\n");
@@ -104,10 +104,10 @@ int main(void)
         status = APP_UART_Process_Message(&AppNavigationCblk);
         
         // Save State of IR Sensor
-        AppNavigationCblk.ir_data.guide_within_sight = APP_Scan_IR();
+        //AppNavigationCblk.ir_data.guide_within_sight = APP_Scan_IR();
         
         // Run Ultrasonics Driver
-        status = APP_HC_SR04_Pulse_Sensors(&AppNavigationCblk);
+        //status = APP_HC_SR04_Pulse_Sensors(&AppNavigationCblk);
         
         // Make any calculations
         status = APP_Navigation_Compute(&AppNavigationCblk);

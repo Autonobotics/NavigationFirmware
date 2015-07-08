@@ -18,23 +18,30 @@
 /* Exported constants --------------------------------------------------------*/
 #define HC_SR04_OUT_OF_RANGE 0xFFFF
 
+#define FRONTAL_AVOIDANCE_MODE_ON   TRUE
+#define FRONTAL_AVOIDANCE_MODE_OFF  FALSE
+
+#define DISTANCE_UNKNOWN 0xFFFF
+
+#define ROTATION_UNKNOWN 0x7FFF  // Centidegrees
+
 #define ROTATION_COMPLETE TRUE
 #define ROTATION_INCOMPLETE FALSE
 
-#define ROTATION_EPSILON    100 // TODO: FIND REAL VALUE in Centidegrees
+#define ROTATION_EPSILON    100 // Tolerance of a degree. Ie. 100 Centidegrees
 #define ROTATION_LOWER_BOUND(_desired_) (_desired_ - (ROTATION_EPSILON >> 2))
 #define ROTATION_UPPER_BOUND(_desired_) (_desired_ + (ROTATION_EPSILON >> 2))
 
 /* Exported types ------------------------------------------------------------*/
 typedef enum _eAPP_NAVIGATION_AXIS_INTENSITY
 {
-    IDLE_INTENSITY = 0,
+    POSITIVE_FAST = 0,
+    NEGATIVE_FAST,
     
     POSITIVE_SLOW,
-    POSITIVE_FAST,
-    
     NEGATIVE_SLOW,
-    NEGATIVE_FAST
+    
+    IDLE_INTENSITY
     
 } eAPP_NAVIGATION_AXIS_INTENSITY;
 
@@ -44,7 +51,7 @@ typedef struct _sAPP_IMAGE_BOARD_DATA
     uint16_t x_distance;
     uint16_t y_distance;
     uint16_t z_distance;
-    uint16_t rotation;                      // Centidegrees
+    int16_t rotation;                      // Centidegrees
     
 } sAPP_IMAGE_BOARD_DATA;
 

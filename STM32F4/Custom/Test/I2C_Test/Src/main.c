@@ -61,7 +61,7 @@ I2C_HandleTypeDef I2cHandle;
 /* Buffer used for transmission */
 static uint8_t aTxBuffer[] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF};
 
-static uint8_t bTxBuffer[] = {0x03, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+static uint8_t bTxBuffer[] = {0x03, 0x00, 0x00, 0x00, 0xFF, 0x00, 0x00, 0x00};
 
 /* Buffer used for reception */
 uint8_t aRxBuffer[RXBUFFERSIZE];
@@ -81,9 +81,8 @@ static void Error_Handler(void);
   */
 int main(void)
 {
-    int32_t temp = 0;
-    uint32_t dis = 0;
     sAPP_PIXARM_READ_DATA* data;
+    sAPP_PIXARM_READ_REQ* req;
     uint8_t iter = 1;
     HAL_StatusTypeDef stat;
     
@@ -157,6 +156,8 @@ int main(void)
         }
     }
     
+    
+    
     /*##-3- Put I2C peripheral in reception process ############################*/ 
     /* Timeout is set to 10S */ 
     while((stat = HAL_I2C_Master_Receive(&I2cHandle, (uint16_t)I2C_ADDRESS, aRxBuffer, RXBUFFERSIZE, 10000)) != HAL_OK)
@@ -181,11 +182,15 @@ int main(void)
     //}
     
     Test_Log("Finished I2C Handshaking.\r\n");
-    //Flush_Buffer(aRxBuffer, RXBUFFERSIZE);
+    
+    
+    req = (sAPP_PIXARM_READ_REQ *) bTxBuffer;
+    data = (sAPP_PIXARM_READ_DATA *) aRxBuffer;
     
     /* Infinite loop */  
     while (1)
     {
+        
         /*##-2- Start the transmission process #####################################*/  
         /* Timeout is set to 10S */
         Test_Log("Iteration %d\r\n", iter);
@@ -206,6 +211,8 @@ int main(void)
         while (HAL_I2C_GetState(&I2cHandle) != HAL_I2C_STATE_READY)
         {
         }
+        
+        req->rotation_absolute = 0;
         
         /*##-3- Put I2C peripheral in reception process ############################*/ 
         /* Timeout is set to 10S */ 
@@ -228,33 +235,34 @@ int main(void)
         }
         
         // Validate the data
-        data = (sAPP_PIXARM_READ_DATA *) aRxBuffer;
         if (data->cmd != 0x04)
         {
             Test_Log("CMD incorrect on packet. Received %x.\r\n", data->cmd);
         }
-        if (data->x_intensity != 0)
+        if (data->x_intensity != 4)
         {
             Test_Log("X incorrect on packet. Received %d.\r\n", data->x_intensity);
         }
-        if (data->y_intensity != 0)
+        if (data->y_intensity != 4)
         {
             Test_Log("Y incorrect on packet. Received %d.\r\n", data->y_intensity);
         }
-        if (data->z_intensity != 0)
+        if (data->z_intensity != 4)
         {
             Test_Log("Z incorrect on packet. Received %d.\r\n", data->z_intensity);
         }
-        if (data->rotation_absolute != 0)
+        if (data->rotation_absolute != (int16_t) 36000)
         {
-            Test_Log("Distance incorrect on packet. Received %d.\r\n", data->rotation_absolute);
+            Test_Log("Rotation in packet was %d.\r\n", data->rotation_absolute);
+            Test_Log("Replying with same rotation.\r\n");
+            req->rotation_absolute = data->rotation_absolute;
         }
         if (data->flag != 0xFF)
         {
             Test_Log("Flag incorrect on packet. Received %x.\r\n", data->flag);
         }
         
-        HAL_Delay(10);
+        HAL_Delay(100);
         iter++;
     }
 }

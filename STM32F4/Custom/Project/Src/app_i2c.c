@@ -80,7 +80,7 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *I2cHandle)
     BSP_LED_On(BSP_I2C_ERROR_LED);
     
     // Log Error and Return Failure
-    APP_Log("Generic I2C Error Occured.\r\n");
+    APP_Log("I2C: Generic I2C Error Occured.\r\n");
     Error_Handler();
 }
 
@@ -101,7 +101,7 @@ static eAPP_STATUS i2c_transmit(void)
         if (HAL_I2C_ERROR_AF != (i2cError = HAL_I2C_GetError(AppI2CCblk.handle)))
         {
             // Log Error and return failed
-            APP_Log("Error during I2C transmission. IT Status: %d.  I2C Error: %d.\r\n", status, i2cError);
+            APP_Log("I2C: Error during I2C transmission. IT Status: %d.  I2C Error: %d.\r\n", status, i2cError);
             return STATUS_FAILURE;
         }
         
@@ -109,7 +109,7 @@ static eAPP_STATUS i2c_transmit(void)
         if ( retryCount > I2C_TRANSACTION_RETRY_LIMIT )
         {
             // Log Error and return failed
-            APP_Log("Error during I2C transmission. IT Status: %d.\r\n", status);
+            APP_Log("I2C: Error during I2C transmission. IT Status: %d.\r\n", status);
             return STATUS_FAILURE;
         }
     }
@@ -131,7 +131,7 @@ static eAPP_STATUS i2c_receive(void)
         if (HAL_I2C_ERROR_AF != (i2cError = HAL_I2C_GetError(AppI2CCblk.handle)))
         {
             // Log Error and Return Failure
-            APP_Log("Error during I2C reception. IT Status: %d.  I2C Error: %d.\r\n", status, i2cError);
+            APP_Log("I2C: Error during I2C reception. IT Status: %d.  I2C Error: %d.\r\n", status, i2cError);
             Error_Handler();
         }
         
@@ -139,7 +139,7 @@ static eAPP_STATUS i2c_receive(void)
         if ( retryCount > I2C_TRANSACTION_RETRY_LIMIT )
         {
             // Log Error and return failed
-            APP_Log("Error during I2C reception. IT Status: %d.\r\n", status);
+            APP_Log("I2C: Error during I2C reception. IT Status: %d.\r\n", status);
             return STATUS_FAILURE;
         }
     }
@@ -157,11 +157,29 @@ static eAPP_STATUS i2c_handle_request(sAPP_NAVIGATION_CBLK* navigation_cblk)
     switch (request.common.cmd)
     {
         case PIXARM_CMD_READ_REQ:
-            // Process the Read Req, pulling out Rotation Completion Data
-            if ( APP_Navigation_Check_Rotation(request.readReq.rotation_absolute, 
-                                               navigation_cblk->navigation_data.rotation_absolute) )
+            // Validate the Flag as end
+            if ( PIXARM_FLAG_END != request.readReq.flag )
             {
-                navigation_cblk->navigation_flags.rotation_status = TRUE;
+                // Log Failure and return
+                APP_Log("I2C: FLAG Bits wrong on READ_REQ Command.\r\n");
+                return STATUS_FAILURE;
+            }
+            
+#ifdef DEBUG_I2C
+            APP_Log("I2C: Received CMD_READ_REQ."ENDLINE);
+#endif
+        
+            // Process the Read Req, pulling out Rotation Completion Data
+            if ( ROTATION_UNKNOWN != navigation_cblk->image_board_data.rotation )
+            {
+                if ( APP_Navigation_Check_Rotation(request.readReq.rotation_absolute, 
+                                               navigation_cblk->navigation_data.rotation_absolute) )
+                {
+                    // If the previous rotation finished, override this cycles rotation calculation
+                    navigation_cblk->navigation_flags.rotation_status = TRUE;
+                    navigation_cblk->image_board_data.rotation = ROTATION_UNKNOWN;
+                    navigation_cblk->navigation_data.rotation_absolute = ROTATION_UNKNOWN;
+                }
             }
         
             // Send back a Read Data
@@ -171,6 +189,10 @@ static eAPP_STATUS i2c_handle_request(sAPP_NAVIGATION_CBLK* navigation_cblk)
             AppI2CCblk.outputBuffer.readData.z_intensity = navigation_cblk->navigation_data.z_axis;
             AppI2CCblk.outputBuffer.readData.rotation_absolute = navigation_cblk->navigation_data.rotation_absolute;
             AppI2CCblk.outputBuffer.readData.flag = PIXARM_FLAG_END;
+            
+#ifdef DEBUG_I2C
+            APP_Log("I2C: Sending CMD_READ_DATA."ENDLINE);
+#endif
         
             // Transmit Response
             status = i2c_transmit();
@@ -181,7 +203,7 @@ static eAPP_STATUS i2c_handle_request(sAPP_NAVIGATION_CBLK* navigation_cblk)
         case PIXARM_CMD_ACK:
         case PIXARM_CMD_READ_DATA:
         default:
-            APP_Log("Recieved Invalid Command %x in state %x.\r\n", request.common.cmd, AppI2CCblk.state);
+            APP_Log("I2C: Recieved Invalid Command %x in state %x.\r\n", request.common.cmd, AppI2CCblk.state);
             AppI2CCblk.state = I2C_ERROR;
             return STATUS_FAILURE;
     }
@@ -260,21 +282,21 @@ eAPP_STATUS APP_I2C_Initiate(void)
     do {
         if (HAL_OK != HAL_I2C_Slave_Receive(AppI2CCblk.handle, AppI2CCblk.inputBuffer.buffer, INPUT_I2C_BUFFER_SIZE, I2C_POLL_TIMEOUT))
         {
-            APP_Log("Error in reception of SYNC.\r\n");
+            APP_Log("I2C: Error in reception of SYNC.\r\n");
             errorCount++;
         }
         else
         {
             break;
         }
-        if ( I2C_CONNECTION_ATTEMPTS == errorCount)
+        if ( (uint8_t) I2C_CONNECTION_ATTEMPTS <= errorCount)
         {
             // Log Error and Return Failed
-            APP_Log("Error in reception of SYNC, abandoning Process.\r\n");
+            APP_Log("I2C: Error in reception of SYNC, abandoning Process.\r\n");
             return STATUS_FAILURE;
         }
         
-    } while( errorCount < I2C_CONNECTION_ATTEMPTS );
+    } while( errorCount < (uint8_t) I2C_CONNECTION_ATTEMPTS );
     
     // Process the Handshake SYNC Packet
     message.sync = AppI2CCblk.inputBuffer.sync;
@@ -283,7 +305,7 @@ eAPP_STATUS APP_I2C_Initiate(void)
     if ( PIXARM_CMD_SYNC != message.sync.cmd )
     {
         // Log Failure and return
-        APP_Log("CMD Bits wrong on SYNC Command.\r\n");
+        APP_Log("I2C: CMD Bits wrong on SYNC Command.\r\n");
         return STATUS_FAILURE;
     }
     
@@ -291,7 +313,7 @@ eAPP_STATUS APP_I2C_Initiate(void)
     if ( PIXARM_FLAG_END != message.sync.flag )
     {
         // Log Failure and return
-        APP_Log("FLAG Bits wrong on SYNC Command.\r\n");
+        APP_Log("I2C: FLAG Bits wrong on SYNC Command.\r\n");
         return STATUS_FAILURE;
     }
     
@@ -302,7 +324,7 @@ eAPP_STATUS APP_I2C_Initiate(void)
     if ( HAL_OK != HAL_I2C_Slave_Transmit(AppI2CCblk.handle, AppI2CCblk.outputBuffer.buffer, OUTPUT_I2C_BUFFER_SIZE, I2C_POLL_TIMEOUT))
     {
         // Log Error and return failed
-        APP_Log("Error in transmission of SYNC.\r\n");
+        APP_Log("I2C: Error in transmission of SYNC.\r\n");
         return STATUS_FAILURE;
     }
     
@@ -317,7 +339,7 @@ eAPP_STATUS APP_I2C_Initiate(void)
     }
     else
     {
-        APP_Log("Error in reception call after Handshake.\r\n");
+        APP_Log("I2C: Error in reception call after Handshake.\r\n");
         AppI2CCblk.state = I2C_ERROR;
         BSP_LED_On(BSP_I2C_ERROR_LED);
         return STATUS_FAILURE;

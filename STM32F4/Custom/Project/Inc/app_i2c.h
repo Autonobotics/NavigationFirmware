@@ -45,8 +45,8 @@
 #define I2Cx_ER_IRQHandler              I2C1_ER_IRQHandler
 
 /* Define Connection Timeout and Attempts */
-#define I2C_POLL_TIMEOUT 1000  // In Milliseconds
-#define I2C_CONNECTION_ATTEMPTS 60
+#define I2C_POLL_TIMEOUT 100  // In Milliseconds
+#define I2C_CONNECTION_ATTEMPTS 600
 
 
 /* Exported types ------------------------------------------------------------*/

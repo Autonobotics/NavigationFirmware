@@ -45,6 +45,19 @@
 #include <stdio.h>
 
 /* Exported types ------------------------------------------------------------*/
+typedef struct _sAPP_PIXARM_READ_REQ
+{
+    uint8_t cmd;
+    uint8_t padding_a;
+    
+    uint16_t rotation_absolute;
+    uint8_t flag;
+    
+    uint8_t padding[3];
+    
+} sAPP_PIXARM_READ_REQ;
+
+
 typedef struct _sAPP_PIXARM_READ_DATA
 {
     uint8_t cmd;
@@ -58,6 +71,7 @@ typedef struct _sAPP_PIXARM_READ_DATA
     uint8_t flag;
     
 } sAPP_PIXARM_READ_DATA;
+
 
 /* Exported constants --------------------------------------------------------*/
 /* User can use this section to tailor I2Cx/I2Cx instance used and associated 
