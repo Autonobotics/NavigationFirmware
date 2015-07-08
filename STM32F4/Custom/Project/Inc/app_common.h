@@ -38,9 +38,20 @@ typedef enum _eAPP_AXIS
     
 } eAPP_AXIS;
 
+typedef enum _eAPP_UART_REQUEST_STATE
+{
+    UART_INITIAL = 0,
+    UART_NO_REQUEST,
+    UART_TRANSMITING,
+    UART_REQUEST_WAITING,
+    UART_REQUEST_PROCESSING,
+    UART_WAITING
+    
+} eAPP_UART_REQUEST_STATE;
+
 /* Exported constants --------------------------------------------------------*/
-#define DEBUG_UART
-//#define DEBUG_I2C
+#define DEBUG_PIXARM
+#define DEBUG_ARMPIT
 
 #define TRUE    1
 #define FALSE   0
@@ -49,9 +60,9 @@ typedef uint16_t BOOL;
 // LED5 -> RED
 #define BSP_HARD_ERROR_LED          LED5
 // LED3 -> ORANGE
-#define BSP_I2C_ERROR_LED           LED3
+#define BSP_PIXARM_ERROR_LED           LED3
 // LED4 -> GREEN
-#define BSP_UART_ERROR_LED          LED4
+#define BSP_ARMPIT_ERROR_LED          LED4
 // LED6 -> BLUE
 #define BSP_ULTRASONIC_ERROR_LED    LED6
 

@@ -786,14 +786,9 @@
               <FilePath>..\Src\stm32f4xx_it.c</FilePath>
             </File>
             <File>
-              <FileName>app_i2c.c</FileName>
+              <FileName>app_armpit.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\app_i2c.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\app_usart.c</FilePath>
+              <FilePath>..\Src\app_armpit.c</FilePath>
             </File>
             <File>
               <FileName>app_common.c</FileName>
@@ -819,6 +814,16 @@
               <FileName>app_navigation.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\app_navigation.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_pixarm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\app_pixarm.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_uart_callbacks.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\app_uart_callbacks.c</FilePath>
             </File>
           </Files>
         </Group>

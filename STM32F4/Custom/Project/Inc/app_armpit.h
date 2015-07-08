@@ -18,29 +18,29 @@
 
 /* Exported constants --------------------------------------------------------*/
 
-/* Definition for USARTx clock resources */
-#define USARTx                           USART2
-#define USARTx_CLK_ENABLE()              __HAL_RCC_USART2_CLK_ENABLE();
-#define USARTx_RX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE()
-#define USARTx_TX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE() 
+/* Definition for ARMPIT clock resources */
+#define ARMPIT_USART                            USART2
+#define ARMPIT_USART_CLK_ENABLE()              __HAL_RCC_USART2_CLK_ENABLE();
+#define ARMPIT_USART_RX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE()
+#define ARMPIT_USART_TX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE() 
 
-#define USARTx_FORCE_RESET()             __HAL_RCC_USART2_FORCE_RESET()
-#define USARTx_RELEASE_RESET()           __HAL_RCC_USART2_RELEASE_RESET()
+#define ARMPIT_USART_FORCE_RESET()             __HAL_RCC_USART2_FORCE_RESET()
+#define ARMPIT_USART_RELEASE_RESET()           __HAL_RCC_USART2_RELEASE_RESET()
 
-/* Definition for USARTx Pins */
-#define USARTx_TX_PIN                    GPIO_PIN_2
-#define USARTx_TX_GPIO_PORT              GPIOA  
-#define USARTx_TX_AF                     GPIO_AF7_USART2
-#define USARTx_RX_PIN                    GPIO_PIN_3
-#define USARTx_RX_GPIO_PORT              GPIOA 
-#define USARTx_RX_AF                     GPIO_AF7_USART2
+/* Definition for ARMPIT Pins */
+#define ARMPIT_USART_TX_PIN                    GPIO_PIN_2
+#define ARMPIT_USART_TX_GPIO_PORT              GPIOA  
+#define ARMPIT_USART_TX_AF                     GPIO_AF7_USART2
+#define ARMPIT_USART_RX_PIN                    GPIO_PIN_3
+#define ARMPIT_USART_RX_GPIO_PORT              GPIOA 
+#define ARMPIT_USART_RX_AF                     GPIO_AF7_USART2
 
-/* Definition for USARTx's NVIC */
-#define USARTx_IRQn                      USART2_IRQn
-#define USARTx_IRQHandler                USART2_IRQHandler
+/* Definition for ARMPIT's NVIC */
+#define ARMPIT_USART_IRQn                      USART2_IRQn
+#define ARMPIT_USART_IRQHandler                USART2_IRQHandler
 
 /* Define Connection Timeout and Attempts */
-#define UART_POLL_TIMEOUT 1  // Ie. Blocking Poll (In Milliseconds) Note: Would like Non-blocking Poll
+#define ARMPIT_POLL_TIMEOUT 1  // Ie. Blocking Poll (In Milliseconds) Note: Would like Non-blocking Poll
 
 /* ARMPIT Definitions */
 #define ARMPIT_CMD_INVD 0x00
@@ -61,27 +61,16 @@
 
 
 /* Exported types ------------------------------------------------------------*/
-typedef enum _eAPP_USART_STATE
+typedef enum _eAPP_ARMPIT_STATE
 {
-    UART_INIT = 0,
-    UART_HANDSHAKE,
-    UART_DATA_RECEIVE,
-    UART_TERMINATE,
+    ARMPIT_INIT = 0,
+    ARMPIT_HANDSHAKE,
+    ARMPIT_DATA_RECEIVE,
+    ARMPIT_TERMINATE,
     
-    UART_ERROR
+    ARMPIT_ERROR
     
-} eAPP_USART_STATE;
-
-typedef enum _eAPP_UART_REQUEST_STATE
-{
-    UART_INITIAL = 0,
-    UART_NO_REQUEST,
-    UART_TRANSMITING,
-    UART_REQUEST_WAITING,
-    UART_REQUEST_PROCESSING,
-    UART_WAITING
-    
-} eAPP_UART_REQUEST_STATE;
+} eAPP_ARMPIT_STATE;
 
 typedef struct _sAPP_ARMPIT_COMMON
 {
@@ -199,24 +188,28 @@ typedef union _uAPP_USART_MESSAGES
     sAPP_ARMPIT_COMMON common;
     uint8_t buffer[16];
     
-} uAPP_USART_MESSAGES;
+} uAPP_ARMPIT_MESSAGES;
 
 typedef struct _sAPP_USART_CBLK
 {
     UART_HandleTypeDef *handle;
-    eAPP_USART_STATE state;
-    uAPP_USART_MESSAGES inputBuffer;
-    uAPP_USART_MESSAGES outputBuffer;
+    eAPP_ARMPIT_STATE state;
+    uAPP_ARMPIT_MESSAGES inputBuffer;
+    uAPP_ARMPIT_MESSAGES outputBuffer;
     
     volatile eAPP_UART_REQUEST_STATE requestState;
     
-} sAPP_USART_CBLK;
+} sAPP_ARMPIT_CBLK;
 
+/* Callback functions ------------------------------------------------------- */
+void ARMPIT_UART_TxCpltCallback(UART_HandleTypeDef *huart);
+void ARMPIT_UART_RxCpltCallback(UART_HandleTypeDef *huart);
+void ARMPIT_UART_ErrorCallback(UART_HandleTypeDef *huart);
 
 /* Exported functions ------------------------------------------------------- */
-void APP_USART_Init(void);
-eAPP_STATUS APP_UART_Initiate(void);
-eAPP_STATUS APP_UART_Process_Message(sAPP_NAVIGATION_CBLK* navigation_cblk);
+void APP_ARMPIT_Init(void);
+eAPP_STATUS APP_ARMPIT_Initiate(void);
+eAPP_STATUS APP_ARMPIT_Process_Message(sAPP_NAVIGATION_CBLK* navigation_cblk);
 
 
 #endif /* #ifndef __APP_USART_H */

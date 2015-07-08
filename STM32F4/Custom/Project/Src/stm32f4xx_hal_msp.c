@@ -10,8 +10,8 @@
 /* Includes ------------------------------------------------------------------*/
 // User Implementation of HAL_MSP functions in #include "stm32f4xx_hal.h"
 #include "app_common.h"
-#include "app_i2c.h"
-#include "app_usart.h"
+#include "app_pixarm.h"
+#include "app_armpit.h"
 #include "app_ir.h"
 #include "app_hc_sr04.h"
 
@@ -225,33 +225,66 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 {  
     GPIO_InitTypeDef  GPIO_InitStruct;
     
-    /*##-1- Enable peripherals and GPIO Clocks #################################*/
-    /* Enable GPIO TX/RX clock */
-    USARTx_TX_GPIO_CLK_ENABLE();
-    USARTx_RX_GPIO_CLK_ENABLE();
-    /* Enable USART2 clock */
-    USARTx_CLK_ENABLE(); 
-    
-    /*##-2- Configure peripheral GPIO ##########################################*/  
-    /* UART TX GPIO pin configuration  */
-    GPIO_InitStruct.Pin       = USARTx_TX_PIN;
-    GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull      = GPIO_NOPULL;
-    GPIO_InitStruct.Speed     = GPIO_SPEED_FAST;
-    GPIO_InitStruct.Alternate = USARTx_TX_AF;
-    
-    HAL_GPIO_Init(USARTx_TX_GPIO_PORT, &GPIO_InitStruct);
-
-    /* UART RX GPIO pin configuration  */
-    GPIO_InitStruct.Pin = USARTx_RX_PIN;
-    GPIO_InitStruct.Alternate = USARTx_RX_AF;
+    if ( huart->Instance == ARMPIT_USART )
+    {
+        /*##-1- Enable peripherals and GPIO Clocks #################################*/
+        /* Enable GPIO TX/RX clock */
+        ARMPIT_USART_TX_GPIO_CLK_ENABLE();
+        ARMPIT_USART_RX_GPIO_CLK_ENABLE();
+        /* Enable USART2 clock */
+        ARMPIT_USART_CLK_ENABLE(); 
         
-    HAL_GPIO_Init(USARTx_RX_GPIO_PORT, &GPIO_InitStruct);
+        /*##-2- Configure peripheral GPIO ##########################################*/  
+        /* UART TX GPIO pin configuration  */
+        GPIO_InitStruct.Pin       = ARMPIT_USART_TX_PIN;
+        GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Pull      = GPIO_NOPULL;
+        GPIO_InitStruct.Speed     = GPIO_SPEED_FAST;
+        GPIO_InitStruct.Alternate = ARMPIT_USART_TX_AF;
         
-    /*##-3- Configure the NVIC for UART ########################################*/
-    /* NVIC for USART1 */
-    HAL_NVIC_SetPriority(USARTx_IRQn, 3, 0);
-    HAL_NVIC_EnableIRQ(USARTx_IRQn);
+        HAL_GPIO_Init(ARMPIT_USART_TX_GPIO_PORT, &GPIO_InitStruct);
+    
+        /* UART RX GPIO pin configuration  */
+        GPIO_InitStruct.Pin = ARMPIT_USART_RX_PIN;
+        GPIO_InitStruct.Alternate = ARMPIT_USART_RX_AF;
+            
+        HAL_GPIO_Init(ARMPIT_USART_RX_GPIO_PORT, &GPIO_InitStruct);
+            
+        /*##-3- Configure the NVIC for UART ########################################*/
+        /* NVIC for USART1 */
+        HAL_NVIC_SetPriority(ARMPIT_USART_IRQn, 3, 0);
+        HAL_NVIC_EnableIRQ(ARMPIT_USART_IRQn);
+    }
+    else if ( huart->Instance == PIXARM_USART )
+    {
+        /*##-1- Enable peripherals and GPIO Clocks #################################*/
+        /* Enable GPIO TX/RX clock */
+        PIXARM_USART_TX_GPIO_CLK_ENABLE();
+        PIXARM_USART_RX_GPIO_CLK_ENABLE();
+        /* Enable PIXARM_USART clock */
+        PIXARM_USART_CLK_ENABLE(); 
+        
+        /*##-2- Configure peripheral GPIO ##########################################*/  
+        /* UART TX GPIO pin configuration  */
+        GPIO_InitStruct.Pin       = PIXARM_USART_TX_PIN;
+        GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Pull      = GPIO_NOPULL;
+        GPIO_InitStruct.Speed     = GPIO_SPEED_FAST;
+        GPIO_InitStruct.Alternate = PIXARM_USART_TX_AF;
+        
+        HAL_GPIO_Init(PIXARM_USART_TX_GPIO_PORT, &GPIO_InitStruct);
+    
+        /* UART RX GPIO pin configuration  */
+        GPIO_InitStruct.Pin = PIXARM_USART_RX_PIN;
+        GPIO_InitStruct.Alternate = PIXARM_USART_RX_AF;
+            
+        HAL_GPIO_Init(PIXARM_USART_RX_GPIO_PORT, &GPIO_InitStruct);
+            
+        /*##-3- Configure the NVIC for UART ########################################*/
+        /* NVIC for USART1 */
+        HAL_NVIC_SetPriority(PIXARM_USART_IRQn, 1, 0);
+        HAL_NVIC_EnableIRQ(PIXARM_USART_IRQn);
+    }
 }
 
 
@@ -265,94 +298,36 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
   */
 void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
 {
-    /*##-1- Reset peripherals ##################################################*/
-    USARTx_FORCE_RESET();
-    USARTx_RELEASE_RESET();
-    
-    /*##-2- Disable peripherals and GPIO Clocks #################################*/
-    /* Configure UART Tx as alternate function  */
-    HAL_GPIO_DeInit(USARTx_TX_GPIO_PORT, USARTx_TX_PIN);
-    /* Configure UART Rx as alternate function  */
-    HAL_GPIO_DeInit(USARTx_RX_GPIO_PORT, USARTx_RX_PIN);
-    
-    /*##-3- Disable the NVIC for UART ##########################################*/
-    HAL_NVIC_DisableIRQ(USARTx_IRQn);
-}
-
-
-/**
-  * @brief I2C MSP Initialization 
-  *        This function configures the hardware resources used in this example: 
-  *           - Peripheral's clock enable
-  *           - Peripheral's GPIO Configuration  
-  *           - DMA configuration for transmission request by peripheral 
-  *           - NVIC configuration for DMA interrupt request enable
-  * @param hi2c: I2C handle pointer
-  * @retval None
-  */
-void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
-{  
-    GPIO_InitTypeDef  GPIO_InitStruct;
-    
-    /*##-1- Enable GPIO Clocks #################################################*/
-    /* Enable GPIO TX/RX clock */
-    I2Cx_SCL_GPIO_CLK_ENABLE();
-    I2Cx_SDA_GPIO_CLK_ENABLE();
-    
-    /*##-2- Configure peripheral GPIO ##########################################*/  
-    /* I2C TX GPIO pin configuration  */
-    GPIO_InitStruct.Pin       = I2Cx_SCL_PIN;
-    GPIO_InitStruct.Mode      = GPIO_MODE_AF_OD;
-    GPIO_InitStruct.Pull      = GPIO_PULLUP;
-    GPIO_InitStruct.Speed     = GPIO_SPEED_FAST;
-    GPIO_InitStruct.Alternate = I2Cx_SCL_AF;
-    
-    HAL_GPIO_Init(I2Cx_SCL_GPIO_PORT, &GPIO_InitStruct);
+    if ( huart->Instance == ARMPIT_USART )
+    {
+        /*##-1- Reset peripherals ##################################################*/
+        ARMPIT_USART_FORCE_RESET();
+        ARMPIT_USART_RELEASE_RESET();
         
-    /* I2C RX GPIO pin configuration  */
-    GPIO_InitStruct.Pin = I2Cx_SDA_PIN;
-    GPIO_InitStruct.Alternate = I2Cx_SDA_AF;
+        /*##-2- Disable peripherals and GPIO Clocks #################################*/
+        /* Configure UART Tx as alternate function  */
+        HAL_GPIO_DeInit(ARMPIT_USART_TX_GPIO_PORT, ARMPIT_USART_TX_PIN);
+        /* Configure UART Rx as alternate function  */
+        HAL_GPIO_DeInit(ARMPIT_USART_RX_GPIO_PORT, ARMPIT_USART_RX_PIN);
         
-    HAL_GPIO_Init(I2Cx_SDA_GPIO_PORT, &GPIO_InitStruct);
-    
-    /*##-3- Enable I2C peripheral Clock ########################################*/ 
-    /* Enable I2C1 clock */
-    I2Cx_CLK_ENABLE();
+        /*##-3- Disable the NVIC for UART ##########################################*/
+        HAL_NVIC_DisableIRQ(ARMPIT_USART_IRQn);
+    }
+    else if ( huart->Instance == PIXARM_USART )
+    {
+        /*##-1- Reset peripherals ##################################################*/
+        PIXARM_USART_FORCE_RESET();
+        PIXARM_USART_RELEASE_RESET();
         
-    /*##-4- Configure the NVIC for I2C #########################################*/   
-    /* NVIC for I2C1 */
-    HAL_NVIC_SetPriority(I2Cx_ER_IRQn, 0, 1);
-    HAL_NVIC_EnableIRQ(I2Cx_ER_IRQn);
-    HAL_NVIC_SetPriority(I2Cx_EV_IRQn, 1, 0);
-    HAL_NVIC_EnableIRQ(I2Cx_EV_IRQn);
+        /*##-2- Disable peripherals and GPIO Clocks #################################*/
+        /* Configure UART Tx as alternate function  */
+        HAL_GPIO_DeInit(PIXARM_USART_TX_GPIO_PORT, PIXARM_USART_TX_PIN);
+        /* Configure UART Rx as alternate function  */
+        HAL_GPIO_DeInit(PIXARM_USART_RX_GPIO_PORT, PIXARM_USART_RX_PIN);
+        
+        /*##-3- Disable the NVIC for UART ##########################################*/
+        HAL_NVIC_DisableIRQ(PIXARM_USART_IRQn);
+    }
 }
-
-
-/**
-  * @brief I2C MSP De-Initialization 
-  *        This function frees the hardware resources used in this example:
-  *          - Disable the Peripheral's clock
-  *          - Revert GPIO, DMA and NVIC configuration to their default state
-  * @param hi2c: I2C handle pointer
-  * @retval None
-  */
-void HAL_I2C_MspDeInit(I2C_HandleTypeDef *hi2c)
-{
-    /*##-1- Reset peripherals ##################################################*/
-    I2Cx_FORCE_RESET();
-    I2Cx_RELEASE_RESET();
-    
-    /*##-2- Disable peripherals and GPIO Clocks ################################*/
-    /* Configure I2C Tx as alternate function  */
-    HAL_GPIO_DeInit(I2Cx_SCL_GPIO_PORT, I2Cx_SCL_PIN);
-    /* Configure I2C Rx as alternate function  */
-    HAL_GPIO_DeInit(I2Cx_SDA_GPIO_PORT, I2Cx_SDA_PIN);
-    
-    /*##-3- Disable the NVIC for I2C ###########################################*/
-    HAL_NVIC_DisableIRQ(I2Cx_ER_IRQn);
-    HAL_NVIC_DisableIRQ(I2Cx_EV_IRQn);
-}
-
-
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

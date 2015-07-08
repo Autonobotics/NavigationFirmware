@@ -10,8 +10,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "app_common.h"
 #include "app_navigation.h"
-#include "app_i2c.h"
-#include "app_usart.h"
+#include "app_pixarm.h"
+#include "app_armpit.h"
 #include "app_ir.h"
 #include "app_hc_sr04.h"
 
@@ -66,8 +66,8 @@ int main(void)
     APP_Log_Init();
     
     /* Initialize the Communication Components */
-    APP_I2C_Init();
-    APP_USART_Init();
+    APP_PIXARM_Init();
+    APP_ARMPIT_Init();
     
     /* Initialize the Sensory Components */
     //APP_IR_Init();
@@ -76,21 +76,21 @@ int main(void)
     /* Log Configuration finished */
     APP_Log("Finished Component Configuration.\r\n");
     
-    // Start I2C Interrupt Process: Synchronous Initiation Process
-    status = APP_I2C_Initiate();
-    if ( STATUS_FAILURE == status )
-    {
-        APP_Log("I2C Handshake failed. Transitioning to Error.\r\n");
-        BSP_LED_On(BSP_I2C_ERROR_LED);
-        Error_Handler();
-    }
+    // Start PIXARM Interrupt Process: Synchronous Initiation Process
+    //status = APP_PIXARM_Initiate();
+    //if ( STATUS_FAILURE == status )
+    //{
+    //    APP_Log("PIXARM Handshake failed. Transitioning to Error.\r\n");
+    //    BSP_LED_On(BSP_PIXARM_ERROR_LED);
+    //    Error_Handler();
+    //}
     
-    // Start UART Interrupt Process: Asynchronous Initiation Process
-    status = APP_UART_Initiate();
+    // Start ARMPIT Interrupt Process: Asynchronous Initiation Process
+    status = APP_ARMPIT_Initiate();
     if ( STATUS_FAILURE == status )
     {
-        APP_Log("UART Handshake initiation failed. Transitioning to Error.\r\n");
-        BSP_LED_On(BSP_UART_ERROR_LED);
+        APP_Log("ARMPIT Handshake initiation failed. Transitioning to Error.\r\n");
+        BSP_LED_On(BSP_ARMPIT_ERROR_LED);
         Error_Handler();
     }
     
@@ -100,8 +100,8 @@ int main(void)
     /* Infinite loop */
     while (1)
     {
-        // Process UART Requests
-        status = APP_UART_Process_Message(&AppNavigationCblk);
+        // Process ARMPIT Requests
+        status = APP_ARMPIT_Process_Message(&AppNavigationCblk);
         
         // Save State of IR Sensor
         //AppNavigationCblk.ir_data.guide_within_sight = APP_Scan_IR();
@@ -112,8 +112,8 @@ int main(void)
         // Make any calculations
         status = APP_Navigation_Compute(&AppNavigationCblk);
         
-        // Process I2C Requests
-        status = APP_I2C_Process_Message(&AppNavigationCblk);
+        // Process PIXARM Requests
+        //status = APP_PIXARM_Process_Message(&AppNavigationCblk);
     }
 }
 
