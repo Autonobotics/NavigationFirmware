@@ -1,63 +1,69 @@
 __author__ = 'Pravjot'
 
-from AB_camera_modules import beacon_processing, image_transformations
-from ARMPIT import protocol as ARMPit
-from AB_Camera_classes import camera
-from AB_Logging import ab_log ab as AB_Log
+from AB_Camera_Modules import beacon_processing
+import AB_Camera_Modules.nav_board_comm as NAVcomm
+from AB_Camera_Classes import ABcamera
+from AB_Logging import ab_log
+import numpy as np
+import io
 import cv2
-import time
 
-if __name__ == "__main__":
-    #beacon marker
+def camera_loop():
+    # beacon marker
     marker = None
-    picam = camera.PiCam()
+    picam = ABcamera.PiCam()
     vector_dist = []
 
-    #intialize handshake
-    ARMPit.perform_handshake();
-
-    #wait for command from STM board to tell you that the drone is facing the write way
-    #this will be a while statement waiting on a response from UART
-    cmd = ARMPit.uart_receive_cmd()
-
-    #infinite loop
     #get image from raspberry pi camera and store it
     camera, rawCapture = picam.PiVideo()
+    stream = io.BytesIO()
 
     #capture frames and process them
-    for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-        image = frame.array
+    for frame in camera.capture_continuous(stream, format='jpeg'):
+        #image = frame.array
+        # clear the stream in preparation for the next frame
+        #rawCapture.truncate(0)
+
+        # Construct a numpy array from the stream
+        data = np.fromstring(stream.getvalue(), dtype=np.uint8)
+        # "Decode" the image from the array, preserving colour
+        image = cv2.imdecode(data, 1)
+
         if image is not None:
-            #undistort
-            #camera_image_capture.undistort_img(image, mtx, dist)
-            #beacon_processing.locate_beacon_information('barcode_01.jpg')
+            #try and locate the beacon marker
             marker = beacon_processing.locate_beacon(image)
 
-        if marker is  None:
-            #send response to nav board we have not found it
+        if marker is None:
             print('Cannot locate beacon!')
+            while NAVcomm.send_no_beacon() is not True:
+                #wait for nav board to respond
+                pass
         else:
-            distance, x, y = beacon_processing.distance_to_camera(image, picam, marker)
-            vector_dist.append(distance)
+            #X,Y,Z
+            beaconDist = beacon_processing.distance_to_camera(image, picam, marker)
+            vector_dist.append(beaconDist)
+            while NAVcomm.send_beacon_detected(beaconDist) is not True:
+                    #wait until the nav board has accepted the distance
+                    pass
 
             if len(vector_dist) == 5:
-                #avg = beacon_processing.movingAverage(vector_dist, 10)
                 avg = beacon_processing.regAverage(vector_dist)
                 vector_dist = []
-                print('AVERAGE: {0}'.format(avg))
+                print('------AVERAGE: ({0}, {1}, {2})'.format(avg.x, avg.y, avg.z))
 
-           #send distance to controller
-
+                #send distance to controller
+                while NAVcomm.send_beacon_detected(avg) is not True:
+                    #wait until the nav board has accepted the distance
+                    pass
 
             #When the drone reaches a minimum distance from the beacon, go to the next beacon
-            if distance < marker.MIN_DISTANCE_BEACON:
+            if beaconDist.z < marker.MIN_DISTANCE_BEACON:
                 print('Go find next beacon!')
                 if beacon_processing.send_next_beacon_info() is False:
                     break
+                #Wait for response from STM board, for the drone to finish rotation
+                #while loop
+                while NAVcomm.query_drone_rotation() is not True:
+                #wait for drone to complete the rotation
+                    pass
 
-
-
-            #Wait for response from STM board, for the drone to finish rotation
-            #while loop
-          # clear the stream in preparation for the next frame
-        rawCapture.truncate(0)
