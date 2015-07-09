@@ -806,11 +806,6 @@
               <FilePath>..\Src\app_ir.c</FilePath>
             </File>
             <File>
-              <FileName>app_hc_sr04.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\app_hc_sr04.c</FilePath>
-            </File>
-            <File>
               <FileName>app_navigation.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\app_navigation.c</FilePath>
@@ -824,6 +819,16 @@
               <FileName>app_uart_callbacks.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\app_uart_callbacks.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_ultrasonic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\app_ultrasonic.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_ultrasonic_adapter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\app_ultrasonic_adapter.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -102,5 +102,6 @@ typedef struct _sAPP_HC_SR04_CBLK
 void APP_HC_SR04_Init(void);
 void HAL_HC_SR04_MspInit(void);
 eAPP_STATUS APP_HC_SR04_Pulse_Sensors(sAPP_NAVIGATION_CBLK* navigation_cblk);
+void APP_HC_SR04_Handle_EXTI(TIM_HandleTypeDef *htim, GPIO_TypeDef* port, uint16_t pin);
 
 #endif // #ifndef __APP_HC_SR04_H

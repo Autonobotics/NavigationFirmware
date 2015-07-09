@@ -182,8 +182,7 @@ void PIXARM_USART_IRQHandler(void)
 */
 void EXTI0_IRQHandler(void)
 {
-    HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1);
-    HAL_GPIO_EXTI_IRQHandler(HC_SR04_FRONT_PIN);
+    APP_HC_SR04_Handle_EXTI(&htim2, HC_SR04_FRONT_PORT, HC_SR04_FRONT_PIN);
 }
 
 
@@ -192,8 +191,7 @@ void EXTI0_IRQHandler(void)
 */
 void EXTI1_IRQHandler(void)
 {
-    HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1);
-    HAL_GPIO_EXTI_IRQHandler(HC_SR04_LEFT_PIN);
+    APP_HC_SR04_Handle_EXTI(&htim3, HC_SR04_LEFT_PORT, HC_SR04_LEFT_PIN);
 }
 
 /**
@@ -201,8 +199,7 @@ void EXTI1_IRQHandler(void)
 */
 void EXTI2_IRQHandler(void)
 {
-    HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_2);
-    HAL_GPIO_EXTI_IRQHandler(HC_SR04_BOTTOM_PIN);
+    APP_HC_SR04_Handle_EXTI(&htim3, HC_SR04_BOTTOM_PORT, HC_SR04_BOTTOM_PIN);
 }
 
 /**
@@ -210,8 +207,7 @@ void EXTI2_IRQHandler(void)
 */
 void EXTI3_IRQHandler(void)
 {
-    HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_2);
-    HAL_GPIO_EXTI_IRQHandler(HC_SR04_RIGHT_PIN);
+    APP_HC_SR04_Handle_EXTI(&htim4, HC_SR04_RIGHT_PORT, HC_SR04_RIGHT_PIN);
 }
 
 /**
@@ -219,34 +215,9 @@ void EXTI3_IRQHandler(void)
 */
 void EXTI4_IRQHandler(void)
 {
-    HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_3);
-    HAL_GPIO_EXTI_IRQHandler(HC_SR04_REAR_PIN);
+    APP_HC_SR04_Handle_EXTI(&htim4, HC_SR04_REAR_PORT, HC_SR04_REAR_PIN);
 }
 
-
-/**
-* @brief This function handles TIM2 global interrupt.
-*/
-void TIM2_IRQHandler(void)
-{
-    HAL_TIM_IRQHandler(&htim2);
-}
-
-/**
-* @brief This function handles TIM3 global interrupt.
-*/
-void TIM3_IRQHandler(void)
-{
-    HAL_TIM_IRQHandler(&htim3);
-}
-
-/**
-* @brief This function handles TIM4 global interrupt.
-*/
-void TIM4_IRQHandler(void)
-{
-    HAL_TIM_IRQHandler(&htim4);
-}
 
 /**
 * @brief This function handles TIM5 global interrupt.

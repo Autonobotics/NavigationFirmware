@@ -34,7 +34,7 @@ static void hc_sr04_TIM2_init(void);
 static void hc_sr04_TIM3_init(void);
 static void hc_sr04_TIM4_init(void);
 static void hc_sr04_Delay_init(void);
-
+static void hc_sr04_Stop_Timer(TIM_HandleTypeDef *htim);
 static void hc_sr04_start_pulse(eAPP_HC_SR04_PULSE_SET pulse_set);
 
 
@@ -55,13 +55,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             HAL_GPIO_WritePin(HC_SR04_FLR_TRIGGER_PORT, 
                               HC_SR04_FLR_TRIGGER_PIN, 
                               GPIO_PIN_RESET);
-            
-            HAL_NVIC_EnableIRQ(TIM3_IRQn);
-            HAL_NVIC_EnableIRQ(TIM4_IRQn);
-            HAL_TIM_IC_Start_IT(AppHcsr04Cblk.tim3Handle, TIM_CHANNEL_1);
-            HAL_TIM_IC_Start_IT(AppHcsr04Cblk.tim4Handle, TIM_CHANNEL_2);
-            HAL_NVIC_EnableIRQ(EXTI1_IRQn);
-            HAL_NVIC_EnableIRQ(EXTI3_IRQn);
         }
         else
         {
@@ -69,98 +62,89 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             HAL_GPIO_WritePin(HC_SR04_FBR_TRIGGER_PORT, 
                               HC_SR04_FBR_TRIGGER_PIN, 
                               GPIO_PIN_RESET);
-            
-            HAL_NVIC_EnableIRQ(TIM3_IRQn);
-            HAL_NVIC_EnableIRQ(TIM4_IRQn);
-            HAL_TIM_IC_Start_IT(AppHcsr04Cblk.tim3Handle, TIM_CHANNEL_2);
-            HAL_TIM_IC_Start_IT(AppHcsr04Cblk.tim4Handle, TIM_CHANNEL_3);
-            HAL_NVIC_EnableIRQ(EXTI2_IRQn);
-            HAL_NVIC_EnableIRQ(EXTI4_IRQn);
         }
         // Reset the Timer value
         __HAL_TIM_SET_COUNTER(htim, 0);
         
-        // Turn on Interrupt Listening for the EXTI Pins
-        HAL_NVIC_EnableIRQ(TIM2_IRQn);
-        HAL_TIM_IC_Start_IT(AppHcsr04Cblk.tim2Handle, TIM_CHANNEL_1);
         HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-        HAL_NVIC_DisableIRQ(TIM5_IRQn);
     }
 }
 
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+static void hc_sr04_Stop_Timer(TIM_HandleTypeDef *htim)
 {
     if( TIM2 == htim->Instance )
     {
         // Update the count variable
         AppHcsr04Cblk.received_count++;
-        // Once the falling edge triggers the capture value, reset+stop counter
-        HAL_TIM_IC_Stop_IT(htim, TIM_CHANNEL_1);
+        // Stop the Timer
+        HAL_TIM_Base_Stop_IT(htim);
         // Save the Comparison Value
-        AppHcsr04Cblk.data.fbr_data.set[HC_SR04_FRONT] = __HAL_TIM_GetCompare(htim, TIM_CHANNEL_1);
-        AppHcsr04Cblk.data.flr_data.set[HC_SR04_FRONT] = __HAL_TIM_GetCompare(htim, TIM_CHANNEL_1);
+        AppHcsr04Cblk.data.fbr_data.set[HC_SR04_FRONT] = __HAL_TIM_GetCounter(htim);
+        AppHcsr04Cblk.data.flr_data.set[HC_SR04_FRONT] = __HAL_TIM_GetCounter(htim);
         // Reset counter after input capture interrupt occurs
         __HAL_TIM_SET_COUNTER(htim, 0);
-        // Disable the Interrupt of the Associated EXTI Pin
+        
         HAL_NVIC_DisableIRQ(EXTI0_IRQn);
-        HAL_NVIC_DisableIRQ(TIM2_IRQn);
     }
     
     if( TIM3 == htim->Instance )
     {
         // Update the count variable
         AppHcsr04Cblk.received_count++;
+        // Stop the Timer
+        HAL_TIM_Base_Stop_IT(htim);
         // Depending on the Set, read and stop channel
         if ( FRONT_LEFT_RIGHT == AppHcsr04Cblk.pulse_set )
         {
-            // Once the falling edge triggers the capture value, reset+stop counter
-            HAL_TIM_IC_Stop_IT(htim, TIM_CHANNEL_1);
             // Save the Comparison Value
-            AppHcsr04Cblk.data.flr_data.set[HC_SR04_LEFT] = __HAL_TIM_GetCompare(htim, TIM_CHANNEL_1);
-            // Disable the Interrupt of the Associated EXTI Pin
-            HAL_NVIC_DisableIRQ(EXTI1_IRQn);
+            AppHcsr04Cblk.data.flr_data.set[HC_SR04_LEFT] = __HAL_TIM_GetCounter(htim);
         }
         else
         {
-            // Once the falling edge triggers the capture value, reset+stop counter
-            HAL_TIM_IC_Stop_IT(htim, TIM_CHANNEL_2);
             // Save the Comparison Value
-            AppHcsr04Cblk.data.fbr_data.set[HC_SR04_BOTTOM] = __HAL_TIM_GetCompare(htim, TIM_CHANNEL_2);
-            // Disable the Interrupt of the Associated EXTI Pin
-            HAL_NVIC_DisableIRQ(EXTI2_IRQn);
+            AppHcsr04Cblk.data.fbr_data.set[HC_SR04_BOTTOM] = __HAL_TIM_GetCounter(htim);
         }
         // Reset counter after input capture interrupt occurs
         __HAL_TIM_SET_COUNTER(htim, 0); 
-        HAL_NVIC_DisableIRQ(TIM3_IRQn);
     }
     
     if( TIM4 == htim->Instance )
     {
         // Update the count variable
         AppHcsr04Cblk.received_count++;
+        // Stop the Timer
+        HAL_TIM_Base_Stop_IT(htim);
         // Depending on the Set, read and stop channel
         if ( FRONT_LEFT_RIGHT == AppHcsr04Cblk.pulse_set )
         {
-            // Once the falling edge triggers the capture value, reset+stop counter
-            HAL_TIM_IC_Stop_IT(htim, TIM_CHANNEL_2);
             // Save the Comparison Value
-            AppHcsr04Cblk.data.flr_data.set[HC_SR04_RIGHT] = __HAL_TIM_GetCompare(htim, TIM_CHANNEL_2);
-            // Disable the Interrupt of the Associated EXTI Pin
-            HAL_NVIC_DisableIRQ(EXTI3_IRQn);
+            AppHcsr04Cblk.data.flr_data.set[HC_SR04_RIGHT] = __HAL_TIM_GetCounter(htim);
         }
         else
         {
-            // Once the falling edge triggers the capture value, reset+stop counter
-            HAL_TIM_IC_Stop_IT(htim, TIM_CHANNEL_3);
             // Save the Comparison Value
-            AppHcsr04Cblk.data.fbr_data.set[HC_SR04_REAR] = __HAL_TIM_GetCompare(htim, TIM_CHANNEL_3);
-            // Disable the Interrupt of the Associated EXTI Pin
-            HAL_NVIC_DisableIRQ(EXTI4_IRQn);
+            AppHcsr04Cblk.data.fbr_data.set[HC_SR04_REAR] = __HAL_TIM_GetCounter(htim);
         }
         // Reset counter after input capture interrupt occurs
         __HAL_TIM_SET_COUNTER(htim, 0);
-        HAL_NVIC_DisableIRQ(TIM4_IRQn);
     }
+}
+
+void APP_HC_SR04_Handle_EXTI(TIM_HandleTypeDef *htim, GPIO_TypeDef* port, uint16_t pin)
+{
+    if ( HC_SR04_ENABLED == AppHcsr04Cblk.state )
+    {
+        if ( HAL_GPIO_ReadPin(port, pin) )
+        {
+            HAL_TIM_Base_Start_IT(htim);
+        }
+        else
+        {
+            hc_sr04_Stop_Timer(htim);
+        }
+    }
+    
+    HAL_GPIO_EXTI_IRQHandler(pin);
 }
 
 /******************************************************************************/
@@ -183,17 +167,9 @@ void hc_sr04_TIM2_init(void)
     sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
     HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig);
     
-    HAL_TIM_IC_Init(&htim2);
-    
     sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
     sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
     HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig);
-    
-    sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_FALLING;
-    sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
-    sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
-    sConfigIC.ICFilter = 0;
-    HAL_TIM_IC_ConfigChannel(&htim2, &sConfigIC, TIM_CHANNEL_1);
     
     AppHcsr04Cblk.tim2Handle = & htim2;
 }
@@ -215,18 +191,9 @@ void hc_sr04_TIM3_init(void)
     sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
     HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig);
     
-    HAL_TIM_IC_Init(&htim3);
-    
     sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
     sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
     HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig);
-    
-    sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_FALLING;
-    sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
-    sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
-    sConfigIC.ICFilter = 0;
-    HAL_TIM_IC_ConfigChannel(&htim3, &sConfigIC, TIM_CHANNEL_1);
-    HAL_TIM_IC_ConfigChannel(&htim3, &sConfigIC, TIM_CHANNEL_2);
     
     AppHcsr04Cblk.tim3Handle = & htim3;
 }
@@ -248,18 +215,9 @@ void hc_sr04_TIM4_init(void)
     sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
     HAL_TIM_ConfigClockSource(&htim4, &sClockSourceConfig);
     
-    HAL_TIM_IC_Init(&htim4);
-    
     sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
     sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
     HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig);
-    
-    sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_FALLING;
-    sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
-    sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
-    sConfigIC.ICFilter = 0;
-    HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, TIM_CHANNEL_2);
-    HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, TIM_CHANNEL_3);
     
     AppHcsr04Cblk.tim4Handle = & htim4;
 }
@@ -288,9 +246,6 @@ static void hc_sr04_Delay_init(void)
 
 static void hc_sr04_start_pulse(eAPP_HC_SR04_PULSE_SET pulse_set)
 {
-    // Start the Delay Timer
-    HAL_NVIC_EnableIRQ(TIM5_IRQn);
-    
     // Depending on the Set, read and stop channel
     if ( FRONT_LEFT_RIGHT == AppHcsr04Cblk.pulse_set )
     {
@@ -320,8 +275,8 @@ void APP_HC_SR04_Init(void)
     
     // Initialize the Timers
     hc_sr04_TIM2_init();
-    hc_sr04_TIM3_init();
-    hc_sr04_TIM4_init();
+    //hc_sr04_TIM3_init();
+    //hc_sr04_TIM4_init();
     hc_sr04_Delay_init();
     
     // Initialize the EXTI Pins
@@ -351,14 +306,15 @@ eAPP_STATUS APP_HC_SR04_Pulse_Sensors(sAPP_NAVIGATION_CBLK* navigation_cblk)
             // Set Pulse Ongoing Flag
             AppHcsr04Cblk.pulsed_ongoing = TRUE;
             
+            // Clear the Received Count variable
+            AppHcsr04Cblk.received_count = 0;
+            
             // Start a new pulse
             hc_sr04_start_pulse(AppHcsr04Cblk.pulse_set);
             
-            // Clear the Received Count variable
-            AppHcsr04Cblk.received_count = 0;
         }
-        
-        if ( HC_SR04_SENSORS_PER_SET <= AppHcsr04Cblk.received_count )
+        //HC_SR04_SENSORS_PER_SET
+        if ( 1 <= AppHcsr04Cblk.received_count )
         {
             // Compute new Readings for the given Sensor set
             if ( FRONT_LEFT_RIGHT == AppHcsr04Cblk.pulse_set )
@@ -377,7 +333,7 @@ eAPP_STATUS APP_HC_SR04_Pulse_Sensors(sAPP_NAVIGATION_CBLK* navigation_cblk)
             }
             
             // Change sensor sets
-            AppHcsr04Cblk.pulse_set = !AppHcsr04Cblk.pulse_set;
+            //AppHcsr04Cblk.pulse_set = !AppHcsr04Cblk.pulse_set;
             
             // Clear Pulse Ongoing Flag
             AppHcsr04Cblk.pulsed_ongoing = FALSE;
@@ -387,7 +343,8 @@ eAPP_STATUS APP_HC_SR04_Pulse_Sensors(sAPP_NAVIGATION_CBLK* navigation_cblk)
     else if ( HC_SR04_WAITING == AppHcsr04Cblk.state )
     {
         // Start delay timer for a short period to settle
-        HAL_Delay(100);
+        APP_Log("Waiting\r\n");
+        HAL_Delay(1000);
         AppHcsr04Cblk.state = HC_SR04_ENABLED;
     }
     

@@ -54,6 +54,14 @@ void HAL_HC_SR04_MspInit(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct;
     
+    /* GPIO Ports Clock Enable */
+    __GPIOE_CLK_ENABLE();
+    __GPIOH_CLK_ENABLE();
+    __GPIOC_CLK_ENABLE();
+    __GPIOA_CLK_ENABLE();
+    __GPIOB_CLK_ENABLE();
+    __GPIOD_CLK_ENABLE();
+    
     GPIO_InitStruct.Pin = GPIO_PIN_8;
     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull = GPIO_PULLDOWN;
@@ -70,7 +78,7 @@ void HAL_HC_SR04_MspInit(void)
     /*Configure GPIO pins : PC0 PC1 PC2 PC3 PC4 */
     GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3 
                             |GPIO_PIN_4;
-    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
     GPIO_InitStruct.Pull = GPIO_PULLDOWN;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
     
@@ -98,9 +106,13 @@ void HAL_HC_SR04_MspInit(void)
     /* EXTI interrupt init*/
     HAL_NVIC_SetPriority(EXTI0_IRQn, 1, 0);
     HAL_NVIC_SetPriority(EXTI1_IRQn, 1, 0);
+    HAL_NVIC_EnableIRQ(EXTI1_IRQn);
     HAL_NVIC_SetPriority(EXTI2_IRQn, 1, 0);
+    HAL_NVIC_EnableIRQ(EXTI2_IRQn);
     HAL_NVIC_SetPriority(EXTI3_IRQn, 1, 0);
+    HAL_NVIC_EnableIRQ(EXTI3_IRQn);
     HAL_NVIC_SetPriority(EXTI4_IRQn, 1, 0);
+    HAL_NVIC_EnableIRQ(EXTI4_IRQn);
 }
 
 
@@ -113,59 +125,27 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
         /* Peripheral clock enable */
         __TIM2_CLK_ENABLE();
         
-        /**TIM2 GPIO Configuration    
-        PA15     ------> TIM2_CH1 
-        */
-        GPIO_InitStruct.Pin = GPIO_PIN_15;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
-        GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;
-        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-        
         /* Peripheral interrupt init*/
         HAL_NVIC_SetPriority(TIM2_IRQn, 2, 1);
-        //HAL_NVIC_EnableIRQ(TIM2_IRQn);
+        HAL_NVIC_EnableIRQ(TIM2_IRQn);
     }
     else if(htim_base->Instance==TIM3)
     {
         /* Peripheral clock enable */
         __TIM3_CLK_ENABLE();
-    
-        /**TIM3 GPIO Configuration    
-        PA6     ------> TIM3_CH1
-        PA7     ------> TIM3_CH2 
-        */
-        GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_7;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
-        GPIO_InitStruct.Alternate = GPIO_AF2_TIM3;
-        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-    
+        
         /* Peripheral interrupt init*/
         HAL_NVIC_SetPriority(TIM3_IRQn, 2, 1);
-        //HAL_NVIC_EnableIRQ(TIM3_IRQn);
+        HAL_NVIC_EnableIRQ(TIM3_IRQn);
     }
     else if(htim_base->Instance==TIM4)
     {
         /* Peripheral clock enable */
         __TIM4_CLK_ENABLE();
-    
-        /**TIM4 GPIO Configuration    
-        PB7     ------> TIM4_CH2
-        PB8     ------> TIM4_CH3 
-        */
-        GPIO_InitStruct.Pin = GPIO_PIN_7|GPIO_PIN_8;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
-        GPIO_InitStruct.Alternate = GPIO_AF2_TIM4;
-        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
         
         /* Peripheral interrupt init */
         HAL_NVIC_SetPriority(TIM4_IRQn, 2, 1);
-        //HAL_NVIC_EnableIRQ(TIM4_IRQn);
+        HAL_NVIC_EnableIRQ(TIM4_IRQn);
     }
     else if ( TIM5 == htim_base->Instance )
     {
@@ -174,7 +154,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
         
         /* Peripheral interrupt init*/
         HAL_NVIC_SetPriority(TIM5_IRQn, 1, 0);
-        //HAL_NVIC_EnableIRQ(TIM5_IRQn);
+        HAL_NVIC_EnableIRQ(TIM5_IRQn);
     }
 }
 

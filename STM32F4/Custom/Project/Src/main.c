@@ -66,8 +66,8 @@ int main(void)
     APP_Log_Init();
     
     /* Initialize the Communication Components */
-    //APP_PIXARM_Init();
-    //APP_ARMPIT_Init();
+    APP_PIXARM_Init();
+    APP_ARMPIT_Init();
     
     /* Initialize the Sensory Components */
     //APP_IR_Init();
@@ -77,22 +77,22 @@ int main(void)
     APP_Log("Finished Component Configuration.\r\n");
     
     // Start PIXARM Interrupt Process: Synchronous Initiation Process
-    //status = APP_PIXARM_Initiate();
-    //if ( STATUS_FAILURE == status )
-    //{
-    //    APP_Log("PIXARM Handshake failed. Transitioning to Error.\r\n");
-    //    BSP_LED_On(BSP_PIXARM_ERROR_LED);
-    //    Error_Handler();
-    //}
+    status = APP_PIXARM_Initiate();
+    if ( STATUS_FAILURE == status )
+    {
+        APP_Log("PIXARM Handshake failed. Transitioning to Error.\r\n");
+        BSP_LED_On(BSP_PIXARM_ERROR_LED);
+        Error_Handler();
+    }
     
     // Start ARMPIT Interrupt Process: Asynchronous Initiation Process
-    //status = APP_ARMPIT_Initiate();
-    //if ( STATUS_FAILURE == status )
-    //{
-    //    APP_Log("ARMPIT Handshake initiation failed. Transitioning to Error.\r\n");
-    //    BSP_LED_On(BSP_ARMPIT_ERROR_LED);
-    //    Error_Handler();
-    //}
+    status = APP_ARMPIT_Initiate();
+    if ( STATUS_FAILURE == status )
+    {
+        APP_Log("ARMPIT Handshake initiation failed. Transitioning to Error.\r\n");
+        BSP_LED_On(BSP_ARMPIT_ERROR_LED);
+        Error_Handler();
+    }
     
     /* Log Initation Finished */
     APP_Log("Finished Component Initiation.\r\n");
@@ -101,19 +101,19 @@ int main(void)
     while (1)
     {
         // Process ARMPIT Requests
-        //status = APP_ARMPIT_Process_Message(&AppNavigationCblk);
+        status = APP_ARMPIT_Process_Message(&AppNavigationCblk);
         
         // Save State of IR Sensor
         //AppNavigationCblk.ir_data.guide_within_sight = APP_Scan_IR();
         
         // Run Ultrasonics Driver
-        status = APP_HC_SR04_Pulse_Sensors(&AppNavigationCblk);
+        //status = APP_HC_SR04_Pulse_Sensors(&AppNavigationCblk);
         
         // Make any calculations
         //status = APP_Navigation_Compute(&AppNavigationCblk);
         
         // Process PIXARM Requests
-        //status = APP_PIXARM_Process_Message(&AppNavigationCblk);
+        status = APP_PIXARM_Process_Message(&AppNavigationCblk);
     }
 }
 
