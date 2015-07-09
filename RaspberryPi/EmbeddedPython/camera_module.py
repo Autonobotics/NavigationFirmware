@@ -1,69 +1,87 @@
 __author__ = 'Pravjot'
 
 from AB_Camera_Modules import beacon_processing
-import AB_Camera_Modules.nav_board_comm as NAVcomm
+import AB_Camera_Modules.nav_board_comm as Nav_Board_Comm
+from AB_Camera_Classes import beacon
 from AB_Camera_Classes import ABcamera
-from AB_Logging import ab_log
+from AB_Logging import ab_log as AB_Log
 import numpy as np
 import io
 import cv2
+import time
+import picamera
+import picamera.array
+global cam_logger
+
 
 def camera_loop():
+    cam_logger = AB_Log.get_logger('AB_CAMERA_MODULE')
     # beacon marker
     marker = None
-    picam = ABcamera.PiCam()
-    vector_dist = []
+    markerList = []
+    prevMarker = None
 
-    #get image from raspberry pi camera and store it
-    camera, rawCapture = picam.PiVideo()
-    stream = io.BytesIO()
+    try:
+        with picamera.PiCamera() as camera:
+            camera.resolution = (640, 480)
+            camera.framerate = 30
+            time.sleep(2)
+            with picamera.array.PiRGBArray(camera) as stream:
+            #capture frames and process them
+                for frame in camera.capture_continuous(stream, format='bgr'):
+                    image = stream.array
+                    if image is not None:
+                        #try and locate the beacon marker
+                        marker = beacon_processing.locate_beacon(image)
 
-    #capture frames and process them
-    for frame in camera.capture_continuous(stream, format='jpeg'):
-        #image = frame.array
-        # clear the stream in preparation for the next frame
-        #rawCapture.truncate(0)
+                    if marker is None:
+                        markerList.append(beacon.beaconLocation(0, 0, 0))
 
-        # Construct a numpy array from the stream
-        data = np.fromstring(stream.getvalue(), dtype=np.uint8)
-        # "Decode" the image from the array, preserving colour
-        image = cv2.imdecode(data, 1)
+                    else:
+                        beaconDist = beacon_processing.distance_to_camera(ABcamera.PiCam.FOCAL_LENGTH, ABcamera.PiCam.RESOLUTION,ABcamera.PiCam.HORIZONTAL_FOV, marker)
+                        markerList.append(beaconDist)
 
-        if image is not None:
-            #try and locate the beacon marker
-            marker = beacon_processing.locate_beacon(image)
+                        #When the drone reaches a minimum distance from the beacon, go to the next beacon
+                        if beaconDist.z < marker.MIN_DISTANCE_BEACON:
+                            cam_logger.debug('BEACON: Threshold distance reached, loading next rotation')
+                            print('Go find next beacon!')
+                            #cause when there are no more beacons left
+                            if beacon_processing.send_next_beacon_info() is False:
+                                cam_logger.debug('BEACON: Rotation information was not sent successfully!!')
+                                break
+                            else:
+                                markerList = []
+                                cam_logger.debug('BEACON: Rotation information was not sent successfully!!')
 
-        if marker is None:
-            print('Cannot locate beacon!')
-            while NAVcomm.send_no_beacon() is not True:
-                #wait for nav board to respond
-                pass
-        else:
-            #X,Y,Z
-            beaconDist = beacon_processing.distance_to_camera(image, picam, marker)
-            vector_dist.append(beaconDist)
-            while NAVcomm.send_beacon_detected(beaconDist) is not True:
-                    #wait until the nav board has accepted the distance
-                    pass
+                                #Wait for response from STM board, for the drone to finish rotation
+                                #Nav_Board_Comm.send_and_wait(None, Nav_Board_Comm.ABFlags.QUERY_ROTATION)
 
-            if len(vector_dist) == 5:
-                avg = beacon_processing.regAverage(vector_dist)
-                vector_dist = []
-                print('------AVERAGE: ({0}, {1}, {2})'.format(avg.x, avg.y, avg.z))
+                    if len(markerList) == 10:
+                        prevMarker = beacon_processing.beacon_filter(markerList)
+                        if prevMarker is None:
+                            #Nav_Board_Comm.send_and_wait(None, Nav_Board_Comm.ABFlags.NO_BEACON_DETECTED)
+                            cam_logger.info('BEACON: Not located')
+                            print('NO BEACON')
+                        else:
+                            #Nav_Board_Comm.send_and_wait(prevMarker, Nav_Board_Comm.ABFlags.BEACON_DETECTED)
+                            cam_logger.info('BEACON: Location --- ({0}, {1}, {2}) ---'.format(beaconDist.x, beaconDist.y, beaconDist.z))
+                            print('BEACON: ({0}, {1}, {2})'.format(beaconDist.x, beaconDist.y, beaconDist.z))
 
-                #send distance to controller
-                while NAVcomm.send_beacon_detected(avg) is not True:
-                    #wait until the nav board has accepted the distance
-                    pass
+                        del markerList[0]
+                        prevMarker = None
+                    else:
+                        if marker is None:
+                            cam_logger.info('BEACON: Not located')
+                            #Nav_Board_Comm.send_and_wait(None, Nav_Board_Comm.ABFlags.NO_BEACON_DETECTED)
+                            print('NO BEACON - i')
+                        elif marker is not None:
+                            #Nav_Board_Comm.send_and_wait(beaconDist, Nav_Board_Comm.ABFlags.BEACON_DETECTED)
+                            cam_logger.info('BEACON: Location --- ({0}, {1}, {2}) ---'.format(beaconDist.x, beaconDist.y, beaconDist.z))
+                            print('BEACON - i: ({0}, {1}, {2})'.format(beaconDist.x, beaconDist.y, beaconDist.z))
+                    # Reset the stream for the next capture
+                    stream.seek(0)
+                    stream.truncate()
 
-            #When the drone reaches a minimum distance from the beacon, go to the next beacon
-            if beaconDist.z < marker.MIN_DISTANCE_BEACON:
-                print('Go find next beacon!')
-                if beacon_processing.send_next_beacon_info() is False:
-                    break
-                #Wait for response from STM board, for the drone to finish rotation
-                #while loop
-                while NAVcomm.query_drone_rotation() is not True:
-                #wait for drone to complete the rotation
-                    pass
-
+    except Exception, e:
+        print(e)
+        cam_logger.error('ERROR: %s' % str(e))

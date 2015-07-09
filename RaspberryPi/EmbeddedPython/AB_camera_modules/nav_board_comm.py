@@ -5,6 +5,31 @@ import beacon_processing
 import numpy as np
 from AB_Logging import ab_log as AB_Log
 
+class ABFlags():
+    BEACON_DETECTED     = 0x01
+    NO_BEACON_DETECTED  = 0x02
+    BEACON_ROTATION     = 0x03
+    FRONTAL_COLLISION   = 0x04
+    QUERY_ROTATION      = 0x05
+
+
+def send_and_wait(data, flag):
+    if flag == ABFlags.BEACON_DETECTED:
+        while send_beacon_detected(data):
+            pass
+    elif flag == ABFlags.NO_BEACON_DETECTED:
+        while send_no_beacon():
+            pass
+    elif flag == ABFlags.QUERY_ROTATION:
+        while query_drone_rotation():
+            pass
+    elif flag ==  ABFlags.BEACON_ROTATION:
+        while send_beacon_rotation(data):
+            pass
+    elif flag == ABFlags.FRONTAL_COLLISION:
+        while send_edge_distance(data):
+            pass
+
 def send_beacon_detected(distance_vector):
     #distance_vector  = [X Y DISTNACE FROM CAMERA TO CENTER OF BEACON]
     beacon_message = message.BeaconDetectedMessage().set_defaults()

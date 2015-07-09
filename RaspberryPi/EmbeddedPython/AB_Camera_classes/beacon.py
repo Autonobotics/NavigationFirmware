@@ -40,7 +40,7 @@ class marker:
     KNOWN_WIDTH = 17.85
 
     #Mininmum distance drone has to be to trigger next beacon (in inches)
-    MIN_DISTANCE_BEACON = 20
+    MIN_DISTANCE_BEACON = 30
 
     def __init__(self, x, y, r):
         self.x = x;
