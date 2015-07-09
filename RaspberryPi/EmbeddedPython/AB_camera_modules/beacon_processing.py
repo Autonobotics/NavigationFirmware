@@ -45,7 +45,7 @@ def locate_beacon(image):
     cv2.imwrite("debug/hsv.jpg", hsv)
     # define the list of boundaries
     boundaries = [
-        ([0, 0, 10], [10, 255, 255])
+        ([0, 10, 10], [10, 255, 255])
     ]
 
     for (lower, upper) in boundaries:
@@ -59,11 +59,11 @@ def locate_beacon(image):
         #HoughCircles likes ring like circles to filled ones
         edge = cv2.Canny(mask, 100, 200)
         #smooth the image by applying gaussian blur
-        blurr = cv2.GaussianBlur(mask, (9, 9), 2)
+        blurr = cv2.GaussianBlur(edge, (9, 9), 2)
 
 
         circles = cv2.HoughCircles(blurr, cv.CV_HOUGH_GRADIENT, 1.2, 150,
-                                   param1=20, param2=50, minRadius=0, maxRadius=0)
+                                   param1=20, param2=80, minRadius=0, maxRadius=0)
         if circles is not None:
             circles = np.uint16(np.around(circles[0]))
             for (x, y, r) in circles:
@@ -74,6 +74,7 @@ def locate_beacon(image):
                 # draw the center of the circle
                 cv2.circle(img, (x, y), 2, (0, 255, 0), 3)
                 cv2.imwrite("debug/img_circled.jpg", img)
+                break
         else:
             marker = None
 
