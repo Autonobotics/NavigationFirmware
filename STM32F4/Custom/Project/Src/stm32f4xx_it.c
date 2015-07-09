@@ -38,6 +38,7 @@ extern UART_HandleTypeDef ArmpitHandle;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim4;
+extern TIM_HandleTypeDef delayHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -142,7 +143,6 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
     HAL_IncTick();
-    //HAL_SYSTICK_IRQHandler();
 }
 
 
@@ -177,26 +177,32 @@ void PIXARM_USART_IRQHandler(void)
     HAL_UART_IRQHandler(& PixarmHandle);
 }
 
-
 /**
-* @brief This function handles EXTI Line0 interrupt.
+* @brief This function handles EXTI Line1 interrupt.
 */
 void EXTI0_IRQHandler(void)
 {
-    HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4,GPIO_PIN_SET); //set trig = 1
-    HAL_TIM_Base_Start_IT(&htim2); //start 10us counter
-    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
+    HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1);
+    HAL_GPIO_EXTI_IRQHandler(HC_SR04_FRONT_PIN);
 }
+
 
 /**
 * @brief This function handles EXTI Line1 interrupt.
 */
 void EXTI1_IRQHandler(void)
 {
-    // If rising edge detected on PA1 connected to Echo pin
-    // Start timer 3 in input capture mode with interrupt
     HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1);
-    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_1);
+    HAL_GPIO_EXTI_IRQHandler(HC_SR04_LEFT_PIN);
+}
+
+/**
+* @brief This function handles EXTI Line1 interrupt.
+*/
+void EXTI2_IRQHandler(void)
+{
+    HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_2);
+    HAL_GPIO_EXTI_IRQHandler(HC_SR04_BOTTOM_PIN);
 }
 
 /**
@@ -204,11 +210,19 @@ void EXTI1_IRQHandler(void)
 */
 void EXTI3_IRQHandler(void)
 {
-    // If rising edge detected on PA7 connected to Echo pin
-    // Start timer 4 in input capture mode with interrupt
-    HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_1);
-    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
+    HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_2);
+    HAL_GPIO_EXTI_IRQHandler(HC_SR04_RIGHT_PIN);
 }
+
+/**
+* @brief This function handles EXTI Line4 interrupt.
+*/
+void EXTI4_IRQHandler(void)
+{
+    HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_3);
+    HAL_GPIO_EXTI_IRQHandler(HC_SR04_REAR_PIN);
+}
+
 
 /**
 * @brief This function handles TIM2 global interrupt.
@@ -232,6 +246,14 @@ void TIM3_IRQHandler(void)
 void TIM4_IRQHandler(void)
 {
     HAL_TIM_IRQHandler(&htim4);
+}
+
+/**
+* @brief This function handles TIM5 global interrupt.
+*/
+void TIM5_IRQHandler(void)
+{
+    HAL_TIM_IRQHandler(&delayHandle);
 }
 
 

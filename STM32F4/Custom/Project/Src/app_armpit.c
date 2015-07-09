@@ -143,7 +143,7 @@ static eAPP_STATUS armpit_send_response(sAPP_NAVIGATION_CBLK* navigation_cblk)
         // Read distance on frontal Ultrasonic
         AppArmpitCblk.outputBuffer.rack.sub_cmd = ARMPIT_SUBCMD_COLLISION_DETECTED;
         AppArmpitCblk.outputBuffer.rack.axis = AXIS_FRONT; // No other possible value currently
-        AppArmpitCblk.outputBuffer.rack.payload_a = navigation_cblk->hc_sr04_data.distance[AXIS_FRONT];
+        AppArmpitCblk.outputBuffer.rack.payload_a = navigation_cblk->proximity_data.distance[AXIS_FRONT];
         
 #ifdef DEBUG_ARMPIT
         APP_Log("ARMPIT: Replying with RACK. Subcmd: COLLISION_DETECTED"ENDLINE);

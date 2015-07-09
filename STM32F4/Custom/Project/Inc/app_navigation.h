@@ -55,12 +55,12 @@ typedef struct _sAPP_IMAGE_BOARD_DATA
     
 } sAPP_IMAGE_BOARD_DATA;
 
-typedef struct _sAPP_HC_SR04_DATA
+typedef struct _sAPP_PROXIMITY_DATA
 {
     BOOL modified[6];       // Indexed by eAPP_AXIS value
     uint16_t distance[6];   // Indexed by eAPP_AXIS value
     
-} sAPP_HC_SR04_DATA;
+} sAPP_PROXIMITY_DATA;
 
 typedef struct _sAPP_IR_DATA
 {
@@ -87,7 +87,7 @@ typedef struct _sAPP_NAVIGATION_FLAGS
 typedef struct _sAPP_NAVIGATION_CBLK
 {
     sAPP_IMAGE_BOARD_DATA image_board_data;
-    sAPP_HC_SR04_DATA hc_sr04_data;
+    sAPP_PROXIMITY_DATA proximity_data;
     sAPP_IR_DATA ir_data;
     sAPP_NAVIGATION_DATA navigation_data;
     sAPP_NAVIGATION_FLAGS navigation_flags;

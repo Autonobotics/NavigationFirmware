@@ -12,6 +12,7 @@
 #define __APP_COMMON_H
  
 /* Includes ------------------------------------------------------------------*/
+#include "stm32f4xx.h"
 #include "stm32f4xx_hal.h"
 #include "stm32f4_discovery.h"
 #include <stdio.h>
