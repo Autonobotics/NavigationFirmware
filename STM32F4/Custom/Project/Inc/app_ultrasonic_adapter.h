@@ -15,6 +15,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "app_common.h"
 #include "app_navigation.h"
+#include "app_ultrasonic.h"
 
 /* Exported Constants --------------------------------------------------------*/
 #define HC_SR04_FLR_TRIGGER_PIN             GPIO_PIN_8
@@ -60,7 +61,19 @@ typedef enum _eAPP_HC_SR04_STATE
     
 } eAPP_HC_SR04_STATE;
 
-typedef enum _eAPP_HC_SRO4_PULSE_SET
+typedef enum _eAPP_HC_SR04_PULSE_INDV
+{
+    PULSE_FRONT = 0,
+    PULSE_RIGHT,
+    PULSE_LEFT,
+    PULSE_REAR,
+    PULSE_BOTTOM,
+    
+    PULSE_LIMIT
+    
+} eAPP_HC_SR04_PULSE_INDV;
+
+typedef enum _eAPP_HC_SR04_PULSE_SET
 {
     FRONT_LEFT_RIGHT = 0,
     FRONT_BOTTOM_REAR,
@@ -85,12 +98,12 @@ typedef struct _sAPP_HC_SR04_CBLK
     eAPP_HC_SR04_STATE state;
     TIM_HandleTypeDef* tim2Handle;
     TIM_HandleTypeDef* tim3Handle;
-    TIM_HandleTypeDef* tim4Handle;
-    TIM_HandleTypeDef* delayHandle;
+    TIM_HandleTypeDef* tim5Handle;
     
     volatile uint8_t received_count;
     BOOL pulsed_ongoing;
     eAPP_HC_SR04_PULSE_SET pulse_set;
+    eAPP_HC_SR04_PULSE_INDV pulse_indv;
     
     sAPP_HC_SR04_DATA data;
     
@@ -102,6 +115,5 @@ typedef struct _sAPP_HC_SR04_CBLK
 void APP_HC_SR04_Init(void);
 void HAL_HC_SR04_MspInit(void);
 eAPP_STATUS APP_HC_SR04_Pulse_Sensors(sAPP_NAVIGATION_CBLK* navigation_cblk);
-void APP_HC_SR04_Handle_EXTI(TIM_HandleTypeDef *htim, GPIO_TypeDef* port, uint16_t pin);
 
 #endif // #ifndef __APP_HC_SR04_H

@@ -14,7 +14,7 @@
 #include "app_common.h"
 #include "app_pixarm.h"
 #include "app_armpit.h"
-#include "app_hc_sr04.h"
+#include "app_ultrasonic_adapter.h"
 
 /** @addtogroup STM32F4xx_HAL_Examples
   * @{
@@ -37,8 +37,7 @@ extern UART_HandleTypeDef ArmpitHandle;
 /* Timer handler declared in "app_hrs04.c" file */
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim3;
-extern TIM_HandleTypeDef htim4;
-extern TIM_HandleTypeDef delayHandle;
+extern TIM_HandleTypeDef htim5;
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -178,28 +177,31 @@ void PIXARM_USART_IRQHandler(void)
 }
 
 /**
-* @brief This function handles EXTI Line1 interrupt.
+* @brief This function handles EXTI Line0 interrupt.
 */
 void EXTI0_IRQHandler(void)
 {
-    APP_HC_SR04_Handle_EXTI(&htim2, HC_SR04_FRONT_PORT, HC_SR04_FRONT_PIN);
+    HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1); //start timer 2 for front
+    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
 }
-
 
 /**
 * @brief This function handles EXTI Line1 interrupt.
 */
 void EXTI1_IRQHandler(void)
 {
-    APP_HC_SR04_Handle_EXTI(&htim3, HC_SR04_LEFT_PORT, HC_SR04_LEFT_PIN);
+    //once the front sensor picks up rising edge interrupt of echo pin
+    HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1); //start timer 3 for left
+    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_1);
 }
 
 /**
-* @brief This function handles EXTI Line1 interrupt.
+* @brief This function handles EXTI Line2 interrupt.
 */
 void EXTI2_IRQHandler(void)
 {
-    APP_HC_SR04_Handle_EXTI(&htim3, HC_SR04_BOTTOM_PORT, HC_SR04_BOTTOM_PIN);
+    HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_2);//start timer 3 for down timer
+    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
 }
 
 /**
@@ -207,7 +209,8 @@ void EXTI2_IRQHandler(void)
 */
 void EXTI3_IRQHandler(void)
 {
-    APP_HC_SR04_Handle_EXTI(&htim4, HC_SR04_RIGHT_PORT, HC_SR04_RIGHT_PIN);
+    HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_3); //timer 4 for right sensor
+    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
 }
 
 /**
@@ -215,16 +218,32 @@ void EXTI3_IRQHandler(void)
 */
 void EXTI4_IRQHandler(void)
 {
-    APP_HC_SR04_Handle_EXTI(&htim4, HC_SR04_REAR_PORT, HC_SR04_REAR_PIN);
+    HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_3);//timer 4 for back sensor
+    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
 }
 
+/**
+* @brief This function handles TIM2 global interrupt.
+*/
+void TIM2_IRQHandler(void)
+{
+    HAL_TIM_IRQHandler(&htim2);
+}
+
+/**
+* @brief This function handles TIM3 global interrupt.
+*/
+void TIM3_IRQHandler(void)
+{
+    HAL_TIM_IRQHandler(&htim3);
+}
 
 /**
 * @brief This function handles TIM5 global interrupt.
 */
 void TIM5_IRQHandler(void)
 {
-    HAL_TIM_IRQHandler(&delayHandle);
+    HAL_TIM_IRQHandler(&htim5);
 }
 
 

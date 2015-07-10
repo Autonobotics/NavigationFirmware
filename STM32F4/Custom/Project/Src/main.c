@@ -13,7 +13,7 @@
 #include "app_pixarm.h"
 #include "app_armpit.h"
 #include "app_ir.h"
-#include "app_hc_sr04.h"
+#include "app_ultrasonic_adapter.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -66,24 +66,24 @@ int main(void)
     APP_Log_Init();
     
     /* Initialize the Communication Components */
-    APP_PIXARM_Init();
+    //APP_PIXARM_Init();
     APP_ARMPIT_Init();
     
     /* Initialize the Sensory Components */
     //APP_IR_Init();
-    APP_HC_SR04_Init();
+    //APP_HC_SR04_Init();
     
     /* Log Configuration finished */
     APP_Log("Finished Component Configuration.\r\n");
     
-    // Start PIXARM Interrupt Process: Synchronous Initiation Process
-    status = APP_PIXARM_Initiate();
-    if ( STATUS_FAILURE == status )
-    {
-        APP_Log("PIXARM Handshake failed. Transitioning to Error.\r\n");
-        BSP_LED_On(BSP_PIXARM_ERROR_LED);
-        Error_Handler();
-    }
+    //// Start PIXARM Interrupt Process: Synchronous Initiation Process
+    //status = APP_PIXARM_Initiate();
+    //if ( STATUS_FAILURE == status )
+    //{
+    //    APP_Log("PIXARM Handshake failed. Transitioning to Error.\r\n");
+    //    BSP_LED_On(BSP_PIXARM_ERROR_LED);
+    //    Error_Handler();
+    //}
     
     // Start ARMPIT Interrupt Process: Asynchronous Initiation Process
     status = APP_ARMPIT_Initiate();
@@ -113,7 +113,7 @@ int main(void)
         //status = APP_Navigation_Compute(&AppNavigationCblk);
         
         // Process PIXARM Requests
-        status = APP_PIXARM_Process_Message(&AppNavigationCblk);
+        //status = APP_PIXARM_Process_Message(&AppNavigationCblk);
     }
 }
 

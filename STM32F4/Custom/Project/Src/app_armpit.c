@@ -288,6 +288,13 @@ static eAPP_STATUS armpit_handle_data_receive(sAPP_NAVIGATION_CBLK* navigation_c
                                        message.beacon_detected.y_distance,
                                        message.beacon_detected.z_distance,
                                        ROTATION_UNKNOWN);
+            
+#ifdef DEBUG_ARMPIT
+            APP_Log("ARMPIT: x_distance: %d y_distance: %d z_distance: %d."ENDLINE, 
+                    message.beacon_detected.x_distance,
+                    message.beacon_detected.y_distance,
+                    message.beacon_detected.z_distance);
+#endif
 
             // Transmit Response
             status = armpit_send_response(navigation_cblk);

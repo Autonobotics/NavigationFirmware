@@ -13,7 +13,7 @@
 
 
 /* Includes ------------------------------------------------------------------*/
-//#include "app_common.h"
+#include "app_common.h"
 
 /* Function Declaration*/
 //front left right
@@ -21,11 +21,11 @@
 //void scan_FLR(void);
 //void scan_FDB(void);
 
-void us_front(void);
-void us_left(void);
-void us_right(void);
-void us_down(void);
-void us_back(void);
+BOOL us_front(void);
+BOOL us_left(void);
+BOOL us_right(void);
+BOOL us_down(void);
+BOOL us_back(void);
 
 
 #endif /* #ifndef __APP_ULTRASONIC_H */
