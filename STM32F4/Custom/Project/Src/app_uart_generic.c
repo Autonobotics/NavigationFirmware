@@ -1,14 +1,14 @@
 /**
   ******************************************************************************
-  * @file    Src/app_uart_callbacks.c 
+  * @file    Src/app_uart_generic.c 
   * @author  Autonobotic Team
   * @version V1.0
   * @date    6-July-2015
-  * @brief   Application UART Callback Implementations
+  * @brief   Application UART Utility and Callback Implementations
   ******************************************************************************
 */
 /* Includes ------------------------------------------------------------------*/
-#include "app_common.h"
+#include "app_uart_generic.h"
 #include "app_armpit.h"
 #include "app_pixarm.h"
 
@@ -20,6 +20,46 @@
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 /* Public functions ----------------------------------------------------------*/
+char* APP_UART_Generic_Translate_Error(uint32_t error_code)
+{
+    switch (error_code)
+    {
+        case HAL_UART_ERROR_NONE:
+            return "UART No Error";
+        
+        case HAL_UART_ERROR_PE:
+            return "UART Parity Error";
+        
+        case HAL_UART_ERROR_NE:
+            return "UART Noise Error";
+        
+        case HAL_UART_ERROR_FE:
+            return "UART Frame Error";
+        
+        case HAL_UART_ERROR_ORE:
+            return "UART Overrun Error";
+        
+        case HAL_UART_ERROR_DMA:
+            return "UART DMA Transfer Error";
+        
+        default:
+            return "Unknown Error Code";
+    }
+}
+
+void APP_UART_Generic_Flush_Buffer(UART_HandleTypeDef *huart)
+{
+    __HAL_UART_FLUSH_DRREGISTER(huart);
+}
+
+
+eAPP_STATUS APP_UART_Generic_Recover_From_Error(UART_HandleTypeDef *huart)
+{
+    // Flush and Clear any Errors
+    __HAL_UART_CLEAR_PEFLAG(huart);
+    return STATUS_SUCCESS;
+}
+
 /**
   * @brief  Tx Transfer completed callback
   * @param  UartHandle: UART handle. 

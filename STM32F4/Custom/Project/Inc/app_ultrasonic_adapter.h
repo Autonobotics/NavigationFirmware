@@ -98,7 +98,9 @@ typedef struct _sAPP_HC_SR04_CBLK
     eAPP_HC_SR04_STATE state;
     TIM_HandleTypeDef* tim2Handle;
     TIM_HandleTypeDef* tim3Handle;
+    TIM_HandleTypeDef* tim4Handle;
     TIM_HandleTypeDef* tim5Handle;
+    TIM_HandleTypeDef* tim6Handle;
     
     volatile uint8_t received_count;
     BOOL pulsed_ongoing;

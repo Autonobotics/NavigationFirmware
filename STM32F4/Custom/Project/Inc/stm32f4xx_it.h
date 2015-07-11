@@ -37,7 +37,9 @@ void EXTI3_IRQHandler(void);
 void EXTI4_IRQHandler(void);
 void TIM2_IRQHandler(void);
 void TIM3_IRQHandler(void);
+void TIM4_IRQHandler(void);
 void TIM5_IRQHandler(void);
+void TIM6_DAC_IRQHandler(void);
 
 
 #ifdef __cplusplus

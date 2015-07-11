@@ -14,6 +14,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "app_common.h"
+#include "app_uart_generic.h"
 #include "app_navigation.h"
 
 /* Exported constants --------------------------------------------------------*/
@@ -52,6 +53,7 @@ typedef enum _eAPP_PIXARM_STATE
     PIXARM_PROCESS,
     PIXARM_SHUTDOWN,
     
+    PIXARM_ATTEMPT_RECOVERY,
     PIXARM_ERROR
     
 } eAPP_PIXARM_STATE;
@@ -131,7 +133,12 @@ typedef union _uAPP_PIXARM_MESSAGES
 typedef struct _sAPP_PIXARM_CBLK
 {
     UART_HandleTypeDef *handle;
+    TIM_HandleTypeDef *tim10Handle;
+#ifdef PIXARM_WATCHDOG_ENABLE
+    eAPP_UART_PERIPHERAL_STATE uart_state;
+#endif
     eAPP_PIXARM_STATE state;
+    eAPP_PIXARM_STATE prev_state;
     uAPP_PIXARM_MESSAGES inputBuffer;
     uAPP_PIXARM_MESSAGES outputBuffer;
     
@@ -141,6 +148,9 @@ typedef struct _sAPP_PIXARM_CBLK
 
 
 /* Callback functions ------------------------------------------------------- */
+#ifdef PIXARM_WATCHDOG_ENABLE
+void PIXARM_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
+#endif
 void PIXARM_UART_TxCpltCallback(UART_HandleTypeDef *huart);
 void PIXARM_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 void PIXARM_UART_ErrorCallback(UART_HandleTypeDef *huart);

@@ -14,6 +14,7 @@
  
 /* Includes ------------------------------------------------------------------*/
 #include "app_common.h"
+#include "app_uart_generic.h"
 #include "app_navigation.h"
 
 /* Exported constants --------------------------------------------------------*/
@@ -68,6 +69,7 @@ typedef enum _eAPP_ARMPIT_STATE
     ARMPIT_DATA_RECEIVE,
     ARMPIT_TERMINATE,
     
+    ARMPIT_ATTEMPT_RECOVERY,
     ARMPIT_ERROR
     
 } eAPP_ARMPIT_STATE;
@@ -193,7 +195,12 @@ typedef union _uAPP_USART_MESSAGES
 typedef struct _sAPP_USART_CBLK
 {
     UART_HandleTypeDef *handle;
+    TIM_HandleTypeDef *tim11Handle;
+#ifdef ARMPIT_WATCHDOG_ENABLE
+    eAPP_UART_PERIPHERAL_STATE uart_state;
+#endif
     eAPP_ARMPIT_STATE state;
+    eAPP_ARMPIT_STATE prev_state;
     uAPP_ARMPIT_MESSAGES inputBuffer;
     uAPP_ARMPIT_MESSAGES outputBuffer;
     
@@ -202,6 +209,9 @@ typedef struct _sAPP_USART_CBLK
 } sAPP_ARMPIT_CBLK;
 
 /* Callback functions ------------------------------------------------------- */
+#ifdef ARMPIT_WATCHDOG_ENABLE
+void ARMPIT_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
+#endif
 void ARMPIT_UART_TxCpltCallback(UART_HandleTypeDef *huart);
 void ARMPIT_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 void ARMPIT_UART_ErrorCallback(UART_HandleTypeDef *huart);

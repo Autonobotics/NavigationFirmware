@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    Inc/app_usart.h
+  * @file    Inc/app_common.h
   * @author  Autonobotic Team
   * @version V1.0
   * @date    6-July-2015
@@ -51,9 +51,6 @@ typedef enum _eAPP_UART_REQUEST_STATE
 } eAPP_UART_REQUEST_STATE;
 
 /* Exported constants --------------------------------------------------------*/
-#define DEBUG_PIXARM
-#define DEBUG_ARMPIT
-
 #define TRUE    1
 #define FALSE   0
 typedef uint16_t BOOL;
@@ -73,9 +70,12 @@ typedef uint16_t BOOL;
 
 // This could be fixed by making a proper logging function that
 // uses vprintf with a given variadic and any extra data.
-#define APP_Log printf
+#ifdef DEBUG
+    #define APP_Log printf
+#else
+    #define APP_Log(...)    
+#endif // #ifdef DEBUG
 #define ENDLINE "\r\n"
-
     
 /* Exported functions ------------------------------------------------------- */
 void Flush_Buffer(uint8_t* pBuffer, uint16_t BufferLength);

@@ -816,11 +816,6 @@
               <FilePath>..\Src\app_pixarm.c</FilePath>
             </File>
             <File>
-              <FileName>app_uart_callbacks.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\app_uart_callbacks.c</FilePath>
-            </File>
-            <File>
               <FileName>app_ultrasonic.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\app_ultrasonic.c</FilePath>
@@ -829,6 +824,16 @@
               <FileName>app_ultrasonic_adapter.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\app_ultrasonic_adapter.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_uart_generic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\app_uart_generic.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_timer_generic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\app_timer_generic.c</FilePath>
             </File>
           </Files>
         </Group>

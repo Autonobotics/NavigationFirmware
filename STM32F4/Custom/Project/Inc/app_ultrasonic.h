@@ -27,5 +27,8 @@ BOOL us_right(void);
 BOOL us_down(void);
 BOOL us_back(void);
 
+void Ultrasonic_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
+void Ultrasonic_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim);
+
 
 #endif /* #ifndef __APP_ULTRASONIC_H */

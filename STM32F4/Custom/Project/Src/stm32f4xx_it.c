@@ -30,14 +30,22 @@
 /* Private variables ---------------------------------------------------------*/
 /* UART handler declared in "app_pixarm.c" file */
 extern UART_HandleTypeDef PixarmHandle;
+#ifdef PIXARM_WATCHDOG_ENABLE
+extern TIM_HandleTypeDef htim10;
+#endif
 
 /* I2C handler declared in "app_armpit.c" file */
 extern UART_HandleTypeDef ArmpitHandle;
+#ifdef ARMPIT_WATCHDOG_ENABLE
+extern TIM_HandleTypeDef htim11;
+#endif
 
-/* Timer handler declared in "app_hrs04.c" file */
+/* Timer handler declared in "app_ultrasonic_adapter.c" file */
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim3;
+extern TIM_HandleTypeDef htim4;
 extern TIM_HandleTypeDef htim5;
+extern TIM_HandleTypeDef htim6;
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -142,6 +150,7 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
     HAL_IncTick();
+    HAL_SYSTICK_IRQHandler();
 }
 
 
@@ -190,7 +199,6 @@ void EXTI0_IRQHandler(void)
 */
 void EXTI1_IRQHandler(void)
 {
-    //once the front sensor picks up rising edge interrupt of echo pin
     HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1); //start timer 3 for left
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_1);
 }
@@ -209,7 +217,7 @@ void EXTI2_IRQHandler(void)
 */
 void EXTI3_IRQHandler(void)
 {
-    HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_3); //timer 4 for right sensor
+    HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_1); //timer 4 for right sensor
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
 }
 
@@ -218,7 +226,7 @@ void EXTI3_IRQHandler(void)
 */
 void EXTI4_IRQHandler(void)
 {
-    HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_3);//timer 4 for back sensor
+    HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_2);//timer 4 for back sensor
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
 }
 
@@ -239,12 +247,48 @@ void TIM3_IRQHandler(void)
 }
 
 /**
+* @brief This function handles TIM4 global interrupt.
+*/
+void TIM4_IRQHandler(void)
+{
+    HAL_TIM_IRQHandler(&htim4);
+}
+
+/**
 * @brief This function handles TIM5 global interrupt.
 */
 void TIM5_IRQHandler(void)
 {
     HAL_TIM_IRQHandler(&htim5);
 }
+
+/**
+* @brief This function handles TIM6 global interrupt, DAC1 and DAC2 underrun error interrupts.
+*/
+void TIM6_DAC_IRQHandler(void)
+{
+    HAL_TIM_IRQHandler(&htim6);
+}
+
+#ifdef PIXARM_WATCHDOG_ENABLE
+/**
+* @brief This function handles TIM1 update interrupt, TIM10 global interrupt.
+*/
+void TIM1_UP_TIM10_IRQHandler(void)
+{
+    HAL_TIM_IRQHandler(&htim10);
+}
+#endif
+
+#ifdef ARMPIT_WATCHDOG_ENABLE
+/**
+* @brief This function handles TIM11 Trigger and Commutation interrupts, TIM11 global interrupt.
+*/
+void TIM1_TRG_COM_TIM11_IRQHandler(void)
+{
+    HAL_TIM_IRQHandler(&htim11);
+}
+#endif
 
 
 /**

@@ -19,7 +19,9 @@ void APP_Log_Init()
     APP_Log(" ");
 }
 
+#ifdef DEBUG
 int fputc(int c, FILE *stream)
 {
     return ITM_SendChar(c);
 }
+#endif

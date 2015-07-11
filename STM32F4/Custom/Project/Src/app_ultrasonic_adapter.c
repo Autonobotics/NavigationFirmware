@@ -13,11 +13,15 @@
 /* Public variables ---------------------------------------------------------*/
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
+TIM_HandleTypeDef htim4;
 TIM_HandleTypeDef htim5;
+TIM_HandleTypeDef htim6;
 
 /* Private variables --------------------------------------------------------*/
 static sAPP_HC_SR04_CBLK AppHcsr04Cblk = {
     HC_SR04_INIT,
+    NULL,
+    NULL,
     NULL,
     NULL,
     NULL,
@@ -31,7 +35,9 @@ static sAPP_HC_SR04_CBLK AppHcsr04Cblk = {
 /* Private function prototypes -----------------------------------------------*/
 static void hc_sr04_TIM2_init(void);
 static void hc_sr04_TIM3_init(void);
+static void hc_sr04_TIM4_init(void);
 static void hc_sr04_TIM5_init(void);
+static void hc_sr04_TIM6_init(void);
 static void hc_sr04_start_pulse(void);
 
 
@@ -55,7 +61,7 @@ void hc_sr04_TIM2_init(void)
     htim2.Instance = TIM2;
     htim2.Init.Prescaler = 8400;
     htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim2.Init.Period = 65000;
+    htim2.Init.Period = 180;
     htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     HAL_TIM_Base_Init(&htim2);
     
@@ -74,8 +80,6 @@ void hc_sr04_TIM2_init(void)
     sConfigIC.ICFilter = 0;
     HAL_TIM_IC_ConfigChannel(&htim2, &sConfigIC, TIM_CHANNEL_1);
     
-    HAL_TIM_IC_ConfigChannel(&htim2, &sConfigIC, TIM_CHANNEL_2);
-    
     AppHcsr04Cblk.tim2Handle = & htim2;
 }
 
@@ -89,7 +93,7 @@ void hc_sr04_TIM3_init(void)
     htim3.Instance = TIM3;
     htim3.Init.Prescaler = 8400;
     htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim3.Init.Period = 65000;
+    htim3.Init.Period = 180;
     htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     HAL_TIM_Base_Init(&htim3);
     
@@ -110,11 +114,44 @@ void hc_sr04_TIM3_init(void)
     
     HAL_TIM_IC_ConfigChannel(&htim3, &sConfigIC, TIM_CHANNEL_2);
     
-    HAL_TIM_IC_ConfigChannel(&htim3, &sConfigIC, TIM_CHANNEL_3);
-    
     AppHcsr04Cblk.tim3Handle = & htim3;
 }
 
+/* TIM4 init function */
+void hc_sr04_TIM4_init(void)
+{
+    TIM_ClockConfigTypeDef sClockSourceConfig;
+    TIM_MasterConfigTypeDef sMasterConfig;
+    TIM_IC_InitTypeDef sConfigIC;
+    
+    htim4.Instance = TIM4;
+    htim4.Init.Prescaler = 8400;
+    htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
+    htim4.Init.Period = 180;
+    htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+    HAL_TIM_Base_Init(&htim4);
+    
+    sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+    HAL_TIM_ConfigClockSource(&htim4, &sClockSourceConfig);
+    
+    HAL_TIM_IC_Init(&htim4);
+    
+    sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+    HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig);
+    
+    sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_FALLING;
+    sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
+    sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
+    sConfigIC.ICFilter = 0;
+    HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, TIM_CHANNEL_1);
+    
+    HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, TIM_CHANNEL_2);
+    
+    AppHcsr04Cblk.tim4Handle = & htim4;
+}
+
+/* TIM5 init function */
 static void hc_sr04_TIM5_init(void)
 {
     TIM_ClockConfigTypeDef sClockSourceConfig;
@@ -136,6 +173,25 @@ static void hc_sr04_TIM5_init(void)
     
     AppHcsr04Cblk.tim5Handle = & htim5;
 }
+
+/* TIM6 init function */
+static void hc_sr04_TIM6_init(void)
+{
+    TIM_MasterConfigTypeDef sMasterConfig;
+    
+    htim6.Instance = TIM6;
+    htim6.Init.Prescaler = 8400;
+    htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
+    htim6.Init.Period = 200;
+    HAL_TIM_Base_Init(&htim6);
+    
+    sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+    HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig);
+    
+    AppHcsr04Cblk.tim6Handle = & htim6;
+}
+
 
 static void hc_sr04_start_pulse(void)
 {
@@ -198,7 +254,9 @@ void APP_HC_SR04_Init(void)
     // Initialize the Timers
     hc_sr04_TIM2_init();
     hc_sr04_TIM3_init();
+    hc_sr04_TIM4_init();
     hc_sr04_TIM5_init();
+    hc_sr04_TIM6_init();
     
     // Initialize the EXTI Pins
     HAL_HC_SR04_MspInit();
@@ -210,12 +268,6 @@ void APP_HC_SR04_Init(void)
 eAPP_STATUS APP_HC_SR04_Pulse_Sensors(sAPP_NAVIGATION_CBLK* navigation_cblk)
 {
     eAPP_STATUS status = STATUS_SUCCESS;
-    float distanceR = 0;
-    float distanceL = 0;
-    float distanceF = 0;
-    float timeR = 0;
-    float timeL = 0;
-    float timeF = 0;
     
     if ( HC_SR04_ENABLED == AppHcsr04Cblk.state )
     {
