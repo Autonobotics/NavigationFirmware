@@ -556,8 +556,10 @@ void ARMPIT_UART_ErrorCallback(UART_HandleTypeDef *huart)
     // Log Error and Return Failure
     APP_Log("ARMPIT: UART Error Occured: %s. Transitioning to Error Recovering.\r\n",
             APP_UART_Generic_Translate_Error(huart->ErrorCode));
-    AppArmpitCblk.prev_state = AppArmpitCblk.state;
-    AppArmpitCblk.state = ARMPIT_ATTEMPT_RECOVERY;
+   
+    //AppArmpitCblk.prev_state = AppArmpitCblk.state;
+    //AppArmpitCblk.state = ARMPIT_ATTEMPT_RECOVERY;
+    Error_Handler();
 }
 
 

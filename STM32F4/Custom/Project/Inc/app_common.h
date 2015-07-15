@@ -15,6 +15,7 @@
 #include "stm32f4xx.h"
 #include "stm32f4xx_hal.h"
 #include "stm32f4_discovery.h"
+#include "app_config.h"
 #include <stdio.h>
 
 /* Exported types ------------------------------------------------------------*/
