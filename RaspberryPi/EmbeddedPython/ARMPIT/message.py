@@ -52,6 +52,8 @@ class ARMPiTMessage():
             self.buffer = temp
             self.buffer.insert(0, cmd_input)
             self.cmd = cmd_input
+
+        if DEBUG: print("Received: {0}".format(self.buffer))
         return self
 
     def load_from_string(self, string_input):
@@ -65,7 +67,7 @@ class ARMPiTMessage():
         self.buffer[0] = self.cmd
 
     def get_byte_stream(self):
-        if DEBUG: print("Sending: {0}".format("".join(map(chr, self.buffer))))
+        if DEBUG: print("Sending: {0}".format(self.buffer))
         return "".join(map(chr, self.buffer))
 
 

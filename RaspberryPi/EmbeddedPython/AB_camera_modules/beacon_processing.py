@@ -20,12 +20,10 @@ def AB_startup():
 
 #send the next beacons location to the flight controller
 def send_next_beacon_info():
-    global cam_logger
     currentB = AB_beaconList.currentID
     nextB = AB_beaconList.nextID
     if currentB == nextB:
         #No more beacon left to navigate to
-        cam_logger.debug('BEACON: No more beacons to navigate to')
         print("no more beacons left to navigate to")
         return False
     else:
@@ -33,9 +31,7 @@ def send_next_beacon_info():
 
         next_beacon = AB_beaconList.beacon_info(AB_beaconList.currentID)
 
-        #Nav_Board_Comm.send_and_wait(next_beacon, Nav_Board_Comm.ABFlags.BEACON_ROTATION)
-
-        print("Next beacon information: {0}".format(next_beacon))
+        Nav_Board_Comm.send_and_wait(next_beacon, Nav_Board_Comm.ABFlags.BEACON_ROTATION)
     return True
 
 # search the image for the beacon, assuming that we use some kind of RED source
@@ -45,7 +41,7 @@ def locate_beacon(image):
     cv2.imwrite("debug/hsv.jpg", hsv)
     # define the list of boundaries
     boundaries = [
-        ([0, 10, 10], [10, 255, 255])
+        ([150, 50, 50], [180, 255, 255])
     ]
 
     for (lower, upper) in boundaries:
@@ -60,10 +56,10 @@ def locate_beacon(image):
         edge = cv2.Canny(mask, 100, 200)
         #smooth the image by applying gaussian blur
         blurr = cv2.GaussianBlur(edge, (9, 9), 2)
-
+        cv2.imwrite("debug/edge.jpg", edge)
 
         circles = cv2.HoughCircles(blurr, cv.CV_HOUGH_GRADIENT, 1.2, 150,
-                                   param1=20, param2=80, minRadius=0, maxRadius=0)
+                                   param1=20, param2=60, minRadius=0, maxRadius=0)
         if circles is not None:
             circles = np.uint16(np.around(circles[0]))
             for (x, y, r) in circles:
@@ -101,8 +97,8 @@ def distance_to_camera(focalLength, resolution,hFOV, marker):
 
     norm_vec = math.sqrt(math.pow(X,2)+math.pow(Y,2))
 
-    X_norm = X / norm_vec
-    Y_norm = Y / norm_vec
+    X_norm =  4096*X / norm_vec
+    Y_norm =  4096*Y / norm_vec
     Z = distance
 
     return beacon.beaconLocation(X_norm,Y_norm,Z)
@@ -127,7 +123,6 @@ def beacon_filter(markerList):
         marker = None
     else:
         marker = regAverage(tmp)
-        print(beacon_count)
     return marker
 
 def regAverage(x):

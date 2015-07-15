@@ -1,8 +1,10 @@
 __author__ = 'Dan'
 
-from log_common import ABLogConstant
 import logging
 import logging.config
+
+from AB_Logging.log_common import ABLogConstant
+
 
 
 # Store the Log Configuration Thread Reference

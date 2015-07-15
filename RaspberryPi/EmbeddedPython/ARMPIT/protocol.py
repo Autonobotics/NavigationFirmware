@@ -51,21 +51,29 @@ def perform_handshake():
 
     # Wait for the Sync message
     cmd = uart_receive_cmd()
+    uart_logger.debug("HANDSHAKE_SYNC: Received command: {0}".format(cmd))
     if cmd is not message.ARMPiTMessage.CMD_SYNC:
         uart_logger.error("Uart did not receive SYNC during handshake.")
+        return False
     sync_package = uart_receive_packet()
 
     # Validate the Sync packet
     sync_message = message.SyncMessage().load_from_string_with_command(cmd, sync_package)
     if sync_message.flag is not message.ARMPiTMessage.FLAG_END:
         uart_logger.error("Uart SYNC packet was malformed.")
+        return False
 
     # Sent a response Sync message
     response_sync = message.SyncMessage().set_defaults()
+    uart_logger.debug("HANDSHAKE_SYNC: Sending sync response: {0}".format(response_sync))
     uart_transmit(response_sync)
 
     # Wait for the Ack packet before continuing
     cmd = uart_receive_cmd()
+    uart_logger.debug("HANDSHAKE_ACK: Received command: {0}".format(cmd))
     if cmd is not message.ARMPiTMessage.CMD_ACK:
         uart_logger.error("Uart did not receive ACK during handshake.")
+        return False
     sync_package = uart_receive_packet()
+
+    return True

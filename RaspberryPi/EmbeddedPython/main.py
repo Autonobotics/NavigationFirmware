@@ -3,7 +3,7 @@ from common import ABStatus
 from AB_Logging import ab_log as ABLog
 from ARMPIT import protocol, message
 import camera_module
-
+import RPi.GPIO as GPIO
 
 def main():
     # Get Logger instance
@@ -16,8 +16,19 @@ def main():
     logger.info("UART Communication Initializing.")
     protocol.initialize_serial_port()
 
+    #Set GPIO13 to high for STM board to check before performing handshake
+    GPIO.setwarnings(False)
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(13, GPIO.OUT)
+    #make sure the pin is intially low
+    GPIO.setup(13, False)
+    GPIO.output(13, True)
+
+
     # Perform Handshake
-    protocol.perform_handshake()
+    while protocol.perform_handshake() is not True:
+        logger.info("Attempting handshake")
+        pass
     logger.info("Finished UART Handshake.")
 
     # Perform main Loop

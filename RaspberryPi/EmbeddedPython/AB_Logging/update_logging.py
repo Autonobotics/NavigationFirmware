@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 __author__ = 'Dan'
 
-from log_common import ABLogConstant
 import socket
 import sys
 import struct
+
+from AB_Logging.log_common import ABLogConstant
+
 
 with open(sys.argv[1], 'rb') as f:
     data_to_send = f.read()
