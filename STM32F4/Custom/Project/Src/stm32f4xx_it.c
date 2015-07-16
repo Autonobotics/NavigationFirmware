@@ -150,7 +150,7 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
     HAL_IncTick();
-    HAL_SYSTICK_IRQHandler();
+    //HAL_SYSTICK_IRQHandler();
 }
 
 
@@ -269,26 +269,6 @@ void TIM6_DAC_IRQHandler(void)
 {
     HAL_TIM_IRQHandler(&htim6);
 }
-
-#ifdef PIXARM_WATCHDOG_ENABLE
-/**
-* @brief This function handles TIM1 update interrupt, TIM10 global interrupt.
-*/
-void TIM1_UP_TIM10_IRQHandler(void)
-{
-    HAL_TIM_IRQHandler(&htim10);
-}
-#endif
-
-#ifdef ARMPIT_WATCHDOG_ENABLE
-/**
-* @brief This function handles TIM11 Trigger and Commutation interrupts, TIM11 global interrupt.
-*/
-void TIM1_TRG_COM_TIM11_IRQHandler(void)
-{
-    HAL_TIM_IRQHandler(&htim11);
-}
-#endif
 
 
 /**

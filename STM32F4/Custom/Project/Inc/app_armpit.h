@@ -40,12 +40,16 @@
 #define ARMPIT_USART_IRQn                      USART2_IRQn
 #define ARMPIT_USART_IRQHandler                USART2_IRQHandler
 
+#define ARMPIT_ENABLE_PIN                      GPIO_PIN_5
+#define ARMPIT_ENABLE_PORT                     GPIOD
+
 /* Define Connection Timeout and Attempts */
-#define ARMPIT_POLL_TIMEOUT 1  // Ie. Blocking Poll (In Milliseconds) Note: Would like Non-blocking Poll
+#define ARMPIT_POLL_TIMEOUT 100  // Ie. Blocking Poll (In Milliseconds) Note: Would like Non-blocking Poll
 
 /* ARMPIT Definitions */
-#define ARMPIT_CMD_INVD 0x00
+#define ARMPIT_CMD_INVD 0xFF
 #define ARMPIT_CMD_SYNC 0x01
+#define ARMPIT_CMD_RSYNC 0x04
 #define ARMPIT_CMD_DYNC 0xFE
 #define ARMPIT_CMD_ACK  0x02
 #define ARMPIT_CMD_RACK 0x03
@@ -65,11 +69,12 @@
 typedef enum _eAPP_ARMPIT_STATE
 {
     ARMPIT_INIT = 0,
-    ARMPIT_HANDSHAKE,
+    ARMPIT_HANDSHAKE_START,
+    ARMPIT_HANDSHAKE_FINISH,
     ARMPIT_DATA_RECEIVE,
     ARMPIT_TERMINATE,
     
-    ARMPIT_ATTEMPT_RECOVERY,
+    ARMPIT_TRANSITION_TO_ERROR,
     ARMPIT_ERROR
     
 } eAPP_ARMPIT_STATE;
@@ -91,6 +96,16 @@ typedef struct _sAPP_ARMPIT_SYNC
     uint8_t padding[8];
     
 } sAPP_ARMPIT_SYNC;
+
+typedef struct _sAPP_ARMPIT_RSYNC
+{
+    uint8_t cmd;
+    uint8_t payload[6];
+    uint8_t flag;
+    
+    uint8_t padding[8];
+    
+} sAPP_ARMPIT_RSYNC;
 
 typedef struct _sAPP_ARMPIT_ACK
 {
@@ -180,6 +195,7 @@ typedef union _uAPP_USART_MESSAGES
     sAPP_ARMPIT_SYNC sync;
     sAPP_ARMPIT_ACK ack;
     sAPP_ARMPIT_RACK rack;
+    sAPP_ARMPIT_RSYNC rsync;
     
     sAPP_ARMPIT_NO_BEACON no_beacon;
     sAPP_ARMPIT_BEACON_DETECTED beacon_detected;

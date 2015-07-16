@@ -51,6 +51,7 @@ int main(void)
                 handled in milliseconds basis.
         - Low Level Initialization
         */
+    
     HAL_Init();
 
     /* Configure LED3, LED4, LED5 and LED6 */
@@ -110,10 +111,12 @@ int main(void)
         //status = APP_HC_SR04_Pulse_Sensors(&AppNavigationCblk);
         
         // Make any calculations
-        //status = APP_Navigation_Compute(&AppNavigationCblk);
+        status = APP_Navigation_Compute(&AppNavigationCblk);
         
         // Process PIXARM Requests
         //status = APP_PIXARM_Process_Message(&AppNavigationCblk);
+        
+        //HAL_Delay(10);
     }
 }
 
@@ -187,9 +190,6 @@ static void SystemClock_Config(void)
         /* Enable the Flash prefetch */
         __HAL_FLASH_PREFETCH_BUFFER_ENABLE();
     }
-    
-    //HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
-    //HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
 }
 
 

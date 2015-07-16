@@ -15,7 +15,6 @@
 /* Private typedef -----------------------------------------------------------*/
 
 /* Private define ------------------------------------------------------------*/
-#define ARMPIT_ACCEPT_SYNC
 #define INPUT_ARMPIT_BUFFER_SIZE (sizeof(AppArmpitCblk.inputBuffer))
 #define OUTPUT_ARMPIT_BUFFER_SIZE (sizeof(AppArmpitCblk.outputBuffer))
 #define ARMPIT_TRANSACTION_RETRY_LIMIT 5
@@ -29,9 +28,6 @@ TIM_HandleTypeDef htim11;
 static sAPP_ARMPIT_CBLK AppArmpitCblk = {
     NULL,
     NULL,
-#ifdef ARMPIT_WATCHDOG_ENABLE
-    UART_PERIPHERAL_IDLE,
-#endif
     ARMPIT_INIT,
     ARMPIT_INIT,
     {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,
@@ -43,9 +39,6 @@ static sAPP_ARMPIT_CBLK AppArmpitCblk = {
 
 
 /* Private function prototypes -----------------------------------------------*/
-#ifdef ARMPIT_WATCHDOG_ENABLE
-static void armpit_watchdog_init(void);
-#endif
 static eAPP_STATUS armpit_receive(void);
 static eAPP_STATUS armpit_transmit(void);
 static void armpit_set_navigation_data(sAPP_NAVIGATION_CBLK* navigation_cblk,
@@ -54,7 +47,8 @@ static void armpit_set_navigation_data(sAPP_NAVIGATION_CBLK* navigation_cblk,
                                        uint16_t z_distance,
                                        int16_t rotation);
 static eAPP_STATUS armpit_send_response(sAPP_NAVIGATION_CBLK* navigation_cblk);
-static eAPP_STATUS armpit_handle_handshake(uAPP_ARMPIT_MESSAGES message);
+static eAPP_STATUS armpit_start_handshake(void);
+static eAPP_STATUS armpit_finish_handshake(void);
 static eAPP_STATUS armpit_handle_data_receive(sAPP_NAVIGATION_CBLK* navigation_cblk,
                                               uAPP_ARMPIT_MESSAGES message);
 static eAPP_STATUS armpit_state_machine(sAPP_NAVIGATION_CBLK* navigation_cblk);
@@ -64,51 +58,10 @@ static eAPP_STATUS armpit_state_machine(sAPP_NAVIGATION_CBLK* navigation_cblk);
 /******************************************************************************/
 /*                 Internal Support Functions                                 */
 /******************************************************************************/
-#ifdef ARMPIT_WATCHDOG_ENABLE
-static void armpit_watchdog_init(void)
-{
-    /*
-    TIM11 is connected to APB2 bus, which has on F407 device 84MHz clock
-    But, timer has internal PLL, which double this frequency for timer, up to 168MHz
-    Clock Division 4 causes 42MHz.
-    
-    Set timer prescaler:
-    timer_tick_frequency = (Timer_default_frequency/4) / (prescaller_set + 1)
-    timer_tick_frequency = 42000000 / (9999 + 1) = 4200
-    
-    Period results in 2500/4200 seconds or approx. 600 ms.
-    */
-    TIM_ClockConfigTypeDef sClockSourceConfig;
-    TIM_MasterConfigTypeDef sMasterConfig;
-    
-    htim11.Instance = TIM11;
-    htim11.Init.Prescaler = 9999;
-    htim11.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim11.Init.Period = 2500;
-    htim11.Init.ClockDivision = TIM_CLOCKDIVISION_DIV4;
-    HAL_TIM_Base_Init(&htim11);
-    
-    sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-    HAL_TIM_ConfigClockSource(&htim11, &sClockSourceConfig);
-    
-    sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-    HAL_TIMEx_MasterConfigSynchronization(&htim11, &sMasterConfig);
-    
-    AppArmpitCblk.tim11Handle = & htim11;
-}
-#endif
-
 static eAPP_STATUS armpit_transmit(void)
 {
     HAL_StatusTypeDef status;
     uint32_t retryCount = 0;
-    
-#ifdef ARMPIT_WATCHDOG_ENABLE
-    // Start the watchdog Timer
-    HAL_TIM_Base_Start_IT(AppArmpitCblk.tim11Handle);
-    AppArmpitCblk.uart_state = UART_PERIPHERAL_TRANSMITTING;
-#endif
     
     /* Start the UART peripheral transmission process */
     AppArmpitCblk.requestState = UART_REQUEST_PROCESSING;
@@ -131,12 +84,6 @@ static eAPP_STATUS armpit_receive(void)
 {
     HAL_StatusTypeDef status;
     uint32_t retryCount = 0;
-
-#ifdef ARMPIT_WATCHDOG_ENABLE
-    // Start the watchdog Timer
-    HAL_TIM_Base_Start_IT(AppArmpitCblk.tim11Handle);
-    AppArmpitCblk.uart_state = UART_PERIPHERAL_RECEIVING;
-#endif
     
     /* Put UART peripheral in reception mode */ 
     Flush_Buffer(AppArmpitCblk.inputBuffer.buffer, INPUT_ARMPIT_BUFFER_SIZE);
@@ -216,55 +163,64 @@ static eAPP_STATUS armpit_send_response(sAPP_NAVIGATION_CBLK* navigation_cblk)
     return status;
 }
 
-static eAPP_STATUS armpit_handle_handshake(uAPP_ARMPIT_MESSAGES message)
+static eAPP_STATUS armpit_start_handshake(void)
 {
-    eAPP_STATUS status = STATUS_FAILURE;
+    eAPP_STATUS status = STATUS_SUCCESS;
     HAL_StatusTypeDef halStatus;
     
-    switch (message.common.cmd)
+    // Format the Handshake SYNC Packet
+    AppArmpitCblk.outputBuffer.sync.cmd = ARMPIT_CMD_SYNC;
+    AppArmpitCblk.outputBuffer.sync.flag = ARMPIT_FLAG_END;
+    
+    if ( HAL_OK == (halStatus = HAL_UART_Transmit(AppArmpitCblk.handle, 
+                                                  AppArmpitCblk.outputBuffer.buffer, 
+                                                  OUTPUT_ARMPIT_BUFFER_SIZE, 
+                                                  ARMPIT_POLL_TIMEOUT)))
     {
-        // Invalid 0x00 is used to start Handshake Procedure
-        case ARMPIT_CMD_INVD:
-            // Even if Receive fails, it was a successful attempt
-            status = STATUS_SUCCESS;
+        Flush_Buffer(AppArmpitCblk.outputBuffer.buffer, OUTPUT_ARMPIT_BUFFER_SIZE);
         
-            // Format the Handshake SYNC Packet
-            AppArmpitCblk.outputBuffer.sync.cmd = ARMPIT_CMD_SYNC;
-            AppArmpitCblk.outputBuffer.sync.flag = ARMPIT_FLAG_END;
-        
-            if ( HAL_OK == (halStatus = HAL_UART_Transmit(AppArmpitCblk.handle, 
-                                                          AppArmpitCblk.outputBuffer.buffer, 
-                                                          OUTPUT_ARMPIT_BUFFER_SIZE, 
-                                                          ARMPIT_POLL_TIMEOUT)))
-            {
-                Flush_Buffer(AppArmpitCblk.outputBuffer.buffer, OUTPUT_ARMPIT_BUFFER_SIZE);
-                
-                halStatus = HAL_UART_Receive(AppArmpitCblk.handle, 
-                                             AppArmpitCblk.inputBuffer.buffer, 
-                                             INPUT_ARMPIT_BUFFER_SIZE, 
-                                             ARMPIT_POLL_TIMEOUT);
-                if ( HAL_OK == halStatus)
-                {
-                    AppArmpitCblk.requestState = UART_REQUEST_WAITING;
-                }
-            }
-            
-            // Ensure that there was no major error with the UART on our end
-            if ( HAL_OK != halStatus
-              && HAL_TIMEOUT != halStatus )
-            {
-                APP_Log("ARMPIT: An error occured with the UART on handshake. Entering Error State.\r\n");
-                status = STATUS_FAILURE;
-            }
-            return status;
-        
-        case ARMPIT_CMD_SYNC:
+        halStatus = HAL_UART_Receive(AppArmpitCblk.handle, 
+                                     AppArmpitCblk.inputBuffer.buffer, 
+                                     INPUT_ARMPIT_BUFFER_SIZE, 
+                                     ARMPIT_POLL_TIMEOUT);
+        if ( HAL_OK == halStatus)
+        {
+            AppArmpitCblk.state = ARMPIT_HANDSHAKE_FINISH;
+            AppArmpitCblk.requestState = UART_REQUEST_WAITING;
+        }
+        else
+        {
+            APP_Log("ARMPIT: Unable to receive expected SYNC. HAL_STATUS: %s"ENDLINE,
+                    Translate_HAL_Status(halStatus));
+        }
+    }
+    
+    // Ensure that there was no major error with the UART on our end
+    if ( HAL_OK != halStatus
+      && HAL_TIMEOUT != halStatus )
+    {
+        APP_Log("ARMPIT: An error occured with the UART on handshake. Entering Error State.\r\n");
+        status = STATUS_FAILURE;
+    }
+    return status;
+    
+}
+
+static eAPP_STATUS armpit_finish_handshake(void)
+{
+    eAPP_STATUS status = STATUS_FAILURE;
+    
+    switch (AppArmpitCblk.inputBuffer.common.cmd)
+    {
+        case ARMPIT_CMD_RSYNC:
             // Validate the Flag as end
-            if ( ARMPIT_FLAG_END != message.sync.flag )
+            if ( ARMPIT_FLAG_END != AppArmpitCblk.inputBuffer.sync.flag )
             {
                 // Log Failure and return
                 APP_Log("ARMPIT: FLAG Bits wrong on SYNC Command.\r\n");
-                return STATUS_FAILURE;
+                AppArmpitCblk.state = ARMPIT_HANDSHAKE_START;
+                AppArmpitCblk.requestState = UART_TRANSMITING;
+                return STATUS_SUCCESS;
             }
         
             // Format the Handshake ACK Packet
@@ -279,12 +235,21 @@ static eAPP_STATUS armpit_handle_handshake(uAPP_ARMPIT_MESSAGES message)
                 APP_Log("Finished ARMPIT Handshake, starting Interrupt Process.\r\n");
                 AppArmpitCblk.state = ARMPIT_DATA_RECEIVE;
             }
+            else
+            {
+                APP_Log("ARMPIT: Unable to transmit ACK."ENDLINE);
+            }
             return status;
         
+        case ARMPIT_CMD_SYNC:
         case ARMPIT_CMD_DYNC:
         case ARMPIT_CMD_ACK:
         default:
-            return status;
+            APP_Log("ARMPIT: Received unknown command %u on Handshake response"ENDLINE,
+                    AppArmpitCblk.inputBuffer.common.cmd);
+            AppArmpitCblk.state = ARMPIT_HANDSHAKE_START;
+            AppArmpitCblk.requestState = UART_TRANSMITING;
+            return STATUS_SUCCESS;
         
     }
 }
@@ -403,20 +368,6 @@ static eAPP_STATUS armpit_handle_data_receive(sAPP_NAVIGATION_CBLK* navigation_c
             return status;
         
         case ARMPIT_CMD_SYNC:
-#ifdef ARMPIT_ACCEPT_SYNC
-            // Validate the Flag as end
-            if ( ARMPIT_FLAG_END != message.sync.flag )
-            {
-                // Log Failure and return
-                APP_Log("ARMPIT: FLAG Bits wrong on SYNC Command.\r\n");
-                return STATUS_FAILURE;
-            }
-            APP_Log("ARMPIT: Received CMD_SYNC."ENDLINE);
-        
-            // Transmit Response
-            status = armpit_send_response(navigation_cblk);
-            return status;
-#endif // #ifdef UART_ACCEPT_SYNC
         case ARMPIT_CMD_INVD:
         case ARMPIT_CMD_DYNC:
         case ARMPIT_CMD_ACK:
@@ -434,8 +385,21 @@ static eAPP_STATUS armpit_state_machine(sAPP_NAVIGATION_CBLK* navigation_cblk)
     
     switch( AppArmpitCblk.state )
     {
-        case ARMPIT_HANDSHAKE:
-            status = armpit_handle_handshake(AppArmpitCblk.inputBuffer);
+        case ARMPIT_HANDSHAKE_START:
+            // If the ARMPIT Enable Pin is set
+            if ( GPIO_PIN_SET == HAL_GPIO_ReadPin(ARMPIT_ENABLE_PORT, ARMPIT_ENABLE_PIN) )
+            {
+                status = armpit_start_handshake();
+                return status;
+            }
+            else
+            {
+                return STATUS_SUCCESS;
+            }
+            break;
+        
+        case ARMPIT_HANDSHAKE_FINISH:
+            status = armpit_finish_handshake();
             return status;
         
         case ARMPIT_DATA_RECEIVE:
@@ -457,43 +421,6 @@ static eAPP_STATUS armpit_state_machine(sAPP_NAVIGATION_CBLK* navigation_cblk)
 /******************************************************************************/
 /*                 Callback Functions                                     */
 /******************************************************************************/
-#ifdef ARMPIT_WATCHDOG_ENABLE
-void ARMPIT_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-    if ( TIM11 == htim->Instance )
-    {
-        // Handle Message Timeout
-        APP_Log("ARMPIT: UART Message Timeout.\r\n");
-        __HAL_UART_DISABLE(AppArmpitCblk.handle);
-        __HAL_UART_ENABLE(AppArmpitCblk.handle);
-        APP_UART_Generic_Flush_Buffer(AppArmpitCblk.handle);
-        
-        // Handle the different timeout possibilites differently
-        if ( UART_PERIPHERAL_TRANSMITTING == AppArmpitCblk.uart_state )
-        {
-            // Cancel the previous sending state and retry
-            AppArmpitCblk.requestState = UART_REQUEST_WAITING;
-        }
-        else if ( UART_PERIPHERAL_RECEIVING == AppArmpitCblk.uart_state )
-        {
-            // Cancel the previous receiving state and retry
-            AppArmpitCblk.requestState = UART_NO_REQUEST;
-        }
-        else
-        {
-            APP_Log("ARMPIT: UART Timeout in Unknown State.\r\n");
-            AppArmpitCblk.state = ARMPIT_ERROR;
-            BSP_LED_On(BSP_ARMPIT_ERROR_LED);
-        }
-        AppArmpitCblk.uart_state = UART_PERIPHERAL_IDLE;
-        
-        // Reset the Watchdog
-        HAL_TIM_Base_Stop_IT(htim);
-        __HAL_TIM_SET_COUNTER(htim, 0);
-    }
-}
-#endif
-
 /**
   * @brief  Tx Transfer completed callback
   * @param  UartHandle: UART handle. 
@@ -503,13 +430,6 @@ void ARMPIT_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   */
 void ARMPIT_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-#ifdef ARMPIT_WATCHDOG_ENABLE
-    // Reset the Watchdog
-    HAL_TIM_Base_Stop_IT(AppArmpitCblk.tim11Handle);
-    __HAL_TIM_SET_COUNTER(AppArmpitCblk.tim11Handle, 0);
-    AppArmpitCblk.uart_state = UART_PERIPHERAL_IDLE;
-#endif
-    
     // Transmission was successful, so ready to listen for a new request
     AppArmpitCblk.requestState = UART_NO_REQUEST;
 }
@@ -523,13 +443,6 @@ void ARMPIT_UART_TxCpltCallback(UART_HandleTypeDef *huart)
   */
 void ARMPIT_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-#ifdef ARMPIT_WATCHDOG_ENABLE
-    // Reset the Watchdog
-    HAL_TIM_Base_Stop_IT(AppArmpitCblk.tim11Handle);
-    __HAL_TIM_SET_COUNTER(AppArmpitCblk.tim11Handle, 0);
-    AppArmpitCblk.uart_state = UART_PERIPHERAL_IDLE;
-#endif
-    
     // Reception was successful, so ready for processing
     AppArmpitCblk.requestState = UART_REQUEST_WAITING;
 }
@@ -543,23 +456,9 @@ void ARMPIT_UART_RxCpltCallback(UART_HandleTypeDef *huart)
   */
 void ARMPIT_UART_ErrorCallback(UART_HandleTypeDef *huart)
 {
-#ifdef ARMPIT_WATCHDOG_ENABLE
-    // Reset the Watchdog
-    HAL_TIM_Base_Stop_IT(AppArmpitCblk.tim11Handle);
-    __HAL_TIM_SET_COUNTER(AppArmpitCblk.tim11Handle, 0);
-    AppArmpitCblk.uart_state = UART_PERIPHERAL_IDLE;
-#endif
-    
     /* Turn BSP_UART_ERROR_LED */
     BSP_LED_On(BSP_ARMPIT_ERROR_LED);
-    
-    // Log Error and Return Failure
-    APP_Log("ARMPIT: UART Error Occured: %s. Transitioning to Error Recovering.\r\n",
-            APP_UART_Generic_Translate_Error(huart->ErrorCode));
-   
-    //AppArmpitCblk.prev_state = AppArmpitCblk.state;
-    //AppArmpitCblk.state = ARMPIT_ATTEMPT_RECOVERY;
-    Error_Handler();
+    AppArmpitCblk.state = ARMPIT_TRANSITION_TO_ERROR;
 }
 
 
@@ -594,20 +493,14 @@ void APP_ARMPIT_Init(void)
     }
     
     AppArmpitCblk.handle = & ArmpitHandle;
-    APP_UART_Generic_Flush_Buffer(AppArmpitCblk.handle);
-
-#ifdef ARMPIT_WATCHDOG_ENABLE
-    armpit_watchdog_init();
-#endif
-    
-    AppArmpitCblk.state = ARMPIT_HANDSHAKE;
+    AppArmpitCblk.state = ARMPIT_HANDSHAKE_START;
     AppArmpitCblk.requestState = UART_TRANSMITING;
 }
 
 eAPP_STATUS APP_ARMPIT_Initiate(void)
 {
     // Validate we are in correct state
-    if ( ARMPIT_HANDSHAKE != AppArmpitCblk.state )
+    if ( ARMPIT_HANDSHAKE_START != AppArmpitCblk.state )
     {
         APP_Log("ARMPIT in incorrect state for Handshake Procedure.\r\n");
         return STATUS_FAILURE;
@@ -623,27 +516,42 @@ eAPP_STATUS APP_ARMPIT_Process_Message(sAPP_NAVIGATION_CBLK* navigation_cblk)
 {
     eAPP_STATUS status = STATUS_SUCCESS;
     
-    // If we are not in an invalid state
-    if ( (ARMPIT_INIT != AppArmpitCblk.state)
-      && (ARMPIT_ERROR != AppArmpitCblk.state))
+    // Determine the state we are in and process accordingly
+    switch ( AppArmpitCblk.state )
     {
-        // If a message is waiting, process it
-        if ( UART_REQUEST_WAITING == AppArmpitCblk.requestState 
-          || UART_TRANSMITING == AppArmpitCblk.requestState )
-        {
-            // Process Message
-            status = armpit_state_machine(navigation_cblk);
-        }
-        else if ( UART_NO_REQUEST == AppArmpitCblk.requestState )
-        {
-            // Enter the Reception state
-            status = armpit_receive();
-        }
-    }
-    else if (ARMPIT_ATTEMPT_RECOVERY == AppArmpitCblk.state)
-    {
-        APP_UART_Generic_Recover_From_Error(AppArmpitCblk.handle);
-        AppArmpitCblk.state = AppArmpitCblk.prev_state;
+        case ARMPIT_HANDSHAKE_START:
+        case ARMPIT_HANDSHAKE_FINISH:
+        case ARMPIT_DATA_RECEIVE:
+        case ARMPIT_TERMINATE:
+            // If a message is waiting, process it
+            if ( UART_REQUEST_WAITING == AppArmpitCblk.requestState 
+              || UART_TRANSMITING == AppArmpitCblk.requestState )
+            {
+                // Process Message
+                status = armpit_state_machine(navigation_cblk);
+            }
+            else if ( UART_NO_REQUEST == AppArmpitCblk.requestState )
+            {
+                // Enter the Reception state
+                status = armpit_receive();
+            }
+            break;
+            
+        case ARMPIT_TRANSITION_TO_ERROR:
+            // Log Error and Return Failure
+            APP_Log("ARMPIT: UART Error Occured: %s. Transitioning to Error Recovering.\r\n",
+            APP_UART_Generic_Translate_Error(AppArmpitCblk.handle->ErrorCode));
+            AppArmpitCblk.state = ARMPIT_ERROR;
+            break;
+        
+        case ARMPIT_INIT:
+            // Do nothing
+            break;
+        
+        case ARMPIT_ERROR:
+        default:
+            status = STATUS_FAILURE;
+            break;
     }
     
     // If any failures, signal via LED

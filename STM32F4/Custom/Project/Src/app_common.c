@@ -20,6 +20,23 @@
 /******************************************************************************/
 /*                 Utility Functions and Helpers                              */
 /******************************************************************************/
+char* Translate_HAL_Status(HAL_StatusTypeDef status)
+{
+    switch (status)
+    {
+        case HAL_OK:
+            return "HAL_OK";
+        case HAL_ERROR:
+            return "HAL_ERROR";
+        case HAL_BUSY:
+            return "HAL_BUSY";
+        case HAL_TIMEOUT:
+            return "HAL_TIMEOUT";
+        default:
+            return "UNKNOWN HAL_STATUS";
+    }
+}
+
 
 /**
   * @brief  Flushes the buffer

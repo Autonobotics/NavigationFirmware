@@ -28,7 +28,7 @@
 void HAL_MspInit(void)
 {
     /* System interrupt init*/
-    HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_2);
+    HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
     
     /* SysTick_IRQn interrupt configuration */
     HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
@@ -193,28 +193,6 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
         HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 0, 1);
         HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
     }
-#ifdef PIXARM_WATCHDOG_ENABLE
-    else if ( TIM10 == htim_base->Instance )
-    {
-        /* Peripheral clock enable */
-        __TIM10_CLK_ENABLE();
-        
-        /* Peripheral interrupt init*/
-        HAL_NVIC_SetPriority(TIM1_UP_TIM10_IRQn, 0, 1);
-        HAL_NVIC_EnableIRQ(TIM1_UP_TIM10_IRQn);
-    }
-#endif
-#ifdef ARMPIT_WATCHDOG_ENABLE
-    else if ( TIM11 == htim_base->Instance )
-    {
-        /* Peripheral clock enable */
-        __TIM11_CLK_ENABLE();
-        
-        /* Peripheral interrupt init*/
-        HAL_NVIC_SetPriority(TIM1_TRG_COM_TIM11_IRQn, 0, 1);
-        HAL_NVIC_EnableIRQ(TIM1_TRG_COM_TIM11_IRQn);
-    }
-#endif
 }
 
 
@@ -276,26 +254,6 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
         /* Peripheral interrupt DeInit*/
         HAL_NVIC_DisableIRQ(TIM6_DAC_IRQn);
     }
-#ifdef PIXARM_WATCHDOG_ENABLE
-    else if ( TIM10 == htim_base->Instance )
-    {
-        /* Peripheral clock disable */
-        __TIM10_CLK_DISABLE();
-    
-        /* Peripheral interrupt DeInit*/
-        HAL_NVIC_DisableIRQ(TIM1_UP_TIM10_IRQn);
-    }
-#endif
-#ifdef ARMPIT_WATCHDOG_ENABLE
-    else if ( TIM11 == htim_base->Instance )
-    {
-        /* Peripheral clock disable */
-        __TIM11_CLK_DISABLE();
-    
-        /* Peripheral interrupt DeInit*/
-        HAL_NVIC_DisableIRQ(TIM1_TRG_COM_TIM11_IRQn);
-    }
-#endif
 }
 
 
@@ -318,6 +276,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         /* Enable GPIO TX/RX clock */
         ARMPIT_USART_TX_GPIO_CLK_ENABLE();
         ARMPIT_USART_RX_GPIO_CLK_ENABLE();
+        __GPIOD_CLK_ENABLE();
         /* Enable USART2 clock */
         ARMPIT_USART_CLK_ENABLE(); 
         
@@ -330,16 +289,23 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         GPIO_InitStruct.Alternate = ARMPIT_USART_TX_AF;
         
         HAL_GPIO_Init(ARMPIT_USART_TX_GPIO_PORT, &GPIO_InitStruct);
-    
+        
         /* UART RX GPIO pin configuration  */
         GPIO_InitStruct.Pin = ARMPIT_USART_RX_PIN;
         GPIO_InitStruct.Alternate = ARMPIT_USART_RX_AF;
             
         HAL_GPIO_Init(ARMPIT_USART_RX_GPIO_PORT, &GPIO_InitStruct);
+        
+        /*Configure GPIO pin : PB2 */
+        GPIO_InitStruct.Pin = ARMPIT_ENABLE_PIN;
+        GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+        GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+        GPIO_InitStruct.Alternate = 0x00;
+        HAL_GPIO_Init(ARMPIT_ENABLE_PORT, &GPIO_InitStruct);
             
         /*##-3- Configure the NVIC for UART ########################################*/
         /* NVIC for USART1 */
-        HAL_NVIC_SetPriority(ARMPIT_USART_IRQn, 3, 0);
+        HAL_NVIC_SetPriority(ARMPIT_USART_IRQn, 0, 0);
         HAL_NVIC_EnableIRQ(ARMPIT_USART_IRQn);
     }
     else if ( huart->Instance == PIXARM_USART )
@@ -396,6 +362,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
         HAL_GPIO_DeInit(ARMPIT_USART_TX_GPIO_PORT, ARMPIT_USART_TX_PIN);
         /* Configure UART Rx as alternate function  */
         HAL_GPIO_DeInit(ARMPIT_USART_RX_GPIO_PORT, ARMPIT_USART_RX_PIN);
+        HAL_GPIO_DeInit(ARMPIT_ENABLE_PORT, ARMPIT_ENABLE_PIN);
         
         /*##-3- Disable the NVIC for UART ##########################################*/
         HAL_NVIC_DisableIRQ(ARMPIT_USART_IRQn);
