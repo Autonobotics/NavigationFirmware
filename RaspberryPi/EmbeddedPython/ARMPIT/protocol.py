@@ -14,13 +14,12 @@ def translate_command_byte(cmd_byte_str):
 
 def initialize_serial_port():
     global serial_port, uart_logger
-    serial_port = Serial("/dev/ttyAMA0", 115200)
+    serial_port = Serial("/dev/ttyAMA0", 57600)
     if serial_port.isOpen() is False:
         serial_port.open()
     serial_port.flushInput()
     serial_port.flushOutput()
     uart_logger = AB_Log.get_logger('UART')
-
 
 def cleanup_serial_port():
     global serial_port
@@ -36,7 +35,9 @@ def uart_receive_cmd():
 def uart_receive_packet():
     return serial_port.read(15)
 
-
+def flushPort():
+    serial_port.flushInput()
+    serial_port.flushOutput()
 # Write a ARMPIT Message to the UART
 def uart_transmit(armpit_message):
     global uart_logger
@@ -51,21 +52,28 @@ def perform_handshake():
 
     # Wait for the Sync message
     cmd = uart_receive_cmd()
+    sync_package = uart_receive_packet()
+    uart_logger.debug("HANDSHAKE_SYNC: Received command: {0}".format(cmd))
     if cmd is not message.ARMPiTMessage.CMD_SYNC:
         uart_logger.error("Uart did not receive SYNC during handshake.")
-    sync_package = uart_receive_packet()
+        return False
 
     # Validate the Sync packet
     sync_message = message.SyncMessage().load_from_string_with_command(cmd, sync_package)
     if sync_message.flag is not message.ARMPiTMessage.FLAG_END:
         uart_logger.error("Uart SYNC packet was malformed.")
-
-    # Sent a response Sync message
-    response_sync = message.SyncMessage().set_defaults()
+        return False
+    # Send a response Sync message
+    response_sync = message.RsyncMessage().set_defaults()
+    uart_logger.debug("HANDSHAKE_RSYNC: Sending Rsync response")
     uart_transmit(response_sync)
 
     # Wait for the Ack packet before continuing
     cmd = uart_receive_cmd()
+    sync_package = uart_receive_packet()
+    uart_logger.debug("HANDSHAKE_ACK: Received command: {0}".format(cmd))
     if cmd is not message.ARMPiTMessage.CMD_ACK:
         uart_logger.error("Uart did not receive ACK during handshake.")
-    sync_package = uart_receive_packet()
+        return False
+
+    return True

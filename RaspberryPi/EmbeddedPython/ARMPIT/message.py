@@ -29,7 +29,7 @@ class ARMPiTMessage():
     CMD_DYNC = 0xFE
     CMD_ACK = 0x02
     CMD_RACK = 0x03
-
+    CMD_RSYNC = 0x04
     CMD_NO_BEACON = 0x30
     CMD_BEACON_DETECTED = 0x31
     CMD_EDGE_DETECTED = 0x32
@@ -52,6 +52,8 @@ class ARMPiTMessage():
             self.buffer = temp
             self.buffer.insert(0, cmd_input)
             self.cmd = cmd_input
+
+        if DEBUG: print("Received: {0}".format(self.buffer))
         return self
 
     def load_from_string(self, string_input):
@@ -65,7 +67,7 @@ class ARMPiTMessage():
         self.buffer[0] = self.cmd
 
     def get_byte_stream(self):
-        if DEBUG: print("Sending: {0}".format("".join(map(chr, self.buffer))))
+        if DEBUG: print("Sending: {0}".format(self.buffer))
         return "".join(map(chr, self.buffer))
 
 
@@ -82,6 +84,30 @@ class SyncMessage(ARMPiTMessage):
 
     def set_defaults(self):
         self.cmd = ARMPiTMessage.CMD_SYNC
+        self.flag = ARMPiTMessage.FLAG_END
+        return self
+
+    def _update(self):
+        ARMPiTMessage._update(self)
+        self.buffer[7] = self.flag
+
+    def get_byte_stream(self):
+        self._update()
+        return ARMPiTMessage.get_byte_stream(self)
+
+class RsyncMessage(ARMPiTMessage):
+
+    def __init__(self):
+        ARMPiTMessage.__init__(self)
+        self.flag = self.buffer[7]
+
+    def load_from_string_with_command(self, cmd_input, string_input):
+        ARMPiTMessage.load_from_string_with_command(self, cmd_input, string_input)
+        self.flag = self.buffer[7]
+        return self
+
+    def set_defaults(self):
+        self.cmd = ARMPiTMessage.CMD_RSYNC
         self.flag = ARMPiTMessage.FLAG_END
         return self
 
