@@ -22,11 +22,9 @@
 /* Private macro -------------------------------------------------------------*/
 /* Public variables ----------------------------------------------------------*/
 UART_HandleTypeDef ArmpitHandle;
-TIM_HandleTypeDef htim11;
 
 /* Private variables ---------------------------------------------------------*/
 static sAPP_ARMPIT_CBLK AppArmpitCblk = {
-    NULL,
     NULL,
     ARMPIT_INIT,
     ARMPIT_INIT,
