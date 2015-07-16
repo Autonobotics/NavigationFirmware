@@ -115,8 +115,6 @@ int main(void)
         
         // Process PIXARM Requests
         //status = APP_PIXARM_Process_Message(&AppNavigationCblk);
-        
-        //HAL_Delay(10);
     }
 }
 

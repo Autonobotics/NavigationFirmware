@@ -190,7 +190,8 @@ static eAPP_STATUS armpit_start_handshake(void)
         }
         else
         {
-            APP_Log("ARMPIT: Unable to receive expected SYNC. HAL_STATUS: %s"ENDLINE,
+            Flush_Buffer(AppArmpitCblk.inputBuffer.buffer, INPUT_ARMPIT_BUFFER_SIZE);
+            APP_Log("ARMPIT: Unable to receive expected RSYNC. HAL_STATUS: %s"ENDLINE,
                     Translate_HAL_Status(halStatus));
         }
     }
@@ -209,6 +210,7 @@ static eAPP_STATUS armpit_start_handshake(void)
 static eAPP_STATUS armpit_finish_handshake(void)
 {
     eAPP_STATUS status = STATUS_FAILURE;
+    HAL_StatusTypeDef halStatus;
     
     switch (AppArmpitCblk.inputBuffer.common.cmd)
     {
@@ -228,16 +230,25 @@ static eAPP_STATUS armpit_finish_handshake(void)
             AppArmpitCblk.outputBuffer.ack.flag = ARMPIT_FLAG_END;
         
             // Transmit and setup for receive
-            status = armpit_transmit();
-            if ( STATUS_SUCCESS == status)
+            if ( HAL_OK == (halStatus = HAL_UART_Transmit(AppArmpitCblk.handle, 
+                                                  AppArmpitCblk.outputBuffer.buffer, 
+                                                  OUTPUT_ARMPIT_BUFFER_SIZE, 
+                                                  ARMPIT_POLL_TIMEOUT)))
             {
                 // Change states
                 APP_Log("Finished ARMPIT Handshake, starting Interrupt Process.\r\n");
                 AppArmpitCblk.state = ARMPIT_DATA_RECEIVE;
+                AppArmpitCblk.requestState = UART_NO_REQUEST;
+                status = STATUS_SUCCESS;
+            }
+            else if (HAL_TIMEOUT != halStatus)
+            {
+                APP_Log("ARMPIT: Unable to transmit ACK."ENDLINE);
             }
             else
             {
-                APP_Log("ARMPIT: Unable to transmit ACK."ENDLINE);
+                // Retry
+                status = STATUS_SUCCESS;
             }
             return status;
         
@@ -396,7 +407,6 @@ static eAPP_STATUS armpit_state_machine(sAPP_NAVIGATION_CBLK* navigation_cblk)
             {
                 return STATUS_SUCCESS;
             }
-            break;
         
         case ARMPIT_HANDSHAKE_FINISH:
             status = armpit_finish_handshake();
@@ -479,7 +489,7 @@ void APP_ARMPIT_Init(void)
         - Hardware flow control disabled (RTS and CTS signals)
     */
     ArmpitHandle.Instance          = ARMPIT_USART;
-    ArmpitHandle.Init.BaudRate     = 115200;
+    ArmpitHandle.Init.BaudRate     = 57600;
     ArmpitHandle.Init.WordLength   = UART_WORDLENGTH_8B;
     ArmpitHandle.Init.StopBits     = UART_STOPBITS_1;
     ArmpitHandle.Init.Parity       = UART_PARITY_NONE;
