@@ -11,12 +11,7 @@ from AB_Camera_Modules import nav_board_comm as Nav_Board_Comm
 
 
 AB_beaconList = beacon.AB_beacons()
-
-def AB_startup():
-    #send be intial beacon lcation to STM board
-    startup_beacon_info = AB_beaconList.beacon_info(AB_beaconList.currentID)
-    print("Initial Startup beacon information: {0}".format(startup_beacon_info))
-    return
+collision_distance = 0
 
 #send the next beacons location to the flight controller
 def send_next_beacon_info():
@@ -103,10 +98,21 @@ def distance_to_camera(focalLength, resolution,hFOV, marker):
 
     return beacon.beaconLocation(X_norm,Y_norm,Z)
 
-def frontal_collision(distance_to_object):
+def detect_frontal_object(image):
+    imageSize = 0
+
+    return imageSize
+
+def frontal_collision(image, focalLength):
     #do some processing
     distance = 0
-    Nav_Board_Comm.send_and_wait(distance, Nav_Board_Comm.ABFlags.FRONTAL_COLLISION)
+
+    #find the image size of the object using bounding box
+    imageSize = detect_frontal_object(image)
+
+    #size of the object is s = (imgSize/FOCAL_LENGTH )* distance_to_object
+    objectSize = (imageSize*focalLength) / collision_distance
+    Nav_Board_Comm.send_and_wait(distance, Nav_Board_Comm.ABFlags.AVOID_FRONT)
     return
 
 def beacon_filter(markerList):

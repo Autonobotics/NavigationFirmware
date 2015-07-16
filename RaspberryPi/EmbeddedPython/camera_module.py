@@ -35,6 +35,12 @@ def camera_loop():
                         #try and locate the beacon marker
                         marker = beacon_processing.locate_beacon(image)
 
+                    if Nav_Board_Comm.ABFlags.STATUS == Nav_Board_Comm.ABFlags.COLLISION_DETECTED:
+                        distance  = beacon_processing.frontal_collision(image, ABcamera.PiCam.FOCAL_LENGTH)
+                        Nav_Board_Comm.send_and_wait(distance,Nav_Board_Comm.ABFlags.AVOID_FRONT)
+                        Nav_Board_Comm.ABFlags.STATUS = 0x0
+
+
                     if marker is None:
                         markerList.append(beacon.beaconLocation(0, 0, 0))
 
@@ -52,7 +58,6 @@ def camera_loop():
                                 break
                             else:
                                 markerList = []
-
                                 #Wait for response from STM board, for the drone to finish rotation
                                 Nav_Board_Comm.send_and_wait(None, Nav_Board_Comm.ABFlags.QUERY_ROTATION)
 
@@ -78,7 +83,7 @@ def camera_loop():
                     stream.truncate()
 
     except Exception, e:
-        print(e)
-
+        cam_logger.error(e)
+        camera.close()
         cam_logger.error('ERROR: %s \r\n' % str(e))
         traceback.print_exc(file=sys.stdout)

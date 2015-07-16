@@ -12,14 +12,14 @@ class ABFlags():
     BEACON_DETECTED     = 0x01
     NO_BEACON_DETECTED  = 0x02
     BEACON_ROTATION     = 0x03
-    FRONTAL_COLLISION   = 0x04
+    AVOID_FRONT   = 0x04
     QUERY_ROTATION      = 0x05
 
-    ACK_RECEIVED            = 0x30
-    QUERY_ROTATION_COMPLETE = 0x31
+    ACK_RECEIVED             = 0x30
+    QUERY_ROTATION_COMPLETE  = 0x31
     COLLISION_DETECTED       = 0x32
 
-
+    STATUS                  = 0x00
 
 def send_and_wait(data, flag):
     global cam_logger
@@ -35,7 +35,7 @@ def send_and_wait(data, flag):
     elif flag ==  ABFlags.BEACON_ROTATION:
         while send_beacon_rotation(data) is not True:
             pass
-    elif flag == ABFlags.FRONTAL_COLLISION:
+    elif flag == ABFlags.AVOID_FRONT:
         while send_edge_distance(data) is not True:
             pass
 
@@ -173,7 +173,8 @@ def receive_and_process():
         if received_message.sub_cmd is message.ARMPiTMessage.SUBCMD_COLLISION_DETECTED:
             cam_logger.debug('SUBCMD_COLLISION_DETECTED')
             distance_to_object = received_message.payload_a
-            beacon_processing.frontal_collision(distance_to_object)
+            ABFlags.STATUS = ABFlags.COLLISION_DETECTED
+            beacon_processing.collision_distance = distance_to_object
             return ABFlags.COLLISION_DETECTED
         elif received_message.sub_cmd is message.ARMPiTMessage.SUBCMD_ROTATION_COMPLETE:
             cam_logger.debug('SUBCMD_ROTATION_COMPLETE')

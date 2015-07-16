@@ -8,7 +8,6 @@ class AB_beacons:
         -90,
         180
         ]
-
     def __init__(self):
         self.currentID = 0
         self.nextID = 1
