@@ -10,7 +10,7 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __APP_NAVIGATION_H
 #define __APP_NAVIGATION_H
-
+#define DISTANCE_UNKNOWN 0xFFFF
 
 /* Includes ------------------------------------------------------------------*/
 #include "app_common.h"
@@ -33,6 +33,13 @@
 #define ROTATION_LOWER_BOUND(_desired_) (_desired_ - (ROTATION_EPSILON >> 2))
 #define ROTATION_UPPER_BOUND(_desired_) (_desired_ + (ROTATION_EPSILON >> 2))
 
+#define ALTITUDE_IDLE 80 //idle at 50cm
+#define ALTITUDE_MARGIN 10 //acceptable error of 10cm
+#define AVOID_THRESHOLD_FRONT 30
+#define AVOID_THRESHOLD_REAR 30
+#define AVOID_THRESHOLD_LEFT 30
+#define AVOID_THRESHOLD_RIGHT 30
+
 /* Exported types ------------------------------------------------------------*/
 typedef enum _eAPP_NAVIGATION_AXIS_INTENSITY
 {
@@ -45,6 +52,20 @@ typedef enum _eAPP_NAVIGATION_AXIS_INTENSITY
     IDLE_INTENSITY
     
 } eAPP_NAVIGATION_AXIS_INTENSITY;
+
+typedef struct _sAPP_NAVIGATION_STATE
+{
+	  BOOL ROTATE;
+	  BOOL MOVE;;
+	
+	  BOOL AVOID_FRONT;
+	  BOOL AVOID_RIGHT;
+	  BOOL AVOID_LEFT;
+	  BOOL AVOID_REAR;
+	  BOOL ALT_LOW;
+	  BOOL ALT_HIGH;
+	
+} eAPP_NAVIGATION_STATE;
 
 typedef struct _sAPP_IMAGE_BOARD_DATA
 {
