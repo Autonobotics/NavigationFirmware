@@ -42,7 +42,7 @@
 
 /* Define Connection Timeout and Attempts */
 #define PIXARM_POLL_TIMEOUT 100  // Ie. Blocking Poll (In Milliseconds)
-#define PIXARM_CONNECTION_ATTEMPTS 600
+#define PIXARM_CONNECTION_ATTEMPTS 60000
 
 
 /* Exported types ------------------------------------------------------------*/
@@ -53,7 +53,7 @@ typedef enum _eAPP_PIXARM_STATE
     PIXARM_PROCESS,
     PIXARM_SHUTDOWN,
     
-    PIXARM_ATTEMPT_RECOVERY,
+    PIXARM_TRANSITION_TO_ERROR,
     PIXARM_ERROR
     
 } eAPP_PIXARM_STATE;
@@ -86,9 +86,10 @@ typedef struct _sAPP_PIXARM_SYNC
 typedef struct _sAPP_PIXARM_ACK
 {
     uint8_t cmd;
-    uint8_t flag;
     
     uint8_t padding[6];
+    
+    uint8_t flag;
     
 } sAPP_PIXARM_ACK;
 
@@ -98,9 +99,10 @@ typedef struct _sAPP_PIXARM_READ_REQ
     uint8_t padding_a;
     
     uint16_t rotation_absolute;
-    uint8_t flag;
     
     uint8_t padding[3];
+    
+    uint8_t flag;
     
 } sAPP_PIXARM_READ_REQ;
 
@@ -133,10 +135,6 @@ typedef union _uAPP_PIXARM_MESSAGES
 typedef struct _sAPP_PIXARM_CBLK
 {
     UART_HandleTypeDef *handle;
-    TIM_HandleTypeDef *tim10Handle;
-#ifdef PIXARM_WATCHDOG_ENABLE
-    eAPP_UART_PERIPHERAL_STATE uart_state;
-#endif
     eAPP_PIXARM_STATE state;
     eAPP_PIXARM_STATE prev_state;
     uAPP_PIXARM_MESSAGES inputBuffer;
@@ -148,9 +146,6 @@ typedef struct _sAPP_PIXARM_CBLK
 
 
 /* Callback functions ------------------------------------------------------- */
-#ifdef PIXARM_WATCHDOG_ENABLE
-void PIXARM_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
-#endif
 void PIXARM_UART_TxCpltCallback(UART_HandleTypeDef *huart);
 void PIXARM_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 void PIXARM_UART_ErrorCallback(UART_HandleTypeDef *huart);

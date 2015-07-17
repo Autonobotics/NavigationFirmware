@@ -547,7 +547,7 @@ eAPP_STATUS APP_ARMPIT_Process_Message(sAPP_NAVIGATION_CBLK* navigation_cblk)
             
         case ARMPIT_TRANSITION_TO_ERROR:
             // Log Error and Return Failure
-            APP_Log("ARMPIT: UART Error Occured: %s. Transitioning to Error Recovering.\r\n",
+            APP_Log("ARMPIT: UART Error Occured: %s. Transitioning to Error.\r\n",
             APP_UART_Generic_Translate_Error(AppArmpitCblk.handle->ErrorCode));
             AppArmpitCblk.state = ARMPIT_ERROR;
             break;

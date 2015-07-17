@@ -31,10 +31,10 @@ typedef enum _eAPP_STATUS
 /* Quadcopter Axis Definitions */
 typedef enum _eAPP_AXIS
 {
-    AXIS_FRONT,     // +z
+    AXIS_FRONT = 0,     // +z
     AXIS_REAR,      // -z
     AXIS_LEFT,      // -x
-    AXIS_RIGH,      // +x
+    AXIS_RIGHT,      // +x
     AXIS_TOP,       // +y
     AXIS_BOTTOM     // -y
     
