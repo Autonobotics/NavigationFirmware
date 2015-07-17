@@ -110,6 +110,7 @@ void Ultrasonic_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             HAL_TIM_IC_Stop_IT(&htim2, TIM_CHANNEL_1);//stop the counter
             __HAL_TIM_SET_COUNTER(&htim2,0);//reset counter
             HAL_NVIC_DisableIRQ(TIM2_IRQn);
+					  front_count = DISTANCE_UNKNOWN; // time out, no-object flag
             //proceed to calculate with previous counter value
             front++;
             to_f++;
@@ -119,6 +120,7 @@ void Ultrasonic_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             HAL_TIM_IC_Stop_IT(&htim3, TIM_CHANNEL_1);
             __HAL_TIM_SET_COUNTER(&htim3,0);
             HAL_NVIC_DisableIRQ(TIM3_IRQn);
+					  left_count = DISTANCE_UNKNOWN; // time out, no-object flag
             left++;
             to_l++;
 
@@ -128,6 +130,7 @@ void Ultrasonic_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             HAL_TIM_IC_Stop_IT(&htim3, TIM_CHANNEL_2);
             __HAL_TIM_SET_COUNTER(&htim3,0);
             HAL_NVIC_DisableIRQ(TIM3_IRQn);
+					  down_count = DISTANCE_UNKNOWN; // time out, no-object flag
             down++;
             to_d++;
         }
@@ -136,6 +139,7 @@ void Ultrasonic_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             HAL_TIM_IC_Stop_IT(&htim4, TIM_CHANNEL_1);
             __HAL_TIM_SET_COUNTER(&htim4,0);
             HAL_NVIC_DisableIRQ(TIM4_IRQn);
+					  right_count = DISTANCE_UNKNOWN; // time out, no-object flag
             right++;
             to_r++;
         }
@@ -144,6 +148,7 @@ void Ultrasonic_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             HAL_TIM_IC_Stop_IT(&htim4, TIM_CHANNEL_2);
             __HAL_TIM_SET_COUNTER(&htim4,0);
             HAL_NVIC_DisableIRQ(TIM4_IRQn);
+					  back_count = DISTANCE_UNKNOWN; // time out, no-object flag
             back++;
             to_b++;	
         }
@@ -224,7 +229,7 @@ BOOL us_front(void)
     }
     else if (front == 2)
     {
-        front_distance = ((front_count*0.0001)*340)/2; //converted to cm/s
+			  front_distance = ((front_count*0.0001)*340)/2; //calculate distance in m
         front = 0;
         trig = 0;
         return TRUE;
@@ -246,7 +251,7 @@ BOOL us_left(void)
     }
     else if (left == 2)
     {
-        left_distance = ((left_count*0.0001)*340)/2;
+        left_distance = ((left_count*0.0001)*340)/2; //calculate distance in m
         left = 0;
         trig = 0;
         return TRUE;
@@ -268,7 +273,7 @@ BOOL us_down(void)
     }
     else if (down == 2)
     {
-        down_distance = ((down_count*0.0001)*340)/2;
+        down_distance = ((down_count*0.0001)*340)/2; //calculate distance in m
         down = 0;
         trig = 0;
         return TRUE;
@@ -290,7 +295,7 @@ BOOL us_right(void)
     }
     else if (right == 2)
     {
-        right_distance = ((right_count*0.0001)*340)/2;
+        right_distance = ((right_count*0.0001)*340)/2; //calculate distance in m
         right = 0;
         trig = 0;
         return TRUE;
