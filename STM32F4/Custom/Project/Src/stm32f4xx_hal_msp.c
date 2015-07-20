@@ -321,14 +321,17 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         /* UART TX GPIO pin configuration  */
         GPIO_InitStruct.Pin       = PIXARM_USART_TX_PIN;
         GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull      = GPIO_NOPULL;
-        GPIO_InitStruct.Speed     = GPIO_SPEED_FAST;
+        GPIO_InitStruct.Pull      = GPIO_PULLUP;
+        GPIO_InitStruct.Speed     = GPIO_SPEED_HIGH;
         GPIO_InitStruct.Alternate = PIXARM_USART_TX_AF;
         
         HAL_GPIO_Init(PIXARM_USART_TX_GPIO_PORT, &GPIO_InitStruct);
     
         /* UART RX GPIO pin configuration  */
         GPIO_InitStruct.Pin = PIXARM_USART_RX_PIN;
+        GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Pull      = GPIO_PULLUP;
+        GPIO_InitStruct.Speed     = GPIO_SPEED_HIGH;
         GPIO_InitStruct.Alternate = PIXARM_USART_RX_AF;
             
         HAL_GPIO_Init(PIXARM_USART_RX_GPIO_PORT, &GPIO_InitStruct);

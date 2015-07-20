@@ -20,30 +20,29 @@
 /* Exported constants --------------------------------------------------------*/
 
 /* Definition for PIXARM clock resources */
-#define PIXARM_USART                            USART1
-#define PIXARM_USART_CLK_ENABLE()              __HAL_RCC_USART1_CLK_ENABLE();
+#define PIXARM_USART                            UART4
+#define PIXARM_USART_CLK_ENABLE()              __HAL_RCC_UART4_CLK_ENABLE();
 #define PIXARM_USART_RX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE()
-#define PIXARM_USART_TX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE() 
-
-#define PIXARM_USART_FORCE_RESET()             __HAL_RCC_USART1_FORCE_RESET()
-#define PIXARM_USART_RELEASE_RESET()           __HAL_RCC_USART1_RELEASE_RESET()
-
-/* Definition for PIXARM Pins */
-#define PIXARM_USART_TX_PIN                    GPIO_PIN_9
-#define PIXARM_USART_TX_GPIO_PORT              GPIOA  
-#define PIXARM_USART_TX_AF                     GPIO_AF7_USART1
-#define PIXARM_USART_RX_PIN                    GPIO_PIN_10
+#define PIXARM_USART_TX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOC_CLK_ENABLE() 
+                                               
+#define PIXARM_USART_FORCE_RESET()             __HAL_RCC_UART4_FORCE_RESET()
+#define PIXARM_USART_RELEASE_RESET()           __HAL_RCC_UART4_RELEASE_RESET()
+                                               
+/* Definition for PIXARM Pins */               
+#define PIXARM_USART_TX_PIN                    GPIO_PIN_10
+#define PIXARM_USART_TX_GPIO_PORT              GPIOC  
+#define PIXARM_USART_TX_AF                     GPIO_AF8_UART4
+#define PIXARM_USART_RX_PIN                    GPIO_PIN_1
 #define PIXARM_USART_RX_GPIO_PORT              GPIOA 
-#define PIXARM_USART_RX_AF                     GPIO_AF7_USART1
-
-/* Definition for PIXARM's NVIC */
-#define PIXARM_USART_IRQn                      USART1_IRQn
-#define PIXARM_USART_IRQHandler                USART1_IRQHandler
+#define PIXARM_USART_RX_AF                     GPIO_AF8_UART4
+                                               
+/* Definition for PIXARM's NVIC */             
+#define PIXARM_USART_IRQn                      UART4_IRQn
+#define PIXARM_USART_IRQHandler                UART4_IRQHandler
 
 /* Define Connection Timeout and Attempts */
 #define PIXARM_POLL_TIMEOUT 100  // Ie. Blocking Poll (In Milliseconds)
 #define PIXARM_CONNECTION_ATTEMPTS 60000
-
 
 /* Exported types ------------------------------------------------------------*/
 typedef enum _eAPP_PIXARM_STATE

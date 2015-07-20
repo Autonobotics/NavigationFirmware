@@ -13,8 +13,6 @@
 
 /* Debug Constants -----------------------------------------------------------*/
 #define DEBUG
-//#define ARMPIT_WATCHDOG_ENABLE
-//#define PIXARM_WATCHDOG_ENABLE
 
 
 #endif // __APP_CONFIG_H
