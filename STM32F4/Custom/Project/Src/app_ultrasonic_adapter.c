@@ -252,6 +252,7 @@ static void hc_sr04_start_pulse(sAPP_NAVIGATION_CBLK* navigation_cblk)
     {
         AppHcsr04Cblk.pulse_indv++;
         AppHcsr04Cblk.pulse_indv = AppHcsr04Cblk.pulse_indv % PULSE_LIMIT;
+        BSP_LED_Toggle(BSP_ULTRASONIC_ERROR_LED);
     }
 }
 

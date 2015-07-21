@@ -85,7 +85,7 @@ int main(void)
         BSP_LED_On(BSP_PIXARM_ERROR_LED);
         Error_Handler();
     }
-
+    
     // Start ARMPIT Interrupt Process: Asynchronous Initiation Process
     status = APP_ARMPIT_Initiate();
     if ( STATUS_FAILURE == status )
@@ -97,6 +97,9 @@ int main(void)
 
     /* Log Initation Finished */
     APP_Log("Finished Component Initiation.\r\n");
+    
+    /* Start the Heartbeat LED */
+    Heartbeat_Start();
     
     /* Infinite loop */
     while (1)
@@ -115,6 +118,9 @@ int main(void)
         
         // Process PIXARM Requests
         status = APP_PIXARM_Process_Message(&AppNavigationCblk);
+        
+        // Ensure Heartbeat LED is set to toggle
+        Heartbeat_Update();
     }
 }
 

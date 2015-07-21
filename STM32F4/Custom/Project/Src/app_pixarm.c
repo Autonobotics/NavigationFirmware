@@ -255,9 +255,9 @@ eAPP_STATUS APP_PIXARM_Initiate(void)
         // Send the Packet
         do {
             if (HAL_OK != HAL_UART_Receive(AppPixarmCblk.handle, 
-                                        AppPixarmCblk.inputBuffer.buffer, 
-                                        INPUT_PIXARM_BUFFER_SIZE,
-                                        PIXARM_POLL_TIMEOUT))
+                                           AppPixarmCblk.inputBuffer.buffer, 
+                                           INPUT_PIXARM_BUFFER_SIZE,
+                                           PIXARM_POLL_TIMEOUT))
             {
                 APP_Log("PIXARM: Error in reception of SYNC.\r\n");
                 errorCount++;
@@ -272,6 +272,9 @@ eAPP_STATUS APP_PIXARM_Initiate(void)
                 APP_Log("PIXARM: Error in reception of SYNC, abandoning Process.\r\n");
                 return STATUS_FAILURE;
             }
+            
+            // Should be around 10hz due to polling timeout
+            BSP_LED_Toggle(BSP_PIXARM_ERROR_LED);
             
         } while( errorCount < (uint32_t) PIXARM_CONNECTION_ATTEMPTS );
         
@@ -319,6 +322,7 @@ eAPP_STATUS APP_PIXARM_Initiate(void)
     
     // Change states
     APP_Log("Finished PIXARM Handshake, starting Interrupt Process.\r\n");
+    BSP_LED_Off(BSP_PIXARM_ERROR_LED);
     AppPixarmCblk.state = PIXARM_PROCESS;
     
     /* Put PIXARM peripheral in reception process */ 
