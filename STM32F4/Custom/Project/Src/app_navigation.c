@@ -127,12 +127,12 @@ static void NAV_DECISION(sAPP_NAVIGATION_CBLK* navigation_cblk)
             navigation_cblk->navigation_data.x_axis = POSITIVE_FAST; //move left
             
         }
-        return
+        return;
 
     } else if( nav_state.ROTATE ) {
     //HOW DO???
     }
-    return
+    return;
 }
 
 eAPP_STATUS APP_Navigation_Compute(sAPP_NAVIGATION_CBLK* navigation_cblk)

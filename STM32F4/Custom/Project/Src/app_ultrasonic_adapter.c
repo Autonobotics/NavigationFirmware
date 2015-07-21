@@ -192,7 +192,7 @@ static void hc_sr04_TIM6_init(void)
     AppHcsr04Cblk.tim6Handle = & htim6;
 }
 
-
+#pragma diag_suppress 188
 static void hc_sr04_start_pulse(sAPP_NAVIGATION_CBLK* navigation_cblk)
 {
     BOOL status;
