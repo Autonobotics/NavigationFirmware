@@ -110,19 +110,9 @@ static eAPP_STATUS pixarm_handle_request(sAPP_NAVIGATION_CBLK* navigation_cblk)
             }
             
             APP_Log("PIXARM: Received CMD_READ_REQ."ENDLINE);
-        
+            
             // Process the Read Req, pulling out Rotation Completion Data
-            if ( ROTATION_UNKNOWN != navigation_cblk->image_board_data.rotation )
-            {
-                if ( APP_Navigation_Check_Rotation(request.readReq.rotation_absolute, 
-                                               navigation_cblk->navigation_data.rotation_absolute) )
-                {
-                    // If the previous rotation finished, override this cycles rotation calculation
-                    navigation_cblk->navigation_flags.rotation_status = TRUE;
-                    navigation_cblk->image_board_data.rotation = ROTATION_UNKNOWN;
-                    navigation_cblk->navigation_data.rotation_absolute = ROTATION_UNKNOWN;
-                }
-            }
+            navigation_cblk->navigation_data.returned_rotation = request.readReq.rotation_absolute;
         
             // Send back a Read Data
             AppPixarmCblk.outputBuffer.readData.cmd = PIXARM_CMD_READ_DATA;

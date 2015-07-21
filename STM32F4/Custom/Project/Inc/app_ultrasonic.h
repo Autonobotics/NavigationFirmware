@@ -21,9 +21,6 @@
 /* Function Declaration*/
 //front left right
 //front down back
-//void scan_FLR(void);
-//void scan_FDB(void);
-
 BOOL us_front(void);
 BOOL us_left(void);
 BOOL us_right(void);
