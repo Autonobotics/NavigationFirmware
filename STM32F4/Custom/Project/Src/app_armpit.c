@@ -134,6 +134,7 @@ static eAPP_STATUS armpit_send_response(sAPP_NAVIGATION_CBLK* navigation_cblk)
         AppArmpitCblk.outputBuffer.rack.sub_cmd = ARMPIT_SUBCMD_ROTATION_COMPLETE;
         // Reset the Rotation Flag
         navigation_cblk->navigation_flags.rotation_status = ROTATION_INCOMPLETE;
+        navigation_cblk->image_board_data.rotation = ROTATION_UNKNOWN;
         
         APP_Log("ARMPIT: Replying with RACK. Subcmd: ROTATION_COMPLETE"ENDLINE);
     }

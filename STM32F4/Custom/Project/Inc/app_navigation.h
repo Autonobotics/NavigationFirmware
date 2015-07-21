@@ -32,6 +32,8 @@
 #define ROTATION_EPSILON    100 // Tolerance of a degree. Ie. 100 Centidegrees
 #define ROTATION_LOWER_BOUND(_desired_) (_desired_ - (ROTATION_EPSILON >> 2))
 #define ROTATION_UPPER_BOUND(_desired_) (_desired_ + (ROTATION_EPSILON >> 2))
+#define ROTATE_LEFT -3000;
+#define ROTATE_RIGHT 3000;
 
 #define ALTITUDE_IDLE 80 //idle at 50cm
 #define ALTITUDE_MARGIN 10 //acceptable error of 10cm
@@ -46,8 +48,8 @@ typedef enum _eAPP_NAVIGATION_AXIS_INTENSITY
     POSITIVE_FAST = 0,
     NEGATIVE_FAST,
     
-    POSITIVE_SLOW,
-    NEGATIVE_SLOW,
+ //   POSITIVE_SLOW,
+ //   NEGATIVE_SLOW,
     
     IDLE_INTENSITY
     
@@ -66,6 +68,7 @@ typedef struct _sAPP_NAVIGATION_STATE
     
     BOOL ALT_LOW;
     BOOL ALT_HIGH;
+    BOOL ALT_MID;
     
 } eAPP_NAVIGATION_STATE;
 
