@@ -212,7 +212,6 @@ typedef struct _sAPP_USART_CBLK
 {
     UART_HandleTypeDef *handle;
     eAPP_ARMPIT_STATE state;
-    eAPP_ARMPIT_STATE prev_state;
     uAPP_ARMPIT_MESSAGES inputBuffer;
     uAPP_ARMPIT_MESSAGES outputBuffer;
     

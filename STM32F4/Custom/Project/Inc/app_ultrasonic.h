@@ -16,6 +16,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "app_common.h"
 
+#define DISTANCE_UNKNOWN 0xFFFF
+
 /* Function Declaration*/
 //front left right
 //front down back

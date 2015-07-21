@@ -73,6 +73,7 @@ static eAPP_STATUS pixarm_receive(void)
     /* Put UART peripheral in reception mode */ 
     Flush_Buffer(AppPixarmCblk.inputBuffer.buffer, INPUT_PIXARM_BUFFER_SIZE);
     Flush_Buffer(AppPixarmCblk.outputBuffer.buffer, OUTPUT_PIXARM_BUFFER_SIZE);
+    APP_UART_Generic_Flush_Buffer(AppPixarmCblk.handle);
     AppPixarmCblk.requestState = UART_WAITING;
     while( HAL_OK != (status = HAL_UART_Receive_IT(AppPixarmCblk.handle, 
                                                    AppPixarmCblk.inputBuffer.buffer,
@@ -259,61 +260,72 @@ eAPP_STATUS APP_PIXARM_Initiate(void)
     // Start the Handshake Procedure (Syncronous Process)
     APP_Log("Starting PIXARM Handshake.\r\n");
     
-    // Send the Packet
+    // Start Handshake Loop
     do {
-        if (HAL_OK != HAL_UART_Receive(AppPixarmCblk.handle, 
-                                       AppPixarmCblk.inputBuffer.buffer, 
-                                       INPUT_PIXARM_BUFFER_SIZE,
-                                       PIXARM_POLL_TIMEOUT))
+        // Send the Packet
+        do {
+            if (HAL_OK != HAL_UART_Receive(AppPixarmCblk.handle, 
+                                        AppPixarmCblk.inputBuffer.buffer, 
+                                        INPUT_PIXARM_BUFFER_SIZE,
+                                        PIXARM_POLL_TIMEOUT))
+            {
+                APP_Log("PIXARM: Error in reception of SYNC.\r\n");
+                errorCount++;
+            }
+            else
+            {
+                break;
+            }
+            if ( (uint32_t) PIXARM_CONNECTION_ATTEMPTS <= errorCount)
+            {
+                // Log Error and Return Failed
+                APP_Log("PIXARM: Error in reception of SYNC, abandoning Process.\r\n");
+                return STATUS_FAILURE;
+            }
+            
+        } while( errorCount < (uint32_t) PIXARM_CONNECTION_ATTEMPTS );
+        
+        // Process the Handshake SYNC Packet
+        message.sync = AppPixarmCblk.inputBuffer.sync;
+        
+        // Validate the CMD
+        if ( PIXARM_CMD_SYNC != message.sync.cmd )
         {
-            APP_Log("PIXARM: Error in reception of SYNC.\r\n");
-            errorCount++;
+            // Log Failure and return
+            APP_Log("PIXARM: CMD Bits wrong on SYNC Command.\r\n");
+            Flush_Buffer(AppPixarmCblk.inputBuffer.buffer, INPUT_PIXARM_BUFFER_SIZE);
+            continue;
+        }
+        
+        // Validate the Flag as end
+        if ( PIXARM_FLAG_END != message.sync.flag )
+        {
+            // Log Failure and return
+            APP_Log("PIXARM: FLAG Bits wrong on SYNC Command.\r\n");
+            Flush_Buffer(AppPixarmCblk.inputBuffer.buffer, INPUT_PIXARM_BUFFER_SIZE);
+            continue;
+        }
+        
+        // Format the Handshake SYNC Packet
+        AppPixarmCblk.outputBuffer.sync.cmd = PIXARM_CMD_SYNC;
+        AppPixarmCblk.outputBuffer.sync.flag = PIXARM_FLAG_END;
+        
+        if ( HAL_OK != HAL_UART_Transmit(AppPixarmCblk.handle, 
+                                        AppPixarmCblk.outputBuffer.buffer, 
+                                        OUTPUT_PIXARM_BUFFER_SIZE, 
+                                        PIXARM_POLL_TIMEOUT))
+        {
+            // Log Error and return failed
+            APP_Log("PIXARM: Error in transmission of SYNC.\r\n");
+            Flush_Buffer(AppPixarmCblk.outputBuffer.buffer, OUTPUT_PIXARM_BUFFER_SIZE);
+            continue;
         }
         else
         {
             break;
         }
-        if ( (uint32_t) PIXARM_CONNECTION_ATTEMPTS <= errorCount)
-        {
-            // Log Error and Return Failed
-            APP_Log("PIXARM: Error in reception of SYNC, abandoning Process.\r\n");
-            return STATUS_FAILURE;
-        }
         
-    } while( errorCount < (uint32_t) PIXARM_CONNECTION_ATTEMPTS );
-    
-    // Process the Handshake SYNC Packet
-    message.sync = AppPixarmCblk.inputBuffer.sync;
-    
-    // Validate the CMD
-    if ( PIXARM_CMD_SYNC != message.sync.cmd )
-    {
-        // Log Failure and return
-        APP_Log("PIXARM: CMD Bits wrong on SYNC Command.\r\n");
-        return STATUS_FAILURE;
-    }
-    
-    // Validate the Flag as end
-    if ( PIXARM_FLAG_END != message.sync.flag )
-    {
-        // Log Failure and return
-        APP_Log("PIXARM: FLAG Bits wrong on SYNC Command.\r\n");
-        return STATUS_FAILURE;
-    }
-    
-    // Format the Handshake SYNC Packet
-    AppPixarmCblk.outputBuffer.sync.cmd = PIXARM_CMD_SYNC;
-    AppPixarmCblk.outputBuffer.sync.flag = PIXARM_FLAG_END;
-    
-    if ( HAL_OK != HAL_UART_Transmit(AppPixarmCblk.handle, 
-                                     AppPixarmCblk.outputBuffer.buffer, 
-                                     OUTPUT_PIXARM_BUFFER_SIZE, 
-                                     PIXARM_POLL_TIMEOUT))
-    {
-        // Log Error and return failed
-        APP_Log("PIXARM: Error in transmission of SYNC.\r\n");
-        return STATUS_FAILURE;
-    }
+    } while (TRUE);
     
     // Change states
     APP_Log("Finished PIXARM Handshake, starting Interrupt Process.\r\n");

@@ -59,9 +59,9 @@ typedef uint16_t BOOL;
 // LED5 -> RED
 #define BSP_HARD_ERROR_LED          LED5
 // LED3 -> ORANGE
-#define BSP_PIXARM_ERROR_LED           LED3
+#define BSP_PIXARM_ERROR_LED        LED3
 // LED4 -> GREEN
-#define BSP_ARMPIT_ERROR_LED          LED4
+#define BSP_ARMPIT_ERROR_LED        LED4
 // LED6 -> BLUE
 #define BSP_ULTRASONIC_ERROR_LED    LED6
 

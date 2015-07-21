@@ -50,8 +50,8 @@ int main(void)
                 duration should be kept 1ms since PPP_TIMEOUT_VALUEs are defined and 
                 handled in milliseconds basis.
         - Low Level Initialization
-        */
-    
+    */
+
     HAL_Init();
 
     /* Configure LED3, LED4, LED5 and LED6 */
@@ -62,18 +62,18 @@ int main(void)
 
     /* Configure the system clock to 168 MHz */
     SystemClock_Config();
-    
+
     /* Init the Logger */
     APP_Log_Init();
-    
+
     /* Initialize the Communication Components */
     APP_PIXARM_Init();
     //APP_ARMPIT_Init();
-    
+
     /* Initialize the Sensory Components */
     //APP_IR_Init();
     //APP_HC_SR04_Init();
-    
+
     /* Log Configuration finished */
     APP_Log("Finished Component Configuration.\r\n");
     
@@ -85,7 +85,7 @@ int main(void)
         BSP_LED_On(BSP_PIXARM_ERROR_LED);
         Error_Handler();
     }
-    
+
     // Start ARMPIT Interrupt Process: Asynchronous Initiation Process
     //status = APP_ARMPIT_Initiate();
     //if ( STATUS_FAILURE == status )
@@ -94,7 +94,7 @@ int main(void)
     //    BSP_LED_On(BSP_ARMPIT_ERROR_LED);
     //    Error_Handler();
     //}
-    
+
     /* Log Initation Finished */
     APP_Log("Finished Component Initiation.\r\n");
     
