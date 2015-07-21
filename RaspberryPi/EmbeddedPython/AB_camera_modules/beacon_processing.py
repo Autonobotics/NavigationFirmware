@@ -36,7 +36,7 @@ def locate_beacon(image):
     cv2.imwrite("debug/hsv.jpg", hsv)
     # define the list of boundaries
     boundaries = [
-        ([150, 50, 50], [180, 255, 255])
+        ([100, 100, 50], [180, 255, 255])
     ]
 
     for (lower, upper) in boundaries:
@@ -48,15 +48,18 @@ def locate_beacon(image):
         mask = cv2.inRange(hsv, lower, upper)
         cv2.imwrite("debug/mask.jpg", mask)
         #HoughCircles likes ring like circles to filled ones
-        edge = cv2.Canny(mask, 100, 200)
+        edge = cv2.Canny(mask, 100, 300)
         #smooth the image by applying gaussian blur
         blurr = cv2.GaussianBlur(edge, (9, 9), 2)
         cv2.imwrite("debug/edge.jpg", edge)
 
-        circles = cv2.HoughCircles(blurr, cv.CV_HOUGH_GRADIENT, 1.2, 150,
-                                   param1=20, param2=60, minRadius=0, maxRadius=0)
+        circles = cv2.HoughCircles(blurr, cv2.HOUGH_GRADIENT, 1.2, 200,
+                                   param1=20, param2=80, minRadius=10, maxRadius=0)
         if circles is not None:
-            circles = np.uint16(np.around(circles[0]))
+            circles = sorted(circles[0], key=lambda x:x[2], reverse=True)
+
+        if circles is not None:
+            circles = np.uint16(np.around(circles))
             for (x, y, r) in circles:
                 # draw the outer circle
                 cv2.circle(img, (x, y), r, (0, 255, 0), 2)
@@ -78,10 +81,6 @@ def distance_to_camera(focalLength, resolution,hFOV, marker):
 
     #calculate the distance using triangle similarity distance calculation
     distance = (marker.KNOWN_WIDTH * focalLength) / perWidth
-
-    #calculate the angle between the camera and the object in both the diagonal and horizontal
-    #http://stackoverflow.com/questions/17499409/opencv-calculate-angle-between-camera-and-pixel
-    #pi camera stats: sensor resolution 2592x1944 with horizontal FOV 53.50 degree Vertical FOV 41.41 degrees
 
     #compute the number of pixels along the diagonal
     pixels_diag = math.sqrt(pow(resolution[0], 2)+pow(resolution[1], 2))
