@@ -9,7 +9,7 @@ def locate_beacon(image):
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     # define the list of boundaries
     boundaries = [
-        ([175, 50, 50], [180, 240, 240])
+        ([100, 100, 50], [180, 255, 255])
     ]
 
     for (lower, upper) in boundaries:
@@ -22,7 +22,7 @@ def locate_beacon(image):
         cv2.imshow('masked', mask)
         cv2.waitKey(0)
         #HoughCircles likes ring like circles to filled ones
-        edge = cv2.Canny(mask, 100, 200)
+        edge = cv2.Canny(mask, 100, 300)
 
         cv2.imshow('edge', edge)
         cv2.waitKey(0)
@@ -30,11 +30,13 @@ def locate_beacon(image):
         blurr = cv2.GaussianBlur(edge, (9, 9), 2)
 
 
-        circles = cv2.HoughCircles(blurr, cv2.HOUGH_GRADIENT, 1.2, 150,
-                                   param1=20, param2=60, minRadius=5, maxRadius=0)
+        circles = cv2.HoughCircles(blurr, cv2.HOUGH_GRADIENT, 1.2, 200,
+                                   param1=20, param2=80, minRadius=10, maxRadius=0)
+        if circles is not None:
+            circles = sorted(circles[0], key=lambda x:x[2], reverse=True)
 
         if circles is not None:
-            circles = np.uint16(np.around(circles[0]))
+            circles = np.uint16(np.around(circles))
             for (x, y, r) in circles:
                 # draw the outer circle
                 cv2.circle(img, (x, y), r, (0, 255, 0), 2)
@@ -42,9 +44,24 @@ def locate_beacon(image):
                 cv2.circle(img, (x, y), 2, (0, 255, 0), 3)
                 cv2.imshow("img_circled.jpg", img)
                 cv2.waitKey(0)
-                #break
+                break
 
     return
+
+def frontal(image):
+    img = cv2.medianBlur(image, 5)
+    #smooth the image by applying gaussian blur
+    blurr = cv2.GaussianBlur(img, (9, 9), 2)
+    edge = cv2.Canny(blurr, 100, 300)
+
+    cv2.imshow('edge', edge)
+    cv2.waitKey(0)
+
+
+
+    return
+
+
 
 if __name__ == "__main__":
     # Camera 0 is the integrated web cam on my netbook
@@ -75,9 +92,7 @@ if __name__ == "__main__":
     # correct format based on the file extension you provide. Convenient!
     cv2.imshow(file, camera_capture)
     cv2.waitKey(0)
-    locate_beacon(camera_capture)
-    cv2.imshow(file, camera_capture)
-    cv2.waitKey(0)
+    frontal(camera_capture)
 
     # You'll want to release the camera, otherwise you won't be able to create a new
     # capture object until your script exits
