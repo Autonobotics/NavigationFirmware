@@ -44,7 +44,7 @@
 #define ARMPIT_ENABLE_PORT                     GPIOD
 
 /* Define Connection Timeout and Attempts */
-#define ARMPIT_POLL_TIMEOUT 100  // Ie. Blocking Poll (In Milliseconds) Note: Would like Non-blocking Poll
+#define ARMPIT_POLL_TIMEOUT 1000  // Ie. Blocking Poll (In Milliseconds) Note: Would like Non-blocking Poll
 
 /* ARMPIT Definitions */
 #define ARMPIT_CMD_INVD 0xFF

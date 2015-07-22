@@ -28,7 +28,7 @@
 void HAL_MspInit(void)
 {
     /* System interrupt init*/
-    HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+    HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_1);
     
     /* SysTick_IRQn interrupt configuration */
     HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
@@ -99,19 +99,19 @@ void HAL_HC_SR04_MspInit(void)
     HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
     
     /* EXTI interrupt init */
-    HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 1);
+    HAL_NVIC_SetPriority(EXTI0_IRQn, 1, 3);
     HAL_NVIC_EnableIRQ(EXTI0_IRQn);
     
-    HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 1);
+    HAL_NVIC_SetPriority(EXTI1_IRQn, 1, 3);
     HAL_NVIC_EnableIRQ(EXTI1_IRQn);
     
-    HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 1);
+    HAL_NVIC_SetPriority(EXTI2_IRQn, 1, 3);
     HAL_NVIC_EnableIRQ(EXTI2_IRQn);
     
-    HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 1);
+    HAL_NVIC_SetPriority(EXTI3_IRQn, 1, 3);
     HAL_NVIC_EnableIRQ(EXTI3_IRQn);
     
-    HAL_NVIC_SetPriority(EXTI4_IRQn, 0, 1);
+    HAL_NVIC_SetPriority(EXTI4_IRQn, 1, 3);
     HAL_NVIC_EnableIRQ(EXTI4_IRQn);
 }
 
@@ -136,7 +136,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
         HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
     
         /* Peripheral interrupt init */
-        HAL_NVIC_SetPriority(TIM2_IRQn, 0, 1);
+        HAL_NVIC_SetPriority(TIM2_IRQn, 1, 3);
     }
     else if ( TIM3 == htim_base->Instance )
     {
@@ -155,7 +155,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
         HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
     
         /* Peripheral interrupt init*/
-        HAL_NVIC_SetPriority(TIM3_IRQn, 0, 1);
+        HAL_NVIC_SetPriority(TIM3_IRQn, 1, 3);
     }
     else if ( TIM4 == htim_base->Instance )
     {
@@ -174,7 +174,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
         HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
         /* Peripheral interrupt init*/
-        HAL_NVIC_SetPriority(TIM4_IRQn, 0, 1);
+        HAL_NVIC_SetPriority(TIM4_IRQn, 1, 3);
     }
     else if ( TIM5 == htim_base->Instance )
     {
@@ -182,7 +182,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
         __TIM5_CLK_ENABLE();
         
         /* Peripheral interrupt init*/
-        HAL_NVIC_SetPriority(TIM5_IRQn, 0, 1);
+        HAL_NVIC_SetPriority(TIM5_IRQn, 1, 3);
     }
     else if ( TIM6 == htim_base->Instance )
     {
@@ -190,7 +190,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
         __TIM6_CLK_ENABLE();
         
         /* Peripheral interrupt init*/
-        HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 0, 1);
+        HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 1, 3);
         HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
     }
     else if ( TIM10 == htim_base->Instance )
@@ -199,7 +199,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
         __TIM10_CLK_ENABLE();
         
         /* Peripheral interrupt init*/
-        HAL_NVIC_SetPriority(TIM1_UP_TIM10_IRQn, 0, 0);
+        HAL_NVIC_SetPriority(TIM1_UP_TIM10_IRQn, 1, 4);
         HAL_NVIC_EnableIRQ(TIM1_UP_TIM10_IRQn);
     }
 }
@@ -322,7 +322,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
             
         /*##-3- Configure the NVIC for UART ########################################*/
         /* NVIC for USART1 */
-        HAL_NVIC_SetPriority(ARMPIT_USART_IRQn, 0, 0);
+        HAL_NVIC_SetPriority(ARMPIT_USART_IRQn, 0, 1);
         HAL_NVIC_EnableIRQ(ARMPIT_USART_IRQn);
     }
     else if ( huart->Instance == PIXARM_USART )
@@ -355,7 +355,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
             
         /*##-3- Configure the NVIC for UART ########################################*/
         /* NVIC for USART1 */
-        HAL_NVIC_SetPriority(PIXARM_USART_IRQn, 0, 0);
+        HAL_NVIC_SetPriority(PIXARM_USART_IRQn, 0, 2);
         HAL_NVIC_EnableIRQ(PIXARM_USART_IRQn);
     }
 }

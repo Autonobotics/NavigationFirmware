@@ -203,7 +203,7 @@ static void hc_sr04_start_pulse(sAPP_NAVIGATION_CBLK* navigation_cblk)
             status = us_front();
             if (TRUE == status )
             {
-                APP_Log("Ultrasonic: Front %u\r\n", (uint16_t) (front_distance * 100));
+                //APP_Log("Ultrasonic: Front %u\r\n", (uint16_t) (front_distance * 100));
                 navigation_cblk->proximity_data.distance[AXIS_FRONT] = (uint16_t) (front_distance * 100);
                 navigation_cblk->proximity_data.modified[AXIS_FRONT] = TRUE;
             }
@@ -212,7 +212,7 @@ static void hc_sr04_start_pulse(sAPP_NAVIGATION_CBLK* navigation_cblk)
             status = us_back();
             if (TRUE == status )
             {
-                APP_Log("Ultrasonic: Rear %u\r\n", (uint16_t) (back_distance * 100));
+                //APP_Log("Ultrasonic: Rear %u\r\n", (uint16_t) (back_distance * 100));
                 navigation_cblk->proximity_data.distance[AXIS_REAR] = (uint16_t) (back_distance * 100);
                 navigation_cblk->proximity_data.modified[AXIS_REAR] = TRUE;
             }
@@ -221,7 +221,7 @@ static void hc_sr04_start_pulse(sAPP_NAVIGATION_CBLK* navigation_cblk)
             status = us_left();
             if (TRUE == status )
             {
-                APP_Log("Ultrasonic: Left %u\r\n", (uint16_t) (left_distance * 100));
+                //APP_Log("Ultrasonic: Left %u\r\n", (uint16_t) (left_distance * 100));
                 navigation_cblk->proximity_data.distance[AXIS_LEFT] = (uint16_t) (left_distance * 100);
                 navigation_cblk->proximity_data.modified[AXIS_LEFT] = TRUE;
                 
@@ -231,7 +231,7 @@ static void hc_sr04_start_pulse(sAPP_NAVIGATION_CBLK* navigation_cblk)
             status = us_right();
             if (TRUE == status )
             {
-                APP_Log("Ultrasonic: Right %u\r\n", (uint16_t) (right_distance * 100));
+                //APP_Log("Ultrasonic: Right %u\r\n", (uint16_t) (right_distance * 100));
                 navigation_cblk->proximity_data.distance[AXIS_RIGHT] = (uint16_t) (right_distance * 100);
                 navigation_cblk->proximity_data.modified[AXIS_RIGHT] = TRUE;
             }
@@ -240,7 +240,7 @@ static void hc_sr04_start_pulse(sAPP_NAVIGATION_CBLK* navigation_cblk)
             status = us_down();
             if (TRUE == status )
             {
-                APP_Log("Ultrasonic: Bottom %u\r\n", (uint16_t) (down_distance * 100));
+                //APP_Log("Ultrasonic: Bottom %u\r\n", (uint16_t) (down_distance * 100));
                 navigation_cblk->proximity_data.distance[AXIS_BOTTOM] = (uint16_t) (down_distance * 100);
                 navigation_cblk->proximity_data.modified[AXIS_BOTTOM] = TRUE;
             }

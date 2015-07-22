@@ -216,7 +216,7 @@ void APP_PIXARM_Init(void)
 {
     /*##-1- Configure the UART peripheral #######################################*/
     PixarmHandle.Instance          = PIXARM_USART;
-    PixarmHandle.Init.BaudRate     = 115200;
+    PixarmHandle.Init.BaudRate     = 9600;
     PixarmHandle.Init.WordLength   = UART_WORDLENGTH_8B;
     PixarmHandle.Init.StopBits     = UART_STOPBITS_1;
     PixarmHandle.Init.Parity       = UART_PARITY_NONE;
