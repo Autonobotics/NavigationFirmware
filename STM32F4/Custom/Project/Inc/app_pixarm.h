@@ -112,7 +112,7 @@ typedef struct _sAPP_PIXARM_READ_DATA
     uint8_t x_intensity;
     uint8_t y_intensity;
     uint8_t z_intensity;
-    int16_t rotation_absolute;
+    int16_t rotation_speed;
 
     uint8_t padding_b;
     uint8_t flag;

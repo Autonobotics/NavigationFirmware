@@ -263,6 +263,14 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
         /* Peripheral interrupt DeInit*/
         HAL_NVIC_DisableIRQ(TIM6_DAC_IRQn);
     }
+    else if ( TIM10 == htim_base->Instance )
+    {
+        /* Peripheral clock disable */
+        __TIM10_CLK_DISABLE();
+    
+        /* Peripheral interrupt DeInit*/
+        HAL_NVIC_DisableIRQ(TIM1_UP_TIM10_IRQn);
+    }
 }
 
 

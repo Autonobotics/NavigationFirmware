@@ -10,7 +10,6 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __APP_NAVIGATION_H
 #define __APP_NAVIGATION_H
-#define DISTANCE_UNKNOWN 0xFFFF
 
 /* Includes ------------------------------------------------------------------*/
 #include "app_common.h"
@@ -21,7 +20,7 @@
 #define FRONTAL_AVOIDANCE_MODE_ON   TRUE
 #define FRONTAL_AVOIDANCE_MODE_OFF  FALSE
 
-#define DISTANCE_UNKNOWN 0xFFFF
+#define DISTANCE_UNKNOWN 0x7FFF
 
 #define ROTATION_UNKNOWN 0x7FFF  // Centidegrees
 #define ROTATION_SEARCH 0x7FFE
@@ -29,18 +28,20 @@
 #define ROTATION_COMPLETE TRUE
 #define ROTATION_INCOMPLETE FALSE
 
-#define ROTATION_EPSILON    100 // Tolerance of a degree. Ie. 100 Centidegrees
+// Tolerance of a degree. Ie. 100 Centidegrees
+#define ROTATION_EPSILON    100
 
-#define ROTATION_MAX 36000;
+#define ROTATION_MAX 36000
 #define ROTATION_LOWER_BOUND(_desired_) (_desired_ - (ROTATION_EPSILON >> 1))
 #define ROTATION_UPPER_BOUND(_desired_) (_desired_ + (ROTATION_EPSILON >> 1))
 
-#define ROTATE_LEFT -3000;
-#define ROTATE_RIGHT 3000;
+#define ROTATE_LEFT -3000
+#define ROTATE_RIGHT 3000
 
-
-#define ALTITUDE_IDLE 80 //idle at 50cm
-#define ALTITUDE_MARGIN 10 //acceptable error of 10cm
+//idle at 50cm
+#define ALTITUDE_IDLE 80
+//acceptable error of 10cm
+#define ALTITUDE_MARGIN 10
 
 #define AVOID_THRESHOLD_FRONT 30
 #define AVOID_THRESHOLD_REAR 30
@@ -79,8 +80,8 @@ typedef struct _sAPP_NAVIGATION_STATE
 typedef struct _sAPP_IMAGE_BOARD_DATA
 {
     BOOL modified;
-    uint16_t x_distance;
-    uint16_t y_distance;
+    int16_t x_distance;
+    int16_t y_distance;
     uint16_t z_distance;
     int16_t rotation;                      // Centidegrees
     
@@ -104,10 +105,10 @@ typedef struct _sAPP_NAVIGATION_DATA
     eAPP_NAVIGATION_AXIS_INTENSITY x_axis;
     eAPP_NAVIGATION_AXIS_INTENSITY y_axis;
     eAPP_NAVIGATION_AXIS_INTENSITY z_axis;
-    int16_t rotation_absolute;             // Centidegrees
+    int16_t rotation_speed;             // Centidegrees
     
     // Returned Rotation
-    int16_t returned_rotation;
+    uint16_t returned_rotation;
     
 } sAPP_NAVIGATION_DATA;
 

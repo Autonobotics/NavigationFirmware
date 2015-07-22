@@ -11,10 +11,10 @@
 #include "app_navigation.h"
 
 static eAPP_NAVIGATION_STATE nav_state;
-static int16_t reference_rotation;
-static int16_t desired_rotation;
+static uint16_t reference_rotation;
+static uint16_t desired_rotation;
 static int16_t rotation_direction;
-static bool first_call = TRUE; //used for first rotation call
+static BOOL first_call = TRUE; //used for first rotation call
 
 /* Public functions ---------------------------------------------------------*/
 BOOL APP_Navigation_Check_Rotation(uint16_t desired_rotation, uint16_t current_rotation)
@@ -182,10 +182,17 @@ static void NAV_DECISION(sAPP_NAVIGATION_CBLK* navigation_cblk)
         
         if( first_call ) // set reference values
         {
-            rotation_direction = image_board_data.rotation; //positive or negative angle
+            // TODO: FIX ME
+            rotation_direction = navigation_cblk->image_board_data.rotation; //positive or negative angle
             desired_rotation = rotation_direction*100 + reference_rotation; // reference plus desired change
-            if( desired_rotation > ROTATION_MAX ) desired_rotation -= ROTATION_MAX; //correct for crossing max value
-            if( desired_rotation < 0 ) desired_rotation += ROTATION_MAX; //correct for crossing min value
+            if( desired_rotation > ROTATION_MAX )
+            {
+                desired_rotation -= ROTATION_MAX; //correct for crossing max value
+            }
+            if( desired_rotation < 0 ) 
+            {
+                desired_rotation += ROTATION_MAX; //correct for crossing min value
+            }
             first_call = FALSE;
         }
         
@@ -199,11 +206,11 @@ static void NAV_DECISION(sAPP_NAVIGATION_CBLK* navigation_cblk)
         }
         if( rotation_direction < 0 ) // negative is left
         {
-            navigation_cblk->navigation_data.rotation_absolute = ROTATE_RIGHT; //rotate left at set rate
+            navigation_cblk->navigation_data.rotation_speed = ROTATE_RIGHT; //rotate left at set rate
         }
         if( rotation_direction > 0 ) // positive is right
         {
-            navigation_cblk->navigation_data.rotation_absolute = ROTATE_RIGHT; //rotate left at set rate
+            navigation_cblk->navigation_data.rotation_speed = ROTATE_RIGHT; //rotate left at set rate
         }
         return;
     }
