@@ -193,7 +193,6 @@ static eAPP_STATUS armpit_start_handshake(void)
                     Translate_HAL_Status(halStatus));
         }
     }
-    BSP_LED_Toggle(BSP_ARMPIT_ERROR_LED);
     
     // Ensure that there was no major error with the UART on our end
     if ( HAL_OK != halStatus
@@ -238,7 +237,6 @@ static eAPP_STATUS armpit_finish_handshake(void)
                 APP_Log("Finished ARMPIT Handshake, starting Interrupt Process.\r\n");
                 AppArmpitCblk.state = ARMPIT_DATA_RECEIVE;
                 AppArmpitCblk.requestState = UART_NO_REQUEST;
-                BSP_LED_Off(BSP_ARMPIT_ERROR_LED);
                 status = STATUS_SUCCESS;
             }
             else if (HAL_TIMEOUT != halStatus)

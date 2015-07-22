@@ -30,9 +30,15 @@
 /* Private variables ---------------------------------------------------------*/
 /* UART handler declared in "app_pixarm.c" file */
 extern UART_HandleTypeDef PixarmHandle;
+#ifdef PIXARM_WATCHDOG_ENABLE
+extern TIM_HandleTypeDef htim10;
+#endif
 
-/* UART handler declared in "app_armpit.c" file */
+/* I2C handler declared in "app_armpit.c" file */
 extern UART_HandleTypeDef ArmpitHandle;
+#ifdef ARMPIT_WATCHDOG_ENABLE
+extern TIM_HandleTypeDef htim11;
+#endif
 
 /* Timer handler declared in "app_ultrasonic_adapter.c" file */
 extern TIM_HandleTypeDef htim2;
@@ -40,9 +46,6 @@ extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim4;
 extern TIM_HandleTypeDef htim5;
 extern TIM_HandleTypeDef htim6;
-
-/* Heartbeat handler declared in "app_common.c" file */
-extern TIM_HandleTypeDef htim10;
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -265,12 +268,6 @@ void TIM5_IRQHandler(void)
 void TIM6_DAC_IRQHandler(void)
 {
     HAL_TIM_IRQHandler(&htim6);
-}
-
-
-void TIM1_UP_TIM10_IRQHandler(void)
-{
-    HAL_TIM_IRQHandler(&htim10);
 }
 
 

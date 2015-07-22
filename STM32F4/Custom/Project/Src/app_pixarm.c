@@ -110,9 +110,21 @@ static eAPP_STATUS pixarm_handle_request(sAPP_NAVIGATION_CBLK* navigation_cblk)
             }
             
             APP_Log("PIXARM: Received CMD_READ_REQ."ENDLINE);
-            
+        
             // Process the Read Req, pulling out Rotation Completion Data
-            navigation_cblk->navigation_data.returned_rotation = request.readReq.rotation_absolute;
+            /*
+            if ( ROTATION_UNKNOWN != navigation_cblk->image_board_data.rotation )
+            {
+                if ( APP_Navigation_Check_Rotation(request.readReq.rotation_absolute, 
+                                               navigation_cblk->navigation_data.rotation_absolute) )
+                {
+                    // If the previous rotation finished, override this cycles rotation calculation
+                    navigation_cblk->navigation_flags.rotation_status = TRUE;
+                    navigation_cblk->image_board_data.rotation = ROTATION_UNKNOWN;
+                    navigation_cblk->navigation_data.rotation_absolute = ROTATION_UNKNOWN;
+                }
+            }
+            */
         
             // Send back a Read Data
             AppPixarmCblk.outputBuffer.readData.cmd = PIXARM_CMD_READ_DATA;
@@ -255,9 +267,9 @@ eAPP_STATUS APP_PIXARM_Initiate(void)
         // Send the Packet
         do {
             if (HAL_OK != HAL_UART_Receive(AppPixarmCblk.handle, 
-                                           AppPixarmCblk.inputBuffer.buffer, 
-                                           INPUT_PIXARM_BUFFER_SIZE,
-                                           PIXARM_POLL_TIMEOUT))
+                                        AppPixarmCblk.inputBuffer.buffer, 
+                                        INPUT_PIXARM_BUFFER_SIZE,
+                                        PIXARM_POLL_TIMEOUT))
             {
                 APP_Log("PIXARM: Error in reception of SYNC.\r\n");
                 errorCount++;
@@ -272,9 +284,6 @@ eAPP_STATUS APP_PIXARM_Initiate(void)
                 APP_Log("PIXARM: Error in reception of SYNC, abandoning Process.\r\n");
                 return STATUS_FAILURE;
             }
-            
-            // Should be around 10hz due to polling timeout
-            BSP_LED_Toggle(BSP_PIXARM_ERROR_LED);
             
         } while( errorCount < (uint32_t) PIXARM_CONNECTION_ATTEMPTS );
         
@@ -322,7 +331,6 @@ eAPP_STATUS APP_PIXARM_Initiate(void)
     
     // Change states
     APP_Log("Finished PIXARM Handshake, starting Interrupt Process.\r\n");
-    BSP_LED_Off(BSP_PIXARM_ERROR_LED);
     AppPixarmCblk.state = PIXARM_PROCESS;
     
     /* Put PIXARM peripheral in reception process */ 

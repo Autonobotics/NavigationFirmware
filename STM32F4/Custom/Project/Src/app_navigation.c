@@ -14,6 +14,7 @@ static eAPP_NAVIGATION_STATE nav_state;
 static int16_t reference_rotation;
 static int16_t desired_rotation;
 static int16_t rotation_direction;
+static bool first_call = TRUE; //used for first rotation call
 
 /* Public functions ---------------------------------------------------------*/
 BOOL APP_Navigation_Check_Rotation(uint16_t desired_rotation, uint16_t current_rotation)
@@ -37,13 +38,13 @@ void CHECK_ALTITUDE(sAPP_NAVIGATION_CBLK* navigation_cblk)
         nav_state.ALT_LOW = FALSE;
         nav_state.ALT_MID = TRUE;
     } 
-    else if( (navigation_cblk->proximity_data.distance[5] > ALTITUDE_IDLE + ALTITUDE_MARGIN) )
+    else if( navigation_cblk->proximity_data.distance[5] > (ALTITUDE_IDLE + ALTITUDE_MARGIN) )
     {
         nav_state.ALT_HIGH = TRUE;
         nav_state.ALT_LOW = FALSE;
         nav_state.ALT_MID = FALSE;
     }
-    else if( (navigation_cblk->proximity_data.distance[5] < ALTITUDE_IDLE - ALTITUDE_MARGIN) )
+    else if( navigation_cblk->proximity_data.distance[5] < (ALTITUDE_IDLE - ALTITUDE_MARGIN) )
     {
         nav_state.ALT_HIGH = FALSE;
         nav_state.ALT_LOW = TRUE; 
@@ -177,16 +178,23 @@ static void NAV_DECISION(sAPP_NAVIGATION_CBLK* navigation_cblk)
         navigation_cblk->navigation_data.x_axis = IDLE_INTENSITY; // don't move
         navigation_cblk->navigation_data.y_axis = IDLE_INTENSITY; // don't move
         
-        reference_rotation = navigation_cblk->navigation_data.returned_rotation; // from 0 to 360000 centidegrees
-        rotation_direction = navigation_cblk->image_board_data.rotation; //positive or negative angle
-        desired_rotation = rotation_direction*100 + reference_rotation; // reference plus desired change
+        reference_rotation = navigation_cblk->navigation_data.returned_rotation; // current, from 0 to 36000 centidegrees
         
+        if( first_call ) // set reference values
+        {
+            rotation_direction = image_board_data.rotation; //positive or negative angle
+            desired_rotation = rotation_direction*100 + reference_rotation; // reference plus desired change
+            if( desired_rotation > ROTATION_MAX ) desired_rotation -= ROTATION_MAX; //correct for crossing max value
+            if( desired_rotation < 0 ) desired_rotation += ROTATION_MAX; //correct for crossing min value
+            first_call = FALSE;
+        }
         
         //check if rotation is within desired bounds
         if( APP_Navigation_Check_Rotation(desired_rotation,reference_rotation) ) 
         {
             navigation_cblk->navigation_flags.rotation_status = ROTATION_COMPLETE;
             nav_state.ROTATE = FALSE;
+            first_call = TRUE; //reset call flag
             return;
         }
         if( rotation_direction < 0 ) // negative is left
@@ -201,11 +209,25 @@ static void NAV_DECISION(sAPP_NAVIGATION_CBLK* navigation_cblk)
     }
     
     // Movement phase, given no avoidance or rotation
+
     if( nav_state.MOVE )
     {
         navigation_cblk->navigation_data.x_axis = IDLE_INTENSITY; // don't move sideways
         navigation_cblk->navigation_data.y_axis =  POSITIVE_FAST; // move forward
-        
+    
+        if( navigation_cblk->image_board_data.x_distance > 10) //10cm tolerance
+        {
+            navigation_cblk->navigation_data.x_axis = POSITIVE_SLOW; // move right
+        }
+        else if ( navigation_cblk->image_board_data.x_distance < -10 ) //10cm tolerance
+        {
+            navigation_cblk->navigation_data.x_axis = NEGATIVE_SLOW; // move left
+        }
+        else
+        {
+            navigation_cblk->navigation_data.x_axis = IDLE_INTENSITY; // don't move right or left
+        }
+        // does not compensate for altitude
     }
     return;
 }

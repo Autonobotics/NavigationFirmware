@@ -9,7 +9,8 @@
 */
 /* Includes ------------------------------------------------------------------*/
 #include "app_timer_generic.h"
-#include "app_common.h"
+#include "app_armpit.h"
+#include "app_pixarm.h"
 #include "app_ultrasonic_adapter.h"
 
 /* Private typedef -----------------------------------------------------------*/
@@ -31,10 +32,18 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     {
         Ultrasonic_TIM_PeriodElapsedCallback(htim);
     }
+#ifdef PIXARM_WATCHDOG_ENABLE
     else if ( TIM10 == htim->Instance )
     {
-        Heartbeat_PeriodElapsedCallback(htim);
+        PIXARM_TIM_PeriodElapsedCallback(htim);
     }
+#endif
+#ifdef ARMPIT_WATCHDOG_ENABLE
+    else if ( TIM11 == htim->Instance )
+    {
+        ARMPIT_TIM_PeriodElapsedCallback(htim);
+    }
+#endif
 }
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)

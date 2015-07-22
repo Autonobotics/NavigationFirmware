@@ -14,9 +14,6 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-TIM_HandleTypeDef htim10;
-static volatile BOOL heartbeat_ready;
-
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
@@ -91,54 +88,13 @@ uint16_t Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint16_t BufferLength)
   */
 void Error_Handler(void)
 {
+    /* Turn BSP_HARD_ERROR_LED on */
+    BSP_LED_On(BSP_HARD_ERROR_LED);
+        
     while(1)
     {
-        if ( !HAL_GPIO_ReadPin(LED5_GPIO_PORT, LED5_PIN) )
-        {
-            /* Turn BSP_HARD_ERROR_LED on */
-            BSP_LED_On(BSP_HARD_ERROR_LED);
-        }
     }
 }
-
-
-void Heartbeat_Start(void)
-{
-    TIM_MasterConfigTypeDef sMasterConfig;
-    
-    htim10.Instance = TIM10;
-    htim10.Init.Prescaler = 42000;
-    htim10.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim10.Init.ClockDivision = TIM_CLOCKDIVISION_DIV4;
-    htim10.Init.Period = 1000;
-    HAL_TIM_Base_Init(&htim10);
-    
-    sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-    HAL_TIMEx_MasterConfigSynchronization(&htim10, &sMasterConfig);
-    
-    heartbeat_ready = FALSE;
-    HAL_TIM_Base_Start_IT(&htim10);
-}
-
-
-void Heartbeat_Update(void)
-{
-    if ( heartbeat_ready )
-    {
-        heartbeat_ready = FALSE;
-        BSP_LED_Toggle(BSP_HARD_ERROR_LED);
-        HAL_TIM_Base_Start_IT(&htim10);
-    }
-}
-
-
-void Heartbeat_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-    HAL_TIM_Base_Stop_IT(&htim10);
-    heartbeat_ready = TRUE;
-}
-
 
 #ifdef  USE_FULL_ASSERT
 /**

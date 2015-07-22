@@ -25,7 +25,7 @@ void APP_IR_Init(void)
     HAL_IR_MspInit();
 }
 
-#pragma diag_suppress 188
+
 GPIO_PinState APP_Scan_IR(void)
 {
     GPIO_PinState ir_pin;

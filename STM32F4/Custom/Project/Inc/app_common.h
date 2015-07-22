@@ -84,10 +84,6 @@ uint16_t Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint16_t BufferLength);
 char* Translate_HAL_Status(HAL_StatusTypeDef status);
 void Error_Handler(void);
 
-void Heartbeat_Start(void);
-void Heartbeat_Update(void);
-void Heartbeat_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
-
 void APP_Log_Init(void);
 
 #endif /* #ifndef __APP_COMMON_H */
