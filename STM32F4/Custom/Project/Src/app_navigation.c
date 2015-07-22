@@ -10,11 +10,13 @@
 /* Includes ------------------------------------------------------------------*/
 #include "app_navigation.h"
 
+TIM_HandleTypeDef htim11;
 static eAPP_NAVIGATION_STATE nav_state;
 static uint16_t reference_rotation;
 static uint16_t desired_rotation;
 static int16_t rotation_direction;
 static BOOL first_call = TRUE; //used for first rotation call
+static volatile BOOL internal_guide_check;
 
 /* Public functions ---------------------------------------------------------*/
 BOOL APP_Navigation_Check_Rotation(uint16_t desired_rotation, uint16_t current_rotation)
@@ -216,7 +218,17 @@ static void NAV_DECISION(sAPP_NAVIGATION_CBLK* navigation_cblk)
     }
     
     // Movement phase, given no avoidance or rotation
-
+    if ( !navigation_cblk->ir_data.guide_within_sight )
+    {
+        HAL_TIM_Base_Start_IT(&htim11);
+    }
+    else
+    {
+        HAL_TIM_Base_Stop_IT(&htim11);
+        internal_guide_check = TRUE;
+    }
+    
+    //if ( internal_guide_check
     if( nav_state.MOVE )
     {
         navigation_cblk->navigation_data.x_axis = IDLE_INTENSITY; // don't move sideways
@@ -230,13 +242,33 @@ static void NAV_DECISION(sAPP_NAVIGATION_CBLK* navigation_cblk)
         {
             navigation_cblk->navigation_data.x_axis = NEGATIVE_SLOW; // move left
         }
-        else
-        {
-            navigation_cblk->navigation_data.x_axis = IDLE_INTENSITY; // don't move right or left
-        }
         // does not compensate for altitude
     }
     return;
+}
+
+void APP_Guide_Timeout_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+    HAL_TIM_Base_Stop_IT(&htim11);
+    internal_guide_check = FALSE;
+}
+
+void APP_Guide_Timeout_Init(void)
+{
+    TIM_MasterConfigTypeDef sMasterConfig;
+    
+    htim11.Instance = TIM11;
+    htim11.Init.Prescaler = 42000;
+    htim11.Init.CounterMode = TIM_COUNTERMODE_UP;
+    htim11.Init.ClockDivision = TIM_CLOCKDIVISION_DIV4;
+    htim11.Init.Period = 20000;
+    HAL_TIM_Base_Init(&htim11);
+    
+    sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+    HAL_TIMEx_MasterConfigSynchronization(&htim11, &sMasterConfig);
+    
+    internal_guide_check = TRUE;
 }
 
 eAPP_STATUS APP_Navigation_Compute(sAPP_NAVIGATION_CBLK* navigation_cblk)
@@ -245,11 +277,7 @@ eAPP_STATUS APP_Navigation_Compute(sAPP_NAVIGATION_CBLK* navigation_cblk)
     
     CHECK_ALTITUDE(navigation_cblk);
     CHECK_PROXIMITY(navigation_cblk);
-    
-    if ( navigation_cblk->ir_data.guide_within_sight )
-    {
-        CHECK_CAMERA(navigation_cblk);
-    }
+    CHECK_CAMERA(navigation_cblk);
     
     NAV_DECISION(navigation_cblk);
     
