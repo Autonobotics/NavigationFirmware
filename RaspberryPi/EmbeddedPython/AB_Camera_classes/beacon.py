@@ -5,8 +5,9 @@ class AB_beacons:
     # BEACON LOCATIONS (ROTATION IN DEGREES, APPROXIMATE DISTANCE IN FEET)
     BEACON_ROTATION_LIST = [
         90,
-        -90,
-        180
+        90,
+        90,
+        90,
         ]
     def __init__(self):
         self.currentID = 0

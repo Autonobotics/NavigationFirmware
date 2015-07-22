@@ -13,7 +13,7 @@ import picamera
 import picamera.array
 import traceback, sys
 global cam_logger
-
+import RPi.GPIO as GPIO
 
 def camera_loop():
     cam_logger = AB_Log.get_logger('AB_CAMERA_MODULE')
@@ -21,7 +21,10 @@ def camera_loop():
     marker = None
     markerList = []
     prevMarker = None
-
+    GPIO.setwarnings(False)
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.setup(22, GPIO.OUT)
+    GPIO.output(22, False)
     try:
         with picamera.PiCamera() as camera:
             camera.resolution = (640, 480)
@@ -61,23 +64,28 @@ def camera_loop():
                                 #Wait for response from STM board, for the drone to finish rotation
                                 Nav_Board_Comm.send_and_wait(None, Nav_Board_Comm.ABFlags.QUERY_ROTATION)
 
-                    if len(markerList) == 10:
+                    if len(markerList) == 3:
                         prevMarker = beacon_processing.beacon_filter(markerList)
 
                         #NO BEACON DETECTED
                         if prevMarker is None:
                             Nav_Board_Comm.send_and_wait(None, Nav_Board_Comm.ABFlags.NO_BEACON_DETECTED)
+                            GPIO.output(22, False)
                         #BEACON DETECTED
                         else:
                             Nav_Board_Comm.send_and_wait(prevMarker, Nav_Board_Comm.ABFlags.BEACON_DETECTED)
+                            GPIO.output(22, True)
+
                         del markerList[0]
                         prevMarker = None
                     else:
                         if marker is None:
                             Nav_Board_Comm.send_and_wait(None, Nav_Board_Comm.ABFlags.NO_BEACON_DETECTED)
+                            GPIO.output(22, False)
 
                         elif marker is not None:
                             Nav_Board_Comm.send_and_wait(beaconDist, Nav_Board_Comm.ABFlags.BEACON_DETECTED)
+                            GPIO.output(22, True)
                     # Reset the stream for the next capture
                     stream.seek(0)
                     stream.truncate()

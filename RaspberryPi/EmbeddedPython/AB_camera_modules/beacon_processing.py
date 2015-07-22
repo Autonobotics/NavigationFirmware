@@ -8,18 +8,21 @@ import cv2
 import cv2.cv as cv
 from AB_Camera_Classes import beacon
 from AB_Camera_Modules import nav_board_comm as Nav_Board_Comm
+from AB_Logging import ab_log as AB_Log
 
 
 AB_beaconList = beacon.AB_beacons()
 collision_distance = 0
 
+cam_logger = AB_Log.get_logger('AB_CAMERA_MODULE')
 #send the next beacons location to the flight controller
 def send_next_beacon_info():
+    global cam_logger
     currentB = AB_beaconList.currentID
     nextB = AB_beaconList.nextID
     if currentB == nextB:
         #No more beacon left to navigate to
-        print("no more beacons left to navigate to")
+        cam_logger.info("no more beacons left to navigate to")
         return False
     else:
         AB_beaconList.next_beacon()
@@ -33,7 +36,8 @@ def send_next_beacon_info():
 def locate_beacon(image):
     img = cv2.medianBlur(image, 5)
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    cv2.imwrite("debug/hsv.jpg", hsv)
+    #cam_logger.debug("writing debug image debug/hsv.jpg")
+    #cv2.imwrite("debug/hsv.jpg", hsv)
     # define the list of boundaries
     boundaries = [
         ([100, 100, 50], [180, 255, 255])
@@ -46,14 +50,16 @@ def locate_beacon(image):
 
         #filter out all unnecessary colors
         mask = cv2.inRange(hsv, lower, upper)
-        cv2.imwrite("debug/mask.jpg", mask)
+        #cv2.imwrite("debug/mask.jpg", mask)
+        #cam_logger.debug("writing debug image debug/mask.jpg")
         #HoughCircles likes ring like circles to filled ones
         edge = cv2.Canny(mask, 100, 300)
         #smooth the image by applying gaussian blur
         blurr = cv2.GaussianBlur(edge, (9, 9), 2)
-        cv2.imwrite("debug/edge.jpg", edge)
+        #cv2.imwrite("debug/edge.jpg", edge)
+        #cam_logger.debug("writing debug image debug/edge.jpg")
 
-        circles = cv2.HoughCircles(blurr, cv2.HOUGH_GRADIENT, 1.2, 200,
+        circles = cv2.HoughCircles(blurr, cv.CV_HOUGH_GRADIENT, 1.2, 200,
                                    param1=20, param2=80, minRadius=10, maxRadius=0)
         if circles is not None:
             circles = sorted(circles[0], key=lambda x:x[2], reverse=True)
@@ -67,7 +73,8 @@ def locate_beacon(image):
                 #print('MARKER LOCATION X: {0}, Y: {1}, R: {2} in pixels'.format(marker.x, marker.y, marker.r))
                 # draw the center of the circle
                 cv2.circle(img, (x, y), 2, (0, 255, 0), 3)
-                cv2.imwrite("debug/img_circled.jpg", img)
+                #cv2.imwrite("debug/img_circled.jpg", img)
+                #cam_logger.debug("writing debug image debug/img_circled.jpg")
                 break
         else:
             marker = None
