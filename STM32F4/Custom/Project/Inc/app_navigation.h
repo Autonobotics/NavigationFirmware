@@ -30,10 +30,11 @@
 #define ROTATION_INCOMPLETE FALSE
 
 #define ROTATION_EPSILON    100 // Tolerance of a degree. Ie. 100 Centidegrees
-#define ROTATION_LOWER_BOUND(_desired_) (_desired_ - (ROTATION_EPSILON >> 2))
-#define ROTATION_UPPER_BOUND(_desired_) (_desired_ + (ROTATION_EPSILON >> 2))
 
 #define ROTATION_MAX 36000;
+#define ROTATION_LOWER_BOUND(_desired_) (_desired_ - (ROTATION_EPSILON >> 1))
+#define ROTATION_UPPER_BOUND(_desired_) (_desired_ + (ROTATION_EPSILON >> 1))
+
 #define ROTATE_LEFT -3000;
 #define ROTATE_RIGHT 3000;
 
@@ -103,7 +104,10 @@ typedef struct _sAPP_NAVIGATION_DATA
     eAPP_NAVIGATION_AXIS_INTENSITY x_axis;
     eAPP_NAVIGATION_AXIS_INTENSITY y_axis;
     eAPP_NAVIGATION_AXIS_INTENSITY z_axis;
-    uint16_t rotation_absolute;             // Centidegrees
+    int16_t rotation_absolute;             // Centidegrees
+    
+    // Returned Rotation
+    int16_t returned_rotation;
     
 } sAPP_NAVIGATION_DATA;
 
