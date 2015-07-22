@@ -53,7 +53,7 @@ void CHECK_ALTITUDE(sAPP_NAVIGATION_CBLK* navigation_cblk)
         nav_state.ALT_MID = FALSE;
     }
     return;
-} //as is, will oscillate instead of settle @ altitude
+} 
 
 static void CHECK_PROXIMITY(sAPP_NAVIGATION_CBLK* navigation_cblk)
 { 
@@ -68,7 +68,6 @@ static void CHECK_PROXIMITY(sAPP_NAVIGATION_CBLK* navigation_cblk)
 
 static void CHECK_CAMERA(sAPP_NAVIGATION_CBLK* navigation_cblk)
 {
-    // To Compensate for Error, the Image board also suggests x movement...
 
     if (navigation_cblk->image_board_data.z_distance == DISTANCE_UNKNOWN)
     {
@@ -184,16 +183,21 @@ static void NAV_DECISION(sAPP_NAVIGATION_CBLK* navigation_cblk)
         
         if( first_call ) // set reference values
         {
-            // TODO: FIX ME
-            rotation_direction = navigation_cblk->image_board_data.rotation; //positive or negative angle
-            desired_rotation = rotation_direction*100 + reference_rotation; // reference plus desired change
-            if( desired_rotation > ROTATION_MAX )
+            rotation_direction = (navigation_cblk->image_board_data.rotation)*100; //positive or negative angle
+            
+            //correct for below-zero case
+            if( (rotation_direction < 0) && (reference_rotation < (rotation_direction*-1)) )
             {
-                desired_rotation -= ROTATION_MAX; //correct for crossing max value
+                desired_rotation = ROTATION_MAX + rotation_direction + reference_rotation; //rotation_direction is negative
             }
-            if( desired_rotation < 0 ) 
+            //correct for above-max case
+            else if( (rotation_direction > 0) && ((reference_rotation + (uint16_t)rotation_direction) > ROTATION_MAX) )
             {
-                desired_rotation += ROTATION_MAX; //correct for crossing min value
+                desired_rotation = rotation_direction + reference_rotation - ROTATION_MAX; //rotation_direction is negative
+            }
+            else
+            {
+                desired_rotation = rotation_direction + reference_rotation;
             }
             first_call = FALSE;
         }
