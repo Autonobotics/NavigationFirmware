@@ -20,12 +20,12 @@ def main():
 
     #Set GPIO13 to high for STM board to check before performing handshake
     GPIO.setwarnings(False)
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(13, GPIO.OUT)
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.setup(21, GPIO.OUT)
     #make sure the pin is intially low
-    GPIO.output(13, False)
+    GPIO.output(21, False)
     time.sleep(15)
-    GPIO.output(13, True)
+    GPIO.output(21, True)
 
     # Perform Handshake
     while protocol.perform_handshake() is not True:
