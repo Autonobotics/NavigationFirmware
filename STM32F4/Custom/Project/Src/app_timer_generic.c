@@ -10,6 +10,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "app_timer_generic.h"
 #include "app_common.h"
+#include "app_navigation.h"
 #include "app_ultrasonic_adapter.h"
 
 /* Private typedef -----------------------------------------------------------*/
@@ -32,10 +33,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         Ultrasonic_TIM_PeriodElapsedCallback(htim);
     }
     else if ( TIM10 == htim->Instance )
-     {
-         Heartbeat_PeriodElapsedCallback(htim);
-     }
-
+    {
+        Heartbeat_PeriodElapsedCallback(htim);
+    }
+    else if ( TIM11 == htim->Instance )
+    {
+        APP_Guide_Timeout_PeriodElapsedCallback(htim);
+    }
 }
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)

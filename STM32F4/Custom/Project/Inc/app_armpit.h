@@ -1,16 +1,16 @@
 /**
   ******************************************************************************
-  * @file    Inc/app_usart.h
+  * @file    Inc/app_armpit.h
   * @author  Autonobotic Team
   * @version V1.0
   * @date    6-July-2015
-  * @brief   Header for app_usart.c module
+  * @brief   Header for app_armpit.c module
   ******************************************************************************
   */
   
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __APP_USART_H
-#define __APP_USART_H
+#ifndef __APP_ARMPIT_H
+#define __APP_ARMPIT_H
  
 /* Includes ------------------------------------------------------------------*/
 #include "app_common.h"
@@ -230,4 +230,4 @@ eAPP_STATUS APP_ARMPIT_Initiate(void);
 eAPP_STATUS APP_ARMPIT_Process_Message(sAPP_NAVIGATION_CBLK* navigation_cblk);
 
 
-#endif /* #ifndef __APP_USART_H */
+#endif /* #ifndef __APP_ARMPIT_H */

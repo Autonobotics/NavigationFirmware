@@ -98,8 +98,9 @@ typedef struct _sAPP_PIXARM_READ_REQ
     uint8_t padding_a;
     
     uint16_t rotation_absolute;
+    int16_t z_velocity;
     
-    uint8_t padding[3];
+    uint8_t padding;
     
     uint8_t flag;
     
@@ -111,7 +112,7 @@ typedef struct _sAPP_PIXARM_READ_DATA
     
     uint8_t x_intensity;
     uint8_t y_intensity;
-    uint8_t z_intensity;
+    uint8_t z_distance;
     int16_t rotation_speed;
 
     uint8_t padding_b;

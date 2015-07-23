@@ -14,6 +14,7 @@
 #include "app_common.h"
 #include "app_pixarm.h"
 #include "app_armpit.h"
+#include "app_navigation.h"
 #include "app_ultrasonic_adapter.h"
 
 /** @addtogroup STM32F4xx_HAL_Examples
@@ -43,6 +44,9 @@ extern TIM_HandleTypeDef htim6;
 
 /* Heartbeat handler declared in "app_common.c" file */
 extern TIM_HandleTypeDef htim10;
+
+/* Guide Timer in "app_navigation.c" file */
+extern TIM_HandleTypeDef htim11;
 
 
 /* Private function prototypes -----------------------------------------------*/
@@ -274,6 +278,11 @@ void TIM1_UP_TIM10_IRQHandler(void)
     HAL_TIM_IRQHandler(&htim10);
 }
 
+
+void TIM1_TRG_COM_TIM11_IRQHandler(void)
+{
+    HAL_TIM_IRQHandler(&htim11);
+}
 
 
 /**

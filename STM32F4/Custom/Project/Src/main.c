@@ -24,7 +24,7 @@ static sAPP_NAVIGATION_CBLK AppNavigationCblk = {
     {FALSE, 0x0000, 0x0000, 0x0000, ROTATION_UNKNOWN},
     {{FALSE}, {0x0000}},
     {0x00},
-    {IDLE_INTENSITY, IDLE_INTENSITY, IDLE_INTENSITY, 0x0000},
+    {IDLE_INTENSITY, IDLE_INTENSITY, IDLE_INTENSITY, 0x0000, 0x0000, 0x0000},
     {FALSE, ROTATION_INCOMPLETE}
 };
 
@@ -51,7 +51,6 @@ int main(void)
                 handled in milliseconds basis.
         - Low Level Initialization
     */
-
     HAL_Init();
 
     /* Configure LED3, LED4, LED5 and LED6 */
@@ -72,6 +71,7 @@ int main(void)
 
     /* Initialize the Sensory Components */
     APP_IR_Init();
+    APP_Guide_Timeout_Init();
     APP_HC_SR04_Init();
 
     /* Log Configuration finished */

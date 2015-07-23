@@ -15,7 +15,7 @@
 #include "app_common.h"
 
 /* Exported constants --------------------------------------------------------*/
-#define HC_SR04_OUT_OF_RANGE 0xFFFF
+#define HC_SR04_OUT_OF_RANGE 0x7FFF
 
 #define FRONTAL_AVOIDANCE_MODE_ON   TRUE
 #define FRONTAL_AVOIDANCE_MODE_OFF  FALSE
@@ -40,8 +40,8 @@
 
 //idle at 50cm
 #define ALTITUDE_IDLE 80
-//acceptable error of 10cm
-#define ALTITUDE_MARGIN 10
+//acceptable error of 20cm
+#define ALTITUDE_MARGIN 20
 
 #define AVOID_THRESHOLD_FRONT 30
 #define AVOID_THRESHOLD_REAR 30
@@ -54,8 +54,8 @@ typedef enum _eAPP_NAVIGATION_AXIS_INTENSITY
     POSITIVE_FAST = 0,
     NEGATIVE_FAST,
     
-   POSITIVE_SLOW,
-   NEGATIVE_SLOW,
+    POSITIVE_SLOW,
+    NEGATIVE_SLOW,
     
     IDLE_INTENSITY
     
@@ -104,11 +104,13 @@ typedef struct _sAPP_NAVIGATION_DATA
 {
     eAPP_NAVIGATION_AXIS_INTENSITY x_axis;
     eAPP_NAVIGATION_AXIS_INTENSITY y_axis;
-    eAPP_NAVIGATION_AXIS_INTENSITY z_axis;
+    uint8_t z_distance;
     int16_t rotation_speed;             // Centidegrees
     
     // Returned Rotation
     uint16_t returned_rotation;
+    // Returned Velocity
+    int16_t returned_velocity;
     
 } sAPP_NAVIGATION_DATA;
 
@@ -133,6 +135,9 @@ typedef struct _sAPP_NAVIGATION_CBLK
 /* Exported functions ------------------------------------------------------- */
 BOOL APP_Navigation_Check_Rotation(uint16_t desired_rotation, uint16_t current_rotation);
 eAPP_STATUS APP_Navigation_Compute(sAPP_NAVIGATION_CBLK* navigation_cblk);
+
+void APP_Guide_Timeout_Init(void);
+void APP_Guide_Timeout_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
 
 
 #endif // __APP_NAVIGATION_H

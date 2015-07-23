@@ -113,12 +113,14 @@ static eAPP_STATUS pixarm_handle_request(sAPP_NAVIGATION_CBLK* navigation_cblk)
         
             // Process the Read Req, pulling out Rotation Completion Data
             navigation_cblk->navigation_data.returned_rotation = request.readReq.rotation_absolute;
+            navigation_cblk->navigation_data.returned_velocity = request.readReq.z_velocity;
+            APP_Log("PIXARM: Z Velocity: %d cm/s\r\n", request.readReq.z_velocity);
             
             // Send back a Read Data
             AppPixarmCblk.outputBuffer.readData.cmd = PIXARM_CMD_READ_DATA;
             AppPixarmCblk.outputBuffer.readData.x_intensity = navigation_cblk->navigation_data.x_axis;
             AppPixarmCblk.outputBuffer.readData.y_intensity = navigation_cblk->navigation_data.y_axis;
-            AppPixarmCblk.outputBuffer.readData.z_intensity = navigation_cblk->navigation_data.z_axis;
+            AppPixarmCblk.outputBuffer.readData.z_distance = navigation_cblk->navigation_data.z_distance;
             AppPixarmCblk.outputBuffer.readData.rotation_speed = navigation_cblk->navigation_data.rotation_speed;
             AppPixarmCblk.outputBuffer.readData.flag = PIXARM_FLAG_END;
             

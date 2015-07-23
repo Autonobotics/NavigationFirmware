@@ -230,10 +230,20 @@ BOOL us_front(void)
     }
     else if (front == 2)
     {
-        front_distance = ((front_count*0.0001)*340)/2; //calculate distance in m
-        front = 0;
-        trig = 0;
-        return TRUE;
+        if (front_count == DISTANCE_UNKNOWN)
+        {
+            front_distance = HC_SR04_OUT_OF_RANGE;
+            front = 0;
+            trig = 0;
+            return TRUE;
+        }
+        else
+        {
+            front_distance = ((front_count*0.0001)*340)/2; //calculate distance in m
+            front = 0;
+            trig = 0;
+            return TRUE;
+        }
     }
     return FALSE;
 }
@@ -252,10 +262,20 @@ BOOL us_left(void)
     }
     else if (left == 2)
     {
-        left_distance = ((left_count*0.0001)*340)/2; //calculate distance in m
-        left = 0;
-        trig = 0;
-        return TRUE;
+        if (left_count == DISTANCE_UNKNOWN)
+        {
+            left_distance = HC_SR04_OUT_OF_RANGE;
+            left = 0;
+            trig = 0;
+            return TRUE;
+        }
+        else
+        {
+            left_distance = ((left_count*0.0001)*340)/2; //calculate distance in m
+            left = 0;
+            trig = 0;
+            return TRUE;
+        }
     }
     return FALSE;
 }
@@ -274,10 +294,20 @@ BOOL us_down(void)
     }
     else if (down == 2)
     {
-        down_distance = ((down_count*0.0001)*340)/2; //calculate distance in m
-        down = 0;
-        trig = 0;
-        return TRUE;
+        if (down_count == DISTANCE_UNKNOWN)
+        {
+            down_distance = HC_SR04_OUT_OF_RANGE;
+            down = 0;
+            trig = 0;
+            return TRUE;
+        }
+        else
+        {
+            down_distance = ((down_count*0.0001)*340)/2; //calculate distance in m
+            down = 0;
+            trig = 0;
+            return TRUE;
+        }
     }
     return FALSE;
 }
@@ -296,10 +326,20 @@ BOOL us_right(void)
     }
     else if (right == 2)
     {
-        right_distance = ((right_count*0.0001)*340)/2; //calculate distance in m
-        right = 0;
-        trig = 0;
-        return TRUE;
+        if (right_count == DISTANCE_UNKNOWN)
+        {
+            right_distance = HC_SR04_OUT_OF_RANGE;
+            right = 0;
+            trig = 0;
+            return TRUE;
+        }
+        else
+        {
+            right_distance = ((right_count*0.0001)*340)/2; //calculate distance in m
+            right = 0;
+            trig = 0;
+            return TRUE;
+        }
     }
     return FALSE;
 }
@@ -318,10 +358,20 @@ BOOL us_back(void)
     }
     else if (back == 2)
     {
-        back_distance = ((back_count*0.0001)*340)/2;
-        back = 0;
-        trig = 0;
-        return TRUE;
+        if (back_count == DISTANCE_UNKNOWN)
+        {
+            back_distance = HC_SR04_OUT_OF_RANGE;
+            back = 0;
+            trig = 0;
+            return TRUE;
+        }
+        else
+        {
+            back_distance = ((back_count*0.0001)*340)/2; //calculate distance in m
+            back = 0;
+            trig = 0;
+            return TRUE;
+        }
     }
     return FALSE;
 }
