@@ -22,11 +22,13 @@ def main():
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(21, GPIO.OUT)
+
+    #handshake led
+    GPIO.setup(18, GPIO.OUT)
     #make sure the pin is intially low
-    GPIO.output(21, False)
-    time.sleep(15)
     GPIO.output(21, True)
 
+    GPIO.output(18, True)
     # Perform Handshake
     while protocol.perform_handshake() is not True:
         #delay for the response
@@ -35,7 +37,7 @@ def main():
         protocol.flushPort()
         pass
     logger.info("Finished UART Handshake.")
-
+    GPIO.output(18, False)
     # Perform main Loop
     camera_module.camera_loop()
 
