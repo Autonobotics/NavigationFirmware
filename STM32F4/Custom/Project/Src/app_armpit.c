@@ -20,6 +20,8 @@
 #define ARMPIT_TRANSACTION_RETRY_LIMIT 5
 
 /* Private macro -------------------------------------------------------------*/
+#define REVERSE_BYTE_16(_var_) (((_var_ & 0xFF) << 8) | ((_var_ & 0xFF00) >> 8))
+
 /* Public variables ----------------------------------------------------------*/
 UART_HandleTypeDef ArmpitHandle;
 
@@ -39,9 +41,9 @@ static sAPP_ARMPIT_CBLK AppArmpitCblk = {
 static eAPP_STATUS armpit_receive(void);
 static eAPP_STATUS armpit_transmit(void);
 static void armpit_set_navigation_data(sAPP_NAVIGATION_CBLK* navigation_cblk,
-                                       uint16_t x_distance,
-                                       uint16_t y_distance,
-                                       uint16_t z_distance,
+                                       int16_t x_distance,
+                                       int16_t y_distance,
+                                       int16_t z_distance,
                                        int16_t rotation);
 static eAPP_STATUS armpit_send_response(sAPP_NAVIGATION_CBLK* navigation_cblk);
 static eAPP_STATUS armpit_start_handshake(void);
@@ -103,9 +105,9 @@ static eAPP_STATUS armpit_receive(void)
 
 
 static void armpit_set_navigation_data(sAPP_NAVIGATION_CBLK* navigation_cblk,
-                                       uint16_t x_distance,
-                                       uint16_t y_distance,
-                                       uint16_t z_distance,
+                                       int16_t x_distance,
+                                       int16_t y_distance,
+                                       int16_t z_distance,
                                        int16_t rotation)
 {
     // Set the modified Flag
@@ -305,15 +307,15 @@ static eAPP_STATUS armpit_handle_data_receive(sAPP_NAVIGATION_CBLK* navigation_c
             
             // Set Data Variables here
             armpit_set_navigation_data(navigation_cblk,
-                                       message.beacon_detected.x_distance,
-                                       message.beacon_detected.y_distance,
-                                       message.beacon_detected.z_distance,
+                                       REVERSE_BYTE_16(message.beacon_detected.x_distance),
+                                       REVERSE_BYTE_16(message.beacon_detected.y_distance),
+                                       REVERSE_BYTE_16(message.beacon_detected.z_distance),
                                        ROTATION_UNKNOWN);
             
-            APP_Log("ARMPIT: x_distance: %d y_distance: %d z_distance: %d."ENDLINE, 
-                    message.beacon_detected.x_distance,
-                    message.beacon_detected.y_distance,
-                    message.beacon_detected.z_distance);
+            APP_Log("ARMPIT: x_distance: %hd y_distance: %hd z_distance: %hd."ENDLINE, 
+                    (int16_t) REVERSE_BYTE_16(message.beacon_detected.x_distance),
+                    (int16_t) REVERSE_BYTE_16(message.beacon_detected.y_distance),
+                    (int16_t) REVERSE_BYTE_16(message.beacon_detected.z_distance));
 
             // Transmit Response
             status = armpit_send_response(navigation_cblk);
@@ -331,7 +333,7 @@ static eAPP_STATUS armpit_handle_data_receive(sAPP_NAVIGATION_CBLK* navigation_c
             
             // Set Data Variables here
             armpit_set_navigation_data(navigation_cblk,
-                                       message.edge_detected.x_distance,
+                                       REVERSE_BYTE_16(message.edge_detected.x_distance),
                                        DISTANCE_UNKNOWN,
                                        DISTANCE_UNKNOWN,
                                        ROTATION_UNKNOWN);
@@ -355,7 +357,10 @@ static eAPP_STATUS armpit_handle_data_receive(sAPP_NAVIGATION_CBLK* navigation_c
                                        DISTANCE_UNKNOWN,
                                        DISTANCE_UNKNOWN,
                                        DISTANCE_UNKNOWN,
-                                       message.beacon_rotation.x_rotation);
+                                       REVERSE_BYTE_16(message.beacon_rotation.x_rotation));
+            
+            APP_Log("ARMPIT: x_rotation: %hd"ENDLINE,
+                    (int16_t) REVERSE_BYTE_16(message.beacon_rotation.x_rotation));
             
             // Transmit Response
             status = armpit_send_response(navigation_cblk);

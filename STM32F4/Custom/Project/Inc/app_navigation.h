@@ -48,6 +48,7 @@
 #define AVOID_THRESHOLD_LEFT 30
 #define AVOID_THRESHOLD_RIGHT 30
 
+
 /* Exported types ------------------------------------------------------------*/
 typedef enum _eAPP_NAVIGATION_AXIS_INTENSITY
 {
@@ -82,7 +83,7 @@ typedef struct _sAPP_IMAGE_BOARD_DATA
     BOOL modified;
     int16_t x_distance;
     int16_t y_distance;
-    uint16_t z_distance;
+    int16_t z_distance;
     int16_t rotation;                      // Centidegrees
     
 } sAPP_IMAGE_BOARD_DATA;
@@ -105,7 +106,7 @@ typedef struct _sAPP_NAVIGATION_DATA
     eAPP_NAVIGATION_AXIS_INTENSITY x_axis;
     eAPP_NAVIGATION_AXIS_INTENSITY y_axis;
     uint8_t z_distance;
-    int16_t rotation_speed;             // Centidegrees
+    int16_t rotation_speed;                 // Centidegrees
     
     // Returned Rotation
     uint16_t returned_rotation;
@@ -123,11 +124,11 @@ typedef struct _sAPP_NAVIGATION_FLAGS
 
 typedef struct _sAPP_NAVIGATION_CBLK
 {
-    sAPP_IMAGE_BOARD_DATA image_board_data;
-    sAPP_PROXIMITY_DATA proximity_data;
-    sAPP_IR_DATA ir_data;
-    sAPP_NAVIGATION_DATA navigation_data;
-    sAPP_NAVIGATION_FLAGS navigation_flags;
+    sAPP_IMAGE_BOARD_DATA   image_board_data;
+    sAPP_PROXIMITY_DATA     proximity_data;
+    sAPP_IR_DATA            ir_data;
+    sAPP_NAVIGATION_DATA    navigation_data;
+    sAPP_NAVIGATION_FLAGS   navigation_flags;
     
 } sAPP_NAVIGATION_CBLK;
 

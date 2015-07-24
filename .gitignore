@@ -10,4 +10,7 @@
 *.idea/
 *.pyc
 Output/
+Debug/
+Release/
+*.sdf
 Navigation Configuration/
