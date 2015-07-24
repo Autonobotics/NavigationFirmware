@@ -40,6 +40,37 @@ static void CHECK_PROXIMITY(sAPP_NAVIGATION_CBLK* navigation_cblk)
     nav_state.AVOID_REAR = (navigation_cblk->proximity_data.distance[1] < AVOID_THRESHOLD_REAR);
     nav_state.AVOID_LEFT = (navigation_cblk->proximity_data.distance[2] < AVOID_THRESHOLD_LEFT);
     nav_state.AVOID_RIGHT = (navigation_cblk->proximity_data.distance[3] < AVOID_THRESHOLD_RIGHT);
+
+    // Set display pins
+    if(nav_state.AVOID_FRONT) {
+        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_1,GPIO_PIN_SET)
+    }
+    else
+    {
+        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_1,GPIO_PIN_RESET)
+    }
+    if(nav_state.AVOID_REAR) {
+        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_SET)
+    }
+    else
+    {
+        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_RESET)
+    }
+    if(nav_state.AVOID_LEFT) {
+        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_SET)
+    }
+    else
+    {
+        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_RESET)
+    }
+    if(nav_state.AVOID_RIGHT) {
+        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_4,GPIO_PIN_SET)
+    }
+    else
+    {
+        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_4,GPIO_PIN_RESET)
+    }
+    
     // TOP sensor not implemented
 }
 
@@ -48,10 +79,12 @@ static void CHECK_CAMERA(sAPP_NAVIGATION_CBLK* navigation_cblk)
     if (navigation_cblk->image_board_data.z_distance == DISTANCE_UNKNOWN)
     {
         nav_state.MOVE = FALSE;
+        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_5,GPIO_PIN_RESET)
     }
     else
     {
         nav_state.MOVE = TRUE;
+        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_5,GPIO_PIN_RESET)
     }
     
     if (navigation_cblk->image_board_data.rotation == ROTATION_UNKNOWN)
@@ -90,146 +123,148 @@ static void NAV_DECISION(sAPP_NAVIGATION_CBLK* navigation_cblk)
     
     //Collision Avoidance
     // Avoid objects ahead and behind by dodging left, right, or freezing.
-    //if( nav_state.AVOID_FRONT && nav_state.AVOID_REAR )
-    //{
-    //    if( !nav_state.AVOID_RIGHT )
-    //    {
-    //        navigation_cblk->navigation_data.x_axis = POSITIVE_FAST; //move right
-    //        navigation_cblk->navigation_data.y_axis = IDLE_INTENSITY;
-    //    } 
-    //    else if ( !nav_state.AVOID_LEFT )
-    //    {
-    //        navigation_cblk->navigation_data.x_axis = NEGATIVE_FAST; //move left
-    //        navigation_cblk->navigation_data.y_axis = IDLE_INTENSITY;
-    //    }
-    //    else 
-    //    {
-    //        navigation_cblk->navigation_data.x_axis = IDLE_INTENSITY; //sit idle
-    //        navigation_cblk->navigation_data.y_axis = IDLE_INTENSITY;
-    //    }
-    //    return;
-    //}
-    //
-    //// Avoid objects left and right by dodging forward, back, or freezing
-    //if( nav_state.AVOID_LEFT && nav_state.AVOID_RIGHT )
-    //{
-    //    if( !nav_state.AVOID_FRONT )
-    //    {
-    //        navigation_cblk->navigation_data.y_axis = POSITIVE_FAST; //move forward
-    //        navigation_cblk->navigation_data.x_axis = IDLE_INTENSITY;
-    //    }
-    //    else if ( !nav_state.AVOID_REAR )
-    //    {
-    //        navigation_cblk->navigation_data.y_axis = NEGATIVE_FAST; //move backward
-    //        navigation_cblk->navigation_data.x_axis = IDLE_INTENSITY;
-    //    }
-    //    else
-    //    {
-    //        navigation_cblk->navigation_data.x_axis = IDLE_INTENSITY; //sit idle
-    //        navigation_cblk->navigation_data.y_axis = IDLE_INTENSITY;
-    //    }
-    //    return;
-    //}
-    //
-    //// Exclusing the cases above, avoid any/all remaining cases
-    //if( nav_state.AVOID_FRONT || nav_state.AVOID_REAR || nav_state.AVOID_LEFT || nav_state.AVOID_RIGHT)
-    //{
-    //    if( nav_state.AVOID_FRONT)
-    //    {
-    //        navigation_cblk->navigation_data.y_axis = NEGATIVE_FAST; //move backward
-    //    }
-    //    if( nav_state.AVOID_REAR)
-    //    {
-    //        navigation_cblk->navigation_data.y_axis = POSITIVE_FAST; //move forward
-    //    }
-    //    if( nav_state.AVOID_LEFT)
-    //    {
-    //        navigation_cblk->navigation_data.x_axis = POSITIVE_FAST; //move right
-    //    }
-    //    if( nav_state.AVOID_RIGHT)
-    //    {
-    //        navigation_cblk->navigation_data.x_axis = NEGATIVE_FAST; //move left
-    //    }
-    //    return;
-    //}
-    //
-    //// Check Rotation flag
-    //if( nav_state.ROTATE )
-    //{
-    //    navigation_cblk->navigation_data.x_axis = IDLE_INTENSITY; // don't move
-    //    navigation_cblk->navigation_data.y_axis = IDLE_INTENSITY; // don't move
-    //    
-    //    reference_rotation = navigation_cblk->navigation_data.returned_rotation; // current, from 0 to 36000 centidegrees
-    //    
-    //    if( first_call ) // set reference values
-    //    {
-    //        rotation_direction = (navigation_cblk->image_board_data.rotation)*100; //positive or negative angle
-    //        
-    //        //correct for below-zero case
-    //        if( (rotation_direction < 0) && (reference_rotation < (rotation_direction*-1)) )
-    //        {
-    //            desired_rotation = ROTATION_MAX + rotation_direction + reference_rotation; //rotation_direction is negative
-    //        }
-    //        //correct for above-max case
-    //        else if( (rotation_direction > 0) && ((reference_rotation + (uint16_t)rotation_direction) > ROTATION_MAX) )
-    //        {
-    //            desired_rotation = rotation_direction + reference_rotation - ROTATION_MAX; //rotation_direction is negative
-    //        }
-    //        else
-    //        {
-    //            desired_rotation = rotation_direction + reference_rotation;
-    //        }
-    //        first_call = FALSE;
-    //    }
-    //    
-    //    //check if rotation is within desired bounds
-    //    if( APP_Navigation_Check_Rotation(desired_rotation,reference_rotation) ) 
-    //    {
-    //        navigation_cblk->navigation_flags.rotation_status = ROTATION_COMPLETE;
-    //        nav_state.ROTATE = FALSE;
-    //        first_call = TRUE; //reset call flag
-    //        return;
-    //    }
-    //    if( rotation_direction < 0 ) // negative is left
-    //    {
-    //        navigation_cblk->navigation_data.rotation_speed = ROTATE_RIGHT; //rotate left at set rate
-    //    }
-    //    if( rotation_direction > 0 ) // positive is right
-    //    {
-    //        navigation_cblk->navigation_data.rotation_speed = ROTATE_RIGHT; //rotate left at set rate
-    //    }
-    //    return;
-    //}
+    if( nav_state.AVOID_FRONT && nav_state.AVOID_REAR )
+    {
+        if( !nav_state.AVOID_RIGHT )
+        {
+            navigation_cblk->navigation_data.x_axis = POSITIVE_FAST; //move right
+            navigation_cblk->navigation_data.y_axis = IDLE_INTENSITY;
+        } 
+        else if ( !nav_state.AVOID_LEFT )
+        {
+            navigation_cblk->navigation_data.x_axis = NEGATIVE_FAST; //move left
+            navigation_cblk->navigation_data.y_axis = IDLE_INTENSITY;
+        }
+        else 
+        {
+            navigation_cblk->navigation_data.x_axis = IDLE_INTENSITY; //sit idle
+            navigation_cblk->navigation_data.y_axis = IDLE_INTENSITY;
+        }
+        return;
+    }
+    
+    // Avoid objects left and right by dodging forward, back, or freezing
+    if( nav_state.AVOID_LEFT && nav_state.AVOID_RIGHT )
+    {
+        if( !nav_state.AVOID_FRONT )
+        {
+            navigation_cblk->navigation_data.y_axis = POSITIVE_FAST; //move forward
+            navigation_cblk->navigation_data.x_axis = IDLE_INTENSITY;
+        }
+        else if ( !nav_state.AVOID_REAR )
+        {
+            navigation_cblk->navigation_data.y_axis = NEGATIVE_FAST; //move backward
+            navigation_cblk->navigation_data.x_axis = IDLE_INTENSITY;
+        }
+        else
+        {
+            navigation_cblk->navigation_data.x_axis = IDLE_INTENSITY; //sit idle
+            navigation_cblk->navigation_data.y_axis = IDLE_INTENSITY;
+        }
+        return;
+    }
+    
+    // Exclusing the cases above, avoid any/all remaining cases
+    if( nav_state.AVOID_FRONT || nav_state.AVOID_REAR || nav_state.AVOID_LEFT || nav_state.AVOID_RIGHT)
+    {
+        if( nav_state.AVOID_FRONT)
+        {
+            navigation_cblk->navigation_data.y_axis = NEGATIVE_FAST; //move backward
+        }
+        if( nav_state.AVOID_REAR)
+        {
+            navigation_cblk->navigation_data.y_axis = POSITIVE_FAST; //move forward
+        }
+        if( nav_state.AVOID_LEFT)
+        {
+            navigation_cblk->navigation_data.x_axis = POSITIVE_FAST; //move right
+        }
+        if( nav_state.AVOID_RIGHT)
+        {
+            navigation_cblk->navigation_data.x_axis = NEGATIVE_FAST; //move left
+        }
+        return;
+    }
+    
+    // Check Rotation flag
+    if( nav_state.ROTATE )
+    {
+        navigation_cblk->navigation_data.x_axis = IDLE_INTENSITY; // don't move
+        navigation_cblk->navigation_data.y_axis = IDLE_INTENSITY; // don't move
+        
+        reference_rotation = navigation_cblk->navigation_data.returned_rotation; // current, from 0 to 36000 centidegrees
+        
+        if( first_call ) // set reference values
+        {
+            rotation_direction = (navigation_cblk->image_board_data.rotation)*100; //positive or negative angle
+            
+            //correct for below-zero case
+            if( (rotation_direction < 0) && (reference_rotation < (rotation_direction*-1)) )
+            {
+                desired_rotation = ROTATION_MAX + rotation_direction + reference_rotation; //rotation_direction is negative
+            }
+            //correct for above-max case
+            else if( (rotation_direction > 0) && ((reference_rotation + (uint16_t)rotation_direction) > ROTATION_MAX) )
+            {
+                desired_rotation = rotation_direction + reference_rotation - ROTATION_MAX; //rotation_direction is negative
+            }
+            else
+            {
+                desired_rotation = rotation_direction + reference_rotation;
+            }
+            first_call = FALSE;
+        }
+        
+        //check if rotation is within desired bounds
+        if( APP_Navigation_Check_Rotation(desired_rotation,reference_rotation) ) 
+        {
+            navigation_cblk->navigation_flags.rotation_status = ROTATION_COMPLETE;
+            nav_state.ROTATE = FALSE;
+            first_call = TRUE; //reset call flag
+            return;
+        }
+        if( rotation_direction < 0 ) // negative is left
+        {
+            navigation_cblk->navigation_data.rotation_speed = ROTATE_RIGHT; //rotate left at set rate
+        }
+        if( rotation_direction > 0 ) // positive is right
+        {
+            navigation_cblk->navigation_data.rotation_speed = ROTATE_RIGHT; //rotate left at set rate
+        }
+        return;
+    }
     
     // Movement phase, given no avoidance or rotation
     if ( !navigation_cblk->ir_data.guide_within_sight )
     {
         HAL_TIM_Base_Start_IT(&htim11);
+        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_6,GPIO_PIN_SET)
     }
     else
     {
         HAL_TIM_Base_Stop_IT(&htim11);
         internal_guide_check = TRUE;
+        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_6,GPIO_PIN_SET)
     }
     
-    //if ( internal_guide_check )
-    //{
-    //    if( nav_state.MOVE )
-    //    {
-    //        navigation_cblk->navigation_data.x_axis = IDLE_INTENSITY; // don't move sideways
-    //        navigation_cblk->navigation_data.y_axis =  POSITIVE_FAST; // move forward
-    //    
-    //        if( navigation_cblk->image_board_data.x_distance > 10) //10cm tolerance
-    //        {
-    //            navigation_cblk->navigation_data.x_axis = POSITIVE_SLOW; // move right
-    //        }
-    //        else if ( navigation_cblk->image_board_data.x_distance < -10 ) //10cm tolerance
-    //        {
-    //            navigation_cblk->navigation_data.x_axis = NEGATIVE_SLOW; // move left
-    //        }
-    //        // does not compensate for altitude
-    //    }
-    //}
+    if ( internal_guide_check )
+    {
+        if( nav_state.MOVE )
+        {
+            navigation_cblk->navigation_data.x_axis = IDLE_INTENSITY; // don't move sideways
+            navigation_cblk->navigation_data.y_axis =  POSITIVE_FAST; // move forward
+        
+            if( navigation_cblk->image_board_data.x_distance > 10) //10cm tolerance
+            {
+                navigation_cblk->navigation_data.x_axis = POSITIVE_SLOW; // move right
+            }
+            else if ( navigation_cblk->image_board_data.x_distance < -10 ) //10cm tolerance
+            {
+                navigation_cblk->navigation_data.x_axis = NEGATIVE_SLOW; // move left
+            }
+            // does not compensate for altitude
+        }
+    }
     return;
 }
 
@@ -262,9 +297,8 @@ eAPP_STATUS APP_Navigation_Compute(sAPP_NAVIGATION_CBLK* navigation_cblk)
 {
     eAPP_STATUS status = STATUS_SUCCESS;
     
-    //CHECK_PROXIMITY(navigation_cblk);
-    //CHECK_CAMERA(navigation_cblk);
-    
+    CHECK_PROXIMITY(navigation_cblk);
+    CHECK_CAMERA(navigation_cblk);
     NAV_DECISION(navigation_cblk);
     
     return status;

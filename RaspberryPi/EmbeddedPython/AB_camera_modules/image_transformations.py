@@ -27,6 +27,7 @@ def order_points(pts):
     # return the ordered coordinates
     return rect
 
+
 def four_point_transform(image, pts):
     # obtain a consistent order of the points and unpack them
     # individually

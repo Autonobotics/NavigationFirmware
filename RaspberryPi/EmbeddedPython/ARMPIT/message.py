@@ -14,12 +14,12 @@ def expand_int_to_bytes(integer):
 
 def collapse_bytes_to_short(byte_list):
     byte_array = array('B', byte_list)
-    return struct.unpack_from('h', byte_array)[0]
+    return struct.unpack_from('!h', byte_array)[0]
 
 
 def collapse_bytes_to_int(byte_list):
     byte_array = array('B', byte_list)
-    return struct.unpack_from('i', byte_array)[0]
+    return struct.unpack_from('!i', byte_array)[0]
 
 
 class ARMPiTMessage():

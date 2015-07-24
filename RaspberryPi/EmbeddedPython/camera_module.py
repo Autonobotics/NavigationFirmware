@@ -5,6 +5,9 @@ import AB_Camera_Modules.nav_board_comm as Nav_Board_Comm
 from AB_Camera_Classes import beacon
 from AB_Camera_Classes import ABcamera
 from AB_Logging import ab_log as AB_Log
+import numpy as np
+import io
+import cv2
 import time
 import picamera
 import picamera.array
@@ -13,27 +16,20 @@ global cam_logger
 import RPi.GPIO as GPIO
 
 def camera_loop():
-    #intialize the logger
     cam_logger = AB_Log.get_logger('AB_CAMERA_MODULE')
     # beacon marker
     marker = None
-    #list of marker detection, for averaging
     markerList = []
     prevMarker = None
-
-    #setup the beacon located LED for debugging
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(22, GPIO.OUT)
     GPIO.output(22, False)
-
     try:
         with picamera.PiCamera() as camera:
-            #setup the camera
             camera.resolution = (640, 480)
             camera.framerate = 30
             time.sleep(2)
-
             with picamera.array.PiRGBArray(camera) as stream:
             #capture frames and process them
                 for frame in camera.capture_continuous(stream, format='bgr'):
@@ -42,22 +38,17 @@ def camera_loop():
                         #try and locate the beacon marker
                         marker = beacon_processing.locate_beacon(image)
 
-                    #Check to see if a frontal collision has been detected
                     if Nav_Board_Comm.ABFlags.STATUS == Nav_Board_Comm.ABFlags.COLLISION_DETECTED:
                         distance  = beacon_processing.frontal_collision(image, ABcamera.PiCam.FOCAL_LENGTH)
                         Nav_Board_Comm.send_and_wait(distance,Nav_Board_Comm.ABFlags.AVOID_FRONT)
                         Nav_Board_Comm.ABFlags.STATUS = 0x0
 
-                    #No beacon was detected
+
                     if marker is None:
                         markerList.append(beacon.beaconLocation(0, 0, 0))
 
                     else:
-                        #beacon was detected, so determine the distance between the drone and the beacons current location
-                        beaconDist = beacon_processing.distance_to_camera(ABcamera.PiCam.FOCAL_LENGTH,
-                                                                            ABcamera.PiCam.RESOLUTION,
-                                                                            ABcamera.PiCam.HORIZONTAL_FOV,
-                                                                            marker, image)
+                        beaconDist = beacon_processing.distance_to_camera(ABcamera.PiCam.FOCAL_LENGTH, ABcamera.PiCam.RESOLUTION,ABcamera.PiCam.HORIZONTAL_FOV, marker)
                         markerList.append(beaconDist)
 
                         #When the drone reaches a minimum distance from the beacon, go to the next beacon
@@ -73,9 +64,9 @@ def camera_loop():
                                 #Wait for response from STM board, for the drone to finish rotation
                                 Nav_Board_Comm.send_and_wait(None, Nav_Board_Comm.ABFlags.QUERY_ROTATION)
 
-                    #when marker list is full (3) readinggs process info
                     if len(markerList) == 3:
                         prevMarker = beacon_processing.beacon_filter(markerList)
+
                         #NO BEACON DETECTED
                         if prevMarker is None:
                             Nav_Board_Comm.send_and_wait(None, Nav_Board_Comm.ABFlags.NO_BEACON_DETECTED)
@@ -87,13 +78,11 @@ def camera_loop():
 
                         del markerList[0]
                         prevMarker = None
-                    #for case the list is not filled yet
                     else:
-                        #No beacon
                         if marker is None:
                             Nav_Board_Comm.send_and_wait(None, Nav_Board_Comm.ABFlags.NO_BEACON_DETECTED)
                             GPIO.output(22, False)
-                        #Beacon detected
+
                         elif marker is not None:
                             Nav_Board_Comm.send_and_wait(beaconDist, Nav_Board_Comm.ABFlags.BEACON_DETECTED)
                             GPIO.output(22, True)
@@ -103,7 +92,6 @@ def camera_loop():
 
     except Exception, e:
         cam_logger.error(e)
-        GPIO.cleanup()
         camera.close()
         cam_logger.error('ERROR: %s \r\n' % str(e))
         traceback.print_exc(file=sys.stdout)

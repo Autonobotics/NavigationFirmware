@@ -7,8 +7,10 @@ import message
 serial_port = None
 uart_logger = None
 
+
 def translate_command_byte(cmd_byte_str):
     return ord(cmd_byte_str)
+
 
 def initialize_serial_port():
     global serial_port, uart_logger
@@ -23,9 +25,11 @@ def cleanup_serial_port():
     global serial_port
     serial_port.close()
 
+
 # Read a Byte from the UART (Blocking) and translate to CMD
 def uart_receive_cmd():
     return translate_command_byte(serial_port.read(1))
+
 
 # Read the remaining Bytes from the UART (Blocking)
 def uart_receive_packet():
@@ -41,6 +45,7 @@ def uart_transmit(armpit_message):
     sent = serial_port.write(armpit_message.get_byte_stream())
     if sent != 16:
         uart_logger.error("Uart did not send the expected 16 Bytes. Sent {0} bytes instead.", sent)
+
 
 def perform_handshake():
     global uart_logger

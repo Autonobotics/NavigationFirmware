@@ -2,7 +2,7 @@ __author__ = 'Pravjot'
 
 
 class AB_beacons:
-    # BEACON LOCATIONS (ROTATION IN DEGREES)
+    # BEACON LOCATIONS (ROTATION IN DEGREES, APPROXIMATE DISTANCE IN FEET)
     BEACON_ROTATION_LIST = [
         90,
         90,
@@ -28,7 +28,6 @@ class AB_beacons:
     def beacon_info(self, next_ID):
         return self.BEACON_ROTATION_LIST[next_ID]
 
-#beacon location class
 class beaconLocation:
 
     def __init__(self, x, y, z):
@@ -36,13 +35,12 @@ class beaconLocation:
         self.y = y
         self.z = z
 
-#marker class
 class marker:
     #width of the beacon in cm
-    KNOWN_WIDTH = 20.0
+    KNOWN_WIDTH = 18.0
 
     #Mininmum distance drone has to be to trigger next beacon (in inches)
-    MIN_DISTANCE_BEACON = 50
+    MIN_DISTANCE_BEACON = 30
 
     def __init__(self, x, y, r):
         self.x = x;
