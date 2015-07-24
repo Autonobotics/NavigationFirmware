@@ -44,9 +44,9 @@ def send_beacon_detected(distance_vector):
     #distance_vector  = [X Y DISTNACE FROM CAMERA TO CENTER OF BEACON]
     beacon_message = message.BeaconDetectedMessage().set_defaults()
     #load the data into the message
-    beacon_message.x_distance = np.int_(distance_vector.x)
-    beacon_message.y_distance = np.int_(distance_vector.y)
-    beacon_message.z_distance = np.int_(distance_vector.z)
+    beacon_message.x_distance = np.int16(32767**distance_vector.x)
+    beacon_message.y_distance = np.int16(32767*distance_vector.y)
+    beacon_message.z_distance = np.int16(distance_vector.z)
 
     cam_logger.info('BEACON: sending location ({0}, {1}, {2})'.format(beacon_message.x_distance, beacon_message.y_distance, beacon_message.z_distance))
     #send the message
@@ -111,7 +111,7 @@ def send_edge_distance(distance):
 def send_beacon_rotation(rotation):
     global cam_logger
     rotation_message = message.BeaconRotationMessage().set_defaults()
-    rotation_message.x_rotation = rotation
+    rotation_message.x_rotation = np.int16(rotation)
 
 
     cam_logger.debug("BEACON: sending next beacon rotation: {0}".format(rotation))

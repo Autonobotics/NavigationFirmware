@@ -70,10 +70,11 @@ def locate_beacon(image):
                 # draw the outer circle
                 cv2.circle(img, (x, y), r, (0, 255, 0), 2)
                 marker = beacon.marker(x, y, r)
-                #print('MARKER LOCATION X: {0}, Y: {1}, R: {2} in pixels'.format(marker.x, marker.y, marker.r))
+
                 # draw the center of the circle
                 cv2.circle(img, (x, y), 2, (0, 255, 0), 3)
-                #cv2.imwrite("debug/img_circled.jpg", img)
+                cv2.imshow("debug/img_circled.jpg", img)
+                cv2.waitKey(100)
                 #cam_logger.debug("writing debug image debug/img_circled.jpg")
                 break
         else:
@@ -83,26 +84,32 @@ def locate_beacon(image):
 
 # determine the location of the beacon with respect to the drones current location
 #calculate the distance vector and send appropriate information to the drones controller
-def distance_to_camera(focalLength, resolution,hFOV, marker):
+def distance_to_camera(focalLength, resolution,hFOV, marker, image):
     perWidth = 2*marker.r;
 
     #calculate the distance using triangle similarity distance calculation
     distance = (marker.KNOWN_WIDTH * focalLength) / perWidth
 
+    #get the center of the image
+
+    row,col = image.shape[0:2]
+    image_center = tuple(np.array([row,col])/2)
+
+
     #compute the number of pixels along the diagonal
-    pixels_diag = math.sqrt(pow(resolution[0], 2)+pow(resolution[1], 2))
-    degrees_per_pixel_diag = hFOV / pixels_diag
-    x_angle = (marker.x * degrees_per_pixel_diag)
-    X = distance*math.cos(x_angle)
-    Y = distance*math.sin(x_angle)
+   # pixels_diag = math.sqrt(pow(resolution[0], 2)+pow(resolution[1], 2))
+    #degrees_per_pixel_diag = hFOV / pixels_diag
+    #x_angle = (marker.x * degrees_per_pixel_diag)
 
-    norm_vec = math.sqrt(math.pow(X,2)+math.pow(Y,2))
+    #X = pixel_to_cm_factor*distance*math.cos(x_angle)
+    #Y = pixel_to_cm_factor *distance*math.sin(x_angle)
+    print image_center
+    X = (image_center[0] - marker.x)* marker.KNOWN_WIDTH/perWidth;
+    Y = (image_center[1] - marker.y)*marker.KNOWN_WIDTH/perWidth;
 
-    X_norm =  4096*X / norm_vec
-    Y_norm =  4096*Y / norm_vec
     Z = distance
 
-    return beacon.beaconLocation(X_norm,Y_norm,Z)
+    return beacon.beaconLocation(X,Y,Z)
 
 def detect_frontal_object(image):
     imageSize = 0
