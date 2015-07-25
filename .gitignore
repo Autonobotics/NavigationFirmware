@@ -12,7 +12,6 @@
 Output/
 Debug/
 Release/
-*.opensdf
 *.sdf
 Navigation Configuration/
 *.sdf

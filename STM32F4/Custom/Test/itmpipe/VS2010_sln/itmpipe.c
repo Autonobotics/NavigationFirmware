@@ -38,7 +38,7 @@ int main( int argc, char *argv[] )
       printf( "client connected\n" ) ;
       while( Connected )
       {
-        Success = ReadFile( PipeHandle, Buffer, BUFFERSIZE - 1, &BytesRead, NULL ) ;
+        Success = ReadFile( PipeHandle, Buffer, 2, &BytesRead, NULL ) ;
         if( 0 != Success )
         {
           Buffer[ BytesRead ] = '\0' ;
