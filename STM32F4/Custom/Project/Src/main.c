@@ -20,6 +20,7 @@
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
+/* Main Navigation State Machine Control Block */
 static sAPP_NAVIGATION_CBLK AppNavigationCblk = {
     {FALSE, 0x0000, 0x0000, 0x0000, ROTATION_UNKNOWN},
     {{FALSE}, {0x0000}},
@@ -102,6 +103,7 @@ int main(void)
     Heartbeat_Start();
     
     /* Infinite loop */
+    // TODO: Top-level error recovery for Subsystems based on Status
     while (1)
     {
         // Process ARMPIT Requests
@@ -120,7 +122,7 @@ int main(void)
         status = APP_PIXARM_Process_Message(&AppNavigationCblk);
         
         // Ensure Heartbeat LED is set to toggle
-        Heartbeat_Update();
+        Heartbeat_Update(&AppNavigationCblk);
     }
 }
 
@@ -194,6 +196,9 @@ static void SystemClock_Config(void)
         /* Enable the Flash prefetch */
         __HAL_FLASH_PREFETCH_BUFFER_ENABLE();
     }
+    
+    HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
+    HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
 }
 
 

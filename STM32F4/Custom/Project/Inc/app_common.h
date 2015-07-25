@@ -77,7 +77,92 @@ typedef uint16_t BOOL;
     #define APP_Log(...)    
 #endif // #ifdef DEBUG
 #define ENDLINE "\r\n"
+
+
+/* Exported types ------------------------------------------------------------*/
+typedef enum _eAPP_NAVIGATION_AXIS_INTENSITY
+{
+    POSITIVE_FAST = 0,
+    NEGATIVE_FAST,
     
+    POSITIVE_SLOW,
+    NEGATIVE_SLOW,
+    
+    IDLE_INTENSITY
+    
+} eAPP_NAVIGATION_AXIS_INTENSITY;
+
+typedef struct _sAPP_NAVIGATION_STATE
+{
+    BOOL ROTATE;
+    BOOL MOVE;
+
+    BOOL AVOID_FRONT;
+    BOOL AVOID_RIGHT;
+    BOOL AVOID_LEFT;
+    BOOL AVOID_REAR;
+    
+    BOOL ALT_LOW;
+    BOOL ALT_HIGH;
+    BOOL ALT_MID;
+    
+} eAPP_NAVIGATION_STATE;
+
+typedef struct _sAPP_IMAGE_BOARD_DATA
+{
+    BOOL modified;
+    int16_t x_distance;
+    int16_t y_distance;
+    int16_t z_distance;
+    int16_t rotation;                      // Centidegrees
+    
+} sAPP_IMAGE_BOARD_DATA;
+
+typedef struct _sAPP_PROXIMITY_DATA
+{
+    BOOL modified[6];       // Indexed by eAPP_AXIS value
+    uint16_t distance[6];   // Indexed by eAPP_AXIS value
+    
+} sAPP_PROXIMITY_DATA;
+
+typedef struct _sAPP_IR_DATA
+{
+    uint8_t guide_within_sight; 
+    
+} sAPP_IR_DATA;
+
+typedef struct _sAPP_NAVIGATION_DATA
+{
+    eAPP_NAVIGATION_AXIS_INTENSITY x_axis;
+    eAPP_NAVIGATION_AXIS_INTENSITY y_axis;
+    uint8_t z_distance;
+    int16_t rotation_speed;                 // Centidegrees
+    
+    // Returned Rotation
+    uint16_t returned_rotation;
+    // Returned Velocity
+    int16_t returned_velocity;
+    
+} sAPP_NAVIGATION_DATA;
+
+typedef struct _sAPP_NAVIGATION_FLAGS
+{
+    BOOL trigger_edge_on_image;  // Used to tell image board that frontal collision detected
+    BOOL rotation_status;        // Used to determine if rotation has completed
+    
+} sAPP_NAVIGATION_FLAGS;
+
+typedef struct _sAPP_NAVIGATION_CBLK
+{
+    sAPP_IMAGE_BOARD_DATA   image_board_data;
+    sAPP_PROXIMITY_DATA     proximity_data;
+    sAPP_IR_DATA            ir_data;
+    sAPP_NAVIGATION_DATA    navigation_data;
+    sAPP_NAVIGATION_FLAGS   navigation_flags;
+    
+} sAPP_NAVIGATION_CBLK;
+
+
 /* Exported functions ------------------------------------------------------- */
 void Flush_Buffer(uint8_t* pBuffer, uint16_t BufferLength);
 uint16_t Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint16_t BufferLength);
@@ -85,7 +170,7 @@ char* Translate_HAL_Status(HAL_StatusTypeDef status);
 void Error_Handler(void);
 
 void Heartbeat_Start(void);
-void Heartbeat_Update(void);
+void Heartbeat_Update(sAPP_NAVIGATION_CBLK* navigation_cblk);
 void Heartbeat_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
 
 void APP_Log_Init(void);

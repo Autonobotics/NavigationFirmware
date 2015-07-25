@@ -41,7 +41,7 @@
 #define PIXARM_USART_IRQHandler                UART4_IRQHandler
 
 /* Define Connection Timeout and Attempts */
-#define PIXARM_POLL_TIMEOUT 100  // Ie. Blocking Poll (In Milliseconds)
+#define PIXARM_POLL_TIMEOUT 1000  // Ie. Blocking Poll (In Milliseconds)
 #define PIXARM_CONNECTION_ATTEMPTS 60000
 
 /* Exported types ------------------------------------------------------------*/

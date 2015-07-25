@@ -32,7 +32,7 @@
 /* UART handler declared in "app_pixarm.c" file */
 extern UART_HandleTypeDef PixarmHandle;
 
-/* I2C handler declared in "app_armpit.c" file */
+/* UART handler declared in "app_armpit.c" file */
 extern UART_HandleTypeDef ArmpitHandle;
 
 /* Timer handler declared in "app_ultrasonic_adapter.c" file */
@@ -272,13 +272,17 @@ void TIM6_DAC_IRQHandler(void)
     HAL_TIM_IRQHandler(&htim6);
 }
 
-
+/**
+* @brief This function handles TIM1 update interrupt and TIM10 global interrupt.
+*/
 void TIM1_UP_TIM10_IRQHandler(void)
 {
     HAL_TIM_IRQHandler(&htim10);
 }
 
-
+/**
+* @brief This function handles TIM1 Trigger and Commutation and TIM11 global interrupt.
+*/
 void TIM1_TRG_COM_TIM11_IRQHandler(void)
 {
     HAL_TIM_IRQHandler(&htim11);

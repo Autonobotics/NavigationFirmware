@@ -10,6 +10,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "app_common.h"
 
+
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
@@ -121,13 +122,52 @@ void Heartbeat_Start(void)
 }
 
 
-void Heartbeat_Update(void)
+void Heartbeat_Update(sAPP_NAVIGATION_CBLK* navigation_cblk)
 {
+    static int i = 0;
+    
     if ( heartbeat_ready )
     {
         heartbeat_ready = FALSE;
         BSP_LED_Toggle(BSP_HARD_ERROR_LED);
         HAL_TIM_Base_Start_IT(&htim10);
+        
+        // Log Current State
+        if ( i == 0 )
+        {
+            // Log Ultrasonics
+            APP_Log("Ultrasonic: Front  %u\r\n", navigation_cblk->proximity_data.distance[AXIS_FRONT]);
+            APP_Log("Ultrasonic: Rear   %u\r\n", navigation_cblk->proximity_data.distance[AXIS_REAR]);
+            APP_Log("Ultrasonic: Left   %u\r\n", navigation_cblk->proximity_data.distance[AXIS_LEFT]);
+            APP_Log("Ultrasonic: Right  %u\r\n", navigation_cblk->proximity_data.distance[AXIS_RIGHT]);
+            APP_Log("Ultrasonic: Bottom %u\r\n", navigation_cblk->proximity_data.distance[AXIS_BOTTOM]);
+        }
+        else if ( i == 1 )
+        {
+            // Log Image Data
+            APP_Log("ImageBoard: X         %hd\r\n", navigation_cblk->image_board_data.x_distance);
+            APP_Log("ImageBoard: Y         %hd\r\n", navigation_cblk->image_board_data.y_distance);
+            APP_Log("ImageBoard: Z         %hd\r\n", navigation_cblk->image_board_data.z_distance);
+            APP_Log("ImageBoard: Rotation  %hd\r\n", navigation_cblk->image_board_data.rotation);
+            
+            // Log Guide Data
+            APP_Log("GuideIR:    Guide  %u\r\n", navigation_cblk->ir_data.guide_within_sight);
+        }
+        else if ( i == 2 )
+        {
+            // Log PIXARM Return Data
+            APP_Log("Pixhawk: X Intensity %hd\r\n", (uint16_t) navigation_cblk->navigation_data.x_axis);
+            APP_Log("Pixhawk: Y Intensity %hd\r\n", (uint16_t) navigation_cblk->navigation_data.y_axis);
+            APP_Log("Pixhawk: Z Distance  %hd\r\n", (uint16_t) navigation_cblk->navigation_data.z_distance);
+            APP_Log("Pixhawk: Rotation    %hd\r\n", navigation_cblk->navigation_data.returned_rotation);
+            APP_Log("Pixhawk: Z Velocity  %hd\r\n", navigation_cblk->navigation_data.returned_velocity);
+        }
+        
+        // Roll over i
+        if (++i >= 3)
+        {
+            i = i % 3;
+        }
     }
 }
 

@@ -35,12 +35,19 @@ void HAL_MspInit(void)
 }
 
 
+/**
+  * @brief IR Hardware Initialization 
+  *        This function configures the hardware resources used: 
+  *           - Peripheral's clock enable
+  *           - Peripheral's GPIO Configuration  
+  * @param None
+  * @retval None
+  */
 void HAL_IR_MspInit(void)
 {
     GPIO_InitTypeDef   GPIO_InitStructure;
     
     IR_CLOCK_ENABLE();
-    /* Configure PD0 pin as input floating */
     GPIO_InitStructure.Mode = GPIO_MODE_INPUT;
 
     //nopull the Vout of the TSOP34840 will drive it 3.3-0V (no IR - sees IR)
@@ -50,10 +57,21 @@ void HAL_IR_MspInit(void)
 }
 
 
+/**
+  * @brief HC_SR04 Hardware Initialization 
+  *        This function configures the hardware resources used: 
+  *           - Peripheral's clock enable
+  *           - Peripheral's GPIO Configuration  
+  *           - NVIC configuration for EXTI interrupt request enable
+  * @param None
+  * @retval None
+  */
 void HAL_HC_SR04_MspInit(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct;
 
+    // TODO: Move these to before any Pins that are
+    //       actually being enabled.
     /* GPIO Ports Clock Enable */
     __GPIOE_CLK_ENABLE();
     __GPIOH_CLK_ENABLE();
@@ -62,41 +80,23 @@ void HAL_HC_SR04_MspInit(void)
     __GPIOB_CLK_ENABLE();
     __GPIOD_CLK_ENABLE();
     
-    /*Configure GPIO pin : PE3 
-    GPIO_InitStruct.Pin = GPIO_PIN_3;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
-    HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
-    */
-    /*Configure GPIO pin : PE1,2,3,4,5,6 */
-    GPIO_InitStruct.Pin = GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3
-                        | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
-    HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
     
-    /*Configure GPIO pin : PC13 
-    GPIO_InitStruct.Pin = GPIO_PIN_13;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
-    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct); */
-    
+    /*
+     * These pins are mapped to EXTI 0 -> 4 and are 
+     * used to capture the ECHO output of the Ultrasonics.
+     */
     /*Configure GPIO pins : PC0 PC1 PC2 PC3 PC4 */
     GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2
                          |GPIO_PIN_3|GPIO_PIN_4;
     GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
     GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
     
-    /*Configure GPIO pin : PB2 */
-    GPIO_InitStruct.Pin = GPIO_PIN_2;
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-    
+    /*
+     * These pins are connected to the TRIGGER input
+     * of the Ultrasonics.
+     */
     /*Configure GPIO pins : PE10 PE11 PE12 PE13 PE14 */
     GPIO_InitStruct.Pin = GPIO_PIN_10|GPIO_PIN_11|GPIO_PIN_12
                          |GPIO_PIN_13|GPIO_PIN_14;
@@ -105,32 +105,34 @@ void HAL_HC_SR04_MspInit(void)
     GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
     HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
     
-    /*Configure GPIO pins : PD12 PD13 PD14 PD15 PD4 */
-    GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14
-                         |GPIO_PIN_15|GPIO_PIN_4;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
-    HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
     
     /* EXTI interrupt init */
-    HAL_NVIC_SetPriority(EXTI0_IRQn, 1, 3);
-    HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-    
+    HAL_NVIC_SetPriority(EXTI0_IRQn, 1, 3); // 1 3
+    HAL_NVIC_EnableIRQ(EXTI0_IRQn);     
+                                       
     HAL_NVIC_SetPriority(EXTI1_IRQn, 1, 3);
-    HAL_NVIC_EnableIRQ(EXTI1_IRQn);
-    
+    HAL_NVIC_EnableIRQ(EXTI1_IRQn);     
+                                        
     HAL_NVIC_SetPriority(EXTI2_IRQn, 1, 3);
-    HAL_NVIC_EnableIRQ(EXTI2_IRQn);
-    
+    HAL_NVIC_EnableIRQ(EXTI2_IRQn);     
+                                        
     HAL_NVIC_SetPriority(EXTI3_IRQn, 1, 3);
-    HAL_NVIC_EnableIRQ(EXTI3_IRQn);
-    
+    HAL_NVIC_EnableIRQ(EXTI3_IRQn);     
+                                        
     HAL_NVIC_SetPriority(EXTI4_IRQn, 1, 3);
     HAL_NVIC_EnableIRQ(EXTI4_IRQn);
 }
 
 
+/**
+  * @brief TIM MSP Initialization 
+  *        This function configures the hardware resources used: 
+  *           - Peripheral's clock enable
+  *           - Peripheral's GPIO Configuration  
+  *           - NVIC configuration for TIM interrupt request enable
+  * @param huart: TIM handle pointer
+  * @retval None
+  */
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
 {
     GPIO_InitTypeDef GPIO_InitStruct;
@@ -229,6 +231,14 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
 }
 
 
+/**
+  * @brief TIM MSP De-Initialization 
+  *        This function frees the hardware resources used:
+  *          - Disable the Peripheral's clock
+  *          - Revert GPIO and NVIC configuration to their default state
+  * @param huart: TIM handle pointer
+  * @retval None
+  */
 void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
 {
     if ( TIM2 == htim_base->Instance )
@@ -308,7 +318,7 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
 
 /**
   * @brief UART MSP Initialization 
-  *        This function configures the hardware resources used in this example: 
+  *        This function configures the hardware resources used: 
   *           - Peripheral's clock enable
   *           - Peripheral's GPIO Configuration  
   *           - NVIC configuration for UART interrupt request enable
@@ -345,6 +355,8 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
             
         HAL_GPIO_Init(ARMPIT_USART_RX_GPIO_PORT, &GPIO_InitStruct);
         
+        // TODO: Remove Pin Usage as Handshake is now forgiving enough 
+        //       to handle initial garbage values
         /*Configure GPIO pin : PB2 */
         GPIO_InitStruct.Pin = ARMPIT_ENABLE_PIN;
         GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
@@ -395,7 +407,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
 /**
   * @brief UART MSP De-Initialization 
-  *        This function frees the hardware resources used in this example:
+  *        This function frees the hardware resources used:
   *          - Disable the Peripheral's clock
   *          - Revert GPIO and NVIC configuration to their default state
   * @param huart: UART handle pointer

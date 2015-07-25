@@ -182,7 +182,7 @@ static void hc_sr04_TIM6_init(void)
     htim6.Instance = TIM6;
     htim6.Init.Prescaler = 8400;
     htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim6.Init.Period = 200;
+    htim6.Init.Period = 400;
     HAL_TIM_Base_Init(&htim6);
     
     sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
@@ -195,7 +195,7 @@ static void hc_sr04_TIM6_init(void)
 #pragma diag_suppress 188
 static void hc_sr04_start_pulse(sAPP_NAVIGATION_CBLK* navigation_cblk)
 {
-    BOOL status;
+    BOOL status = FALSE;
     
     switch(AppHcsr04Cblk.pulse_indv)
     {
@@ -272,6 +272,12 @@ void APP_HC_SR04_Init(void)
     
     // Initialize the EXTI Pins
     HAL_HC_SR04_MspInit();
+    
+    // Ensure IRQs are disabled
+    HAL_NVIC_DisableIRQ(TIM5_IRQn);
+    HAL_NVIC_DisableIRQ(TIM2_IRQn);
+    HAL_NVIC_DisableIRQ(TIM3_IRQn);
+    HAL_NVIC_DisableIRQ(TIM4_IRQn);
     
     // Change out of Initialization State
     AppHcsr04Cblk.state = HC_SR04_ENABLED;

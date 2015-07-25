@@ -36,40 +36,10 @@ BOOL APP_Navigation_Check_Rotation(uint16_t desired_rotation, uint16_t current_r
 
 static void CHECK_PROXIMITY(sAPP_NAVIGATION_CBLK* navigation_cblk)
 { 
-    nav_state.AVOID_FRONT = (navigation_cblk->proximity_data.distance[0] < AVOID_THRESHOLD_FRONT);
-    nav_state.AVOID_REAR = (navigation_cblk->proximity_data.distance[1] < AVOID_THRESHOLD_REAR);
-    nav_state.AVOID_LEFT = (navigation_cblk->proximity_data.distance[2] < AVOID_THRESHOLD_LEFT);
-    nav_state.AVOID_RIGHT = (navigation_cblk->proximity_data.distance[3] < AVOID_THRESHOLD_RIGHT);
-
-    // Set display pins
-    if(nav_state.AVOID_FRONT) {
-        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_1,GPIO_PIN_SET)
-    }
-    else
-    {
-        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_1,GPIO_PIN_RESET)
-    }
-    if(nav_state.AVOID_REAR) {
-        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_SET)
-    }
-    else
-    {
-        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_RESET)
-    }
-    if(nav_state.AVOID_LEFT) {
-        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_SET)
-    }
-    else
-    {
-        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_RESET)
-    }
-    if(nav_state.AVOID_RIGHT) {
-        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_4,GPIO_PIN_SET)
-    }
-    else
-    {
-        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_4,GPIO_PIN_RESET)
-    }
+    nav_state.AVOID_FRONT = (navigation_cblk->proximity_data.distance[AXIS_FRONT] < AVOID_THRESHOLD_FRONT);
+    nav_state.AVOID_REAR = (navigation_cblk->proximity_data.distance[AXIS_REAR] < AVOID_THRESHOLD_REAR);
+    nav_state.AVOID_LEFT = (navigation_cblk->proximity_data.distance[AXIS_LEFT] < AVOID_THRESHOLD_LEFT);
+    nav_state.AVOID_RIGHT = (navigation_cblk->proximity_data.distance[AXIS_RIGHT] < AVOID_THRESHOLD_RIGHT);
     
     // TOP sensor not implemented
 }
@@ -79,12 +49,10 @@ static void CHECK_CAMERA(sAPP_NAVIGATION_CBLK* navigation_cblk)
     if (navigation_cblk->image_board_data.z_distance == DISTANCE_UNKNOWN)
     {
         nav_state.MOVE = FALSE;
-        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_5,GPIO_PIN_RESET)
     }
     else
     {
         nav_state.MOVE = TRUE;
-        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_5,GPIO_PIN_RESET)
     }
     
     if (navigation_cblk->image_board_data.rotation == ROTATION_UNKNOWN)
@@ -101,6 +69,9 @@ static void CHECK_CAMERA(sAPP_NAVIGATION_CBLK* navigation_cblk)
 static void NAV_DECISION(sAPP_NAVIGATION_CBLK* navigation_cblk)
 {
     uint8_t temp = 0;
+    
+    navigation_cblk->navigation_data.x_axis = IDLE_INTENSITY; 
+    navigation_cblk->navigation_data.y_axis = IDLE_INTENSITY;
     
     // Altitude Management
     if ( navigation_cblk->proximity_data.distance[AXIS_BOTTOM] == HC_SR04_OUT_OF_RANGE )
@@ -140,7 +111,7 @@ static void NAV_DECISION(sAPP_NAVIGATION_CBLK* navigation_cblk)
             navigation_cblk->navigation_data.x_axis = IDLE_INTENSITY; //sit idle
             navigation_cblk->navigation_data.y_axis = IDLE_INTENSITY;
         }
-        return;
+        //return;
     }
     
     // Avoid objects left and right by dodging forward, back, or freezing
@@ -161,7 +132,7 @@ static void NAV_DECISION(sAPP_NAVIGATION_CBLK* navigation_cblk)
             navigation_cblk->navigation_data.x_axis = IDLE_INTENSITY; //sit idle
             navigation_cblk->navigation_data.y_axis = IDLE_INTENSITY;
         }
-        return;
+        //return;
     }
     
     // Exclusing the cases above, avoid any/all remaining cases
@@ -183,7 +154,7 @@ static void NAV_DECISION(sAPP_NAVIGATION_CBLK* navigation_cblk)
         {
             navigation_cblk->navigation_data.x_axis = NEGATIVE_FAST; //move left
         }
-        return;
+        //return;
     }
     
     // Check Rotation flag
@@ -221,7 +192,7 @@ static void NAV_DECISION(sAPP_NAVIGATION_CBLK* navigation_cblk)
             navigation_cblk->navigation_flags.rotation_status = ROTATION_COMPLETE;
             nav_state.ROTATE = FALSE;
             first_call = TRUE; //reset call flag
-            return;
+            //return;
         }
         if( rotation_direction < 0 ) // negative is left
         {
@@ -231,20 +202,18 @@ static void NAV_DECISION(sAPP_NAVIGATION_CBLK* navigation_cblk)
         {
             navigation_cblk->navigation_data.rotation_speed = ROTATE_RIGHT; //rotate left at set rate
         }
-        return;
+        //return;
     }
     
     // Movement phase, given no avoidance or rotation
-    if ( !navigation_cblk->ir_data.guide_within_sight )
+    if ( 0 == navigation_cblk->ir_data.guide_within_sight )
     {
         HAL_TIM_Base_Start_IT(&htim11);
-        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_6,GPIO_PIN_SET)
     }
     else
     {
         HAL_TIM_Base_Stop_IT(&htim11);
         internal_guide_check = TRUE;
-        HAL_GPIO_WritePin(GPIOE,GPIO_PIN_6,GPIO_PIN_SET)
     }
     
     if ( internal_guide_check )

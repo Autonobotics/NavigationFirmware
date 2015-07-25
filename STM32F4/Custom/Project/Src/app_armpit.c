@@ -138,7 +138,7 @@ static eAPP_STATUS armpit_send_response(sAPP_NAVIGATION_CBLK* navigation_cblk)
         navigation_cblk->navigation_flags.rotation_status = ROTATION_INCOMPLETE;
         navigation_cblk->image_board_data.rotation = ROTATION_UNKNOWN;
         
-        APP_Log("ARMPIT: Replying with RACK. Subcmd: ROTATION_COMPLETE"ENDLINE);
+        //APP_Log("ARMPIT: Replying with RACK. Subcmd: ROTATION_COMPLETE"ENDLINE);
     }
     else if ( FRONTAL_AVOIDANCE_MODE_ON == navigation_cblk->navigation_flags.trigger_edge_on_image )
     {
@@ -147,7 +147,7 @@ static eAPP_STATUS armpit_send_response(sAPP_NAVIGATION_CBLK* navigation_cblk)
         AppArmpitCblk.outputBuffer.rack.axis = AXIS_FRONT; // No other possible value currently
         AppArmpitCblk.outputBuffer.rack.payload_a = navigation_cblk->proximity_data.distance[AXIS_FRONT];
         
-        APP_Log("ARMPIT: Replying with RACK. Subcmd: COLLISION_DETECTED"ENDLINE);
+        //APP_Log("ARMPIT: Replying with RACK. Subcmd: COLLISION_DETECTED"ENDLINE);
     }
     else
     {
@@ -155,7 +155,7 @@ static eAPP_STATUS armpit_send_response(sAPP_NAVIGATION_CBLK* navigation_cblk)
         AppArmpitCblk.outputBuffer.ack.cmd = ARMPIT_CMD_ACK;
         AppArmpitCblk.outputBuffer.ack.flag = ARMPIT_FLAG_END;
         
-        APP_Log("ARMPIT: Replying with ACK."ENDLINE);
+        //APP_Log("ARMPIT: Replying with ACK."ENDLINE);
     }
     
     // Transmit and setup for receive
@@ -282,7 +282,7 @@ static eAPP_STATUS armpit_handle_data_receive(sAPP_NAVIGATION_CBLK* navigation_c
                 APP_Log("ARMPIT: FLAG Bits wrong on NO_BEACON Command.\r\n");
                 return STATUS_FAILURE;
             }
-            APP_Log("ARMPIT: Received CMD_NO_BEACON.\r\n");
+            //APP_Log("ARMPIT: Received CMD_NO_BEACON.\r\n");
             
             // Set Data Variables here
             armpit_set_navigation_data(navigation_cblk,
@@ -303,7 +303,7 @@ static eAPP_STATUS armpit_handle_data_receive(sAPP_NAVIGATION_CBLK* navigation_c
                 APP_Log("ARMPIT: FLAG Bits wrong on BEACON_DETECTED Command.\r\n");
                 return STATUS_FAILURE;
             }
-            APP_Log("ARMPIT: Received CMD_BEACON_DETECTED."ENDLINE);
+            //APP_Log("ARMPIT: Received CMD_BEACON_DETECTED."ENDLINE);
             
             // Set Data Variables here
             armpit_set_navigation_data(navigation_cblk,
@@ -311,11 +311,6 @@ static eAPP_STATUS armpit_handle_data_receive(sAPP_NAVIGATION_CBLK* navigation_c
                                        REVERSE_BYTE_16(message.beacon_detected.y_distance),
                                        REVERSE_BYTE_16(message.beacon_detected.z_distance),
                                        ROTATION_UNKNOWN);
-            
-            APP_Log("ARMPIT: x_distance: %hd y_distance: %hd z_distance: %hd."ENDLINE, 
-                    (int16_t) REVERSE_BYTE_16(message.beacon_detected.x_distance),
-                    (int16_t) REVERSE_BYTE_16(message.beacon_detected.y_distance),
-                    (int16_t) REVERSE_BYTE_16(message.beacon_detected.z_distance));
 
             // Transmit Response
             status = armpit_send_response(navigation_cblk);
@@ -378,6 +373,8 @@ static eAPP_STATUS armpit_handle_data_receive(sAPP_NAVIGATION_CBLK* navigation_c
             
             // NOTE: No data set in a Query Rotation as we want our old
             //       rotation value to continue to be transmitted.
+            // FOR DEMO ONLY
+            navigation_cblk->navigation_flags.rotation_status = ROTATION_COMPLETE;
             
             // Transmit Response
             status = armpit_send_response(navigation_cblk);
@@ -508,14 +505,14 @@ void APP_ARMPIT_Init(void)
     }
     
     AppArmpitCblk.handle = & ArmpitHandle;
-    AppArmpitCblk.state = ARMPIT_HANDSHAKE_START;
+    AppArmpitCblk.state = ARMPIT_INIT;
     AppArmpitCblk.requestState = UART_TRANSMITING;
 }
 
 eAPP_STATUS APP_ARMPIT_Initiate(void)
 {
     // Validate we are in correct state
-    if ( ARMPIT_HANDSHAKE_START != AppArmpitCblk.state )
+    if ( ARMPIT_INIT != AppArmpitCblk.state )
     {
         APP_Log("ARMPIT in incorrect state for Handshake Procedure.\r\n");
         return STATUS_FAILURE;
@@ -523,6 +520,7 @@ eAPP_STATUS APP_ARMPIT_Initiate(void)
     
     // Start the Handshake Procedure (Asychronous Process)
     APP_Log("Starting ARMPIT Handshake.\r\n");
+    AppArmpitCblk.state = ARMPIT_HANDSHAKE_START;
     return STATUS_SUCCESS;
     
 }
